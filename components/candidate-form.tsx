@@ -2,18 +2,19 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 import { createCandidate } from "@/app/(app)/dashboard/candidates/actions"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import {
   candidateInputSchema,
   MAX_RESUME_BYTES,
   validateResume,
 } from "@/lib/intake/validation"
 import { createClient } from "@/lib/supabase/client"
-
-const fieldClassName =
-  "w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none transition-shadow placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 aria-invalid:border-destructive"
 
 type FormErrors = Record<string, string[] | undefined>
 
@@ -95,7 +96,7 @@ export function CandidateForm({
         return
       }
 
-      router.push(`/dashboard/candidates/${candidateId}`)
+      router.push(`/dashboard/jobs/${jobId}/candidates/${candidateId}`)
       router.refresh()
     } catch {
       // A transport failure can occur after the database insert commits. Keep
@@ -115,13 +116,13 @@ export function CandidateForm({
   }
 
   return (
-    <form className="space-y-5" noValidate onSubmit={handleSubmit}>
+    <form className="space-y-4" noValidate onSubmit={handleSubmit}>
       <FormField error={errors.name} id="name" label="Candidate name">
-        <input
+        <Input
           aria-describedby={errors.name ? "name-error" : undefined}
           aria-invalid={Boolean(errors.name)}
           autoComplete="off"
-          className={`${fieldClassName} h-11`}
+          className="h-10"
           disabled={pending}
           id="name"
           maxLength={200}
@@ -132,12 +133,12 @@ export function CandidateForm({
       </FormField>
 
       <FormField error={errors.proposalText} id="proposalText" label="Proposal">
-        <textarea
+        <Textarea
           aria-describedby={
             errors.proposalText ? "proposalText-error" : undefined
           }
           aria-invalid={Boolean(errors.proposalText)}
-          className={`${fieldClassName} min-h-36 resize-y`}
+          className="min-h-32 resize-y"
           disabled={pending}
           id="proposalText"
           maxLength={20000}
@@ -153,12 +154,12 @@ export function CandidateForm({
         id="portfolioUrl"
         label="Portfolio URL"
       >
-        <input
+        <Input
           aria-describedby={
             errors.portfolioUrl ? "portfolioUrl-error" : undefined
           }
           aria-invalid={Boolean(errors.portfolioUrl)}
-          className={`${fieldClassName} h-11`}
+          className="h-10"
           disabled={pending}
           id="portfolioUrl"
           maxLength={2048}
@@ -175,11 +176,11 @@ export function CandidateForm({
         id="resume"
         label="Resume"
       >
-        <input
+        <Input
           accept="application/pdf,.pdf"
           aria-describedby={errors.resume ? "resume-error" : undefined}
           aria-invalid={Boolean(errors.resume)}
-          className={`${fieldClassName} file:mr-3 file:rounded-lg file:border-0 file:bg-muted file:px-3 file:py-1.5 file:text-sm file:font-medium`}
+          className="h-10 file:mr-3 file:rounded-lg file:border-0 file:bg-muted file:px-3 file:py-1.5 file:text-sm file:font-medium"
           disabled={pending}
           id="resume"
           name="resume"
@@ -197,11 +198,26 @@ export function CandidateForm({
         </p>
       ) : null}
 
-      <Button disabled={pending} size="lg" type="submit">
-        {pending ? "Uploading candidate…" : "Add candidate"}
-      </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-2 pt-2">
+        <Button
+          asChild
+          variant="outline"
+          className="flex-1 sm:flex-none"
+          disabled={pending}
+          type="button"
+        >
+          <Link href={`/dashboard/jobs/${jobId}`}>Cancel</Link>
+        </Button>
+        <Button
+          className="flex-1 sm:flex-none bg-primary hover:bg-primary/80"
+          disabled={pending}
+          type="submit"
+        >
+          {pending ? "Uploading candidate…" : "Add candidate"}
+        </Button>
+      </div>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-center text-xs text-muted-foreground">
         Maximum file size: {MAX_RESUME_BYTES / 1024 / 1024} MB.
       </p>
     </form>
@@ -223,11 +239,11 @@ function FormField({
 }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium" htmlFor={id}>
-        {label}
-      </label>
+      <Label htmlFor={id}>{label}</Label>
       {children}
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+      {hint ? (
+        <p className="text-xs text-muted-foreground">{hint}</p>
+      ) : null}
       {error?.length ? (
         <ul className="space-y-1 text-xs text-destructive" id={`${id}-error`}>
           {error.map((item) => (

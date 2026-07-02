@@ -2,10 +2,15 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { IconFileText } from "@tabler/icons-react"
+import {
+  IconCircleCheck,
+  IconFileText,
+  IconLoader2,
+} from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
 import type { Database } from "@/lib/supabase/database.types"
+import { cn } from "@/lib/utils"
 
 type AnalysisStatus = Database["public"]["Enums"]["candidate_analysis_status"]
 
@@ -23,8 +28,13 @@ export function ResumeExtractionControl({
   const router = useRouter()
   const [message, setMessage] = useState<string>()
   const [pending, setPending] = useState(false)
-  const extractionComplete =
-    status === "ready" || status === "processing" || status === "completed"
+
+  const isReady =
+    status === "ready" ||
+    status === "processing" ||
+    status === "completed"
+  const isExtracting = status === "extracting" || pending
+  const canExtract = !isReady && !isExtracting
 
   async function extractResume() {
     setPending(true)
@@ -54,25 +64,57 @@ export function ResumeExtractionControl({
     }
   }
 
+  if (isReady) {
+    return (
+      <div className="space-y-2">
+        <div
+          className={cn(
+            "flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5"
+          )}
+        >
+          <IconCircleCheck
+            aria-hidden="true"
+            className="size-4 shrink-0 text-emerald-400"
+          />
+          <div>
+            <p className="text-sm font-medium text-emerald-400">
+              Resume text ready
+            </p>
+            <p className="text-xs text-emerald-400/80">
+              Evidence is prepared for analysis.
+            </p>
+          </div>
+        </div>
+        {message ? (
+          <p className="text-xs leading-5 text-muted-foreground" role="status">
+            {message}
+          </p>
+        ) : null}
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <Button
         className="w-full"
-        disabled={pending || extractionComplete}
+        disabled={!canExtract && !isExtracting}
         onClick={extractResume}
+        size="lg"
         type="button"
-        variant={extractionComplete ? "outline" : "default"}
+        variant="default"
       >
-        <IconFileText aria-hidden="true" />
-        {pending
+        {isExtracting ? (
+          <IconLoader2 aria-hidden="true" className="animate-spin" />
+        ) : (
+          <IconFileText aria-hidden="true" />
+        )}
+        {isExtracting
           ? "Extracting text…"
-          : extractionComplete
-            ? "Resume text ready"
-            : status === "failed" || status === "extracting"
-              ? "Retry extraction"
-              : "Extract resume text"}
+          : status === "failed"
+            ? "Retry extraction"
+            : "Extract resume text"}
       </Button>
-
       {message ? (
         <p className="text-xs leading-5 text-muted-foreground" role="status">
           {message}

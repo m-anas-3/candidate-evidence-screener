@@ -1,27 +1,29 @@
 "use client"
 
 import { useActionState } from "react"
+import Link from "next/link"
 
 import { createJob } from "@/app/(app)/dashboard/jobs/actions"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import type { IntakeActionState } from "@/lib/intake/types"
 
 const initialState: IntakeActionState = {}
-const fieldClassName =
-  "w-full rounded-xl border border-input bg-background px-3 py-2 text-sm outline-none transition-shadow placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 aria-invalid:border-destructive"
 
 export function JobForm() {
   const [state, formAction, pending] = useActionState(createJob, initialState)
 
   return (
-    <form action={formAction} className="space-y-5" noValidate>
+    <form action={formAction} className="space-y-4" noValidate>
       <FormField error={state.fieldErrors?.title} id="title" label="Job title">
-        <input
+        <Input
           aria-describedby={
             state.fieldErrors?.title ? "title-error" : undefined
           }
           aria-invalid={Boolean(state.fieldErrors?.title)}
-          className={`${fieldClassName} h-11`}
+          className="h-10"
           disabled={pending}
           id="title"
           maxLength={160}
@@ -36,12 +38,12 @@ export function JobForm() {
         id="description"
         label="Job description"
       >
-        <textarea
+        <Textarea
           aria-describedby={
             state.fieldErrors?.description ? "description-error" : undefined
           }
           aria-invalid={Boolean(state.fieldErrors?.description)}
-          className={`${fieldClassName} min-h-32 resize-y`}
+          className="min-h-28 resize-y"
           disabled={pending}
           id="description"
           maxLength={20000}
@@ -56,12 +58,12 @@ export function JobForm() {
         id="requirements"
         label="Requirements"
       >
-        <textarea
+        <Textarea
           aria-describedby={
             state.fieldErrors?.requirements ? "requirements-error" : undefined
           }
           aria-invalid={Boolean(state.fieldErrors?.requirements)}
-          className={`${fieldClassName} min-h-32 resize-y`}
+          className="min-h-28 resize-y"
           disabled={pending}
           id="requirements"
           maxLength={20000}
@@ -77,14 +79,14 @@ export function JobForm() {
         id="mustHaveSkills"
         label="Must-have skills"
       >
-        <textarea
+        <Textarea
           aria-describedby={
             state.fieldErrors?.mustHaveSkills
               ? "mustHaveSkills-error"
               : undefined
           }
           aria-invalid={Boolean(state.fieldErrors?.mustHaveSkills)}
-          className={`${fieldClassName} min-h-24 resize-y`}
+          className="min-h-20 resize-y"
           disabled={pending}
           id="mustHaveSkills"
           name="mustHaveSkills"
@@ -94,16 +96,31 @@ export function JobForm() {
 
       {state.message ? (
         <p
-          className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          className="rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive"
           role="alert"
         >
           {state.message}
         </p>
       ) : null}
 
-      <Button disabled={pending} size="lg" type="submit">
-        {pending ? "Creating job…" : "Create job"}
-      </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-2 pt-2">
+        <Button
+          asChild
+          variant="outline"
+          className="flex-1 sm:flex-none"
+          disabled={pending}
+          type="button"
+        >
+          <Link href="/dashboard/jobs">Cancel</Link>
+        </Button>
+        <Button
+          className="flex-1 sm:flex-none bg-primary hover:bg-primary/80"
+          disabled={pending}
+          type="submit"
+        >
+          {pending ? "Creating role…" : "Create role"}
+        </Button>
+      </div>
     </form>
   )
 }
@@ -123,11 +140,11 @@ function FormField({
 }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium" htmlFor={id}>
-        {label}
-      </label>
+      <Label htmlFor={id}>{label}</Label>
       {children}
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+      {hint ? (
+        <p className="text-xs text-muted-foreground">{hint}</p>
+      ) : null}
       {error?.length ? (
         <ul className="space-y-1 text-xs text-destructive" id={`${id}-error`}>
           {error.map((message) => (

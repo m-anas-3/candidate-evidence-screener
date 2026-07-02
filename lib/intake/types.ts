@@ -2,6 +2,7 @@ export type IntakeActionState = {
   fieldErrors?: Record<string, string[] | undefined>
   message?: string
   status?: "error" | "success"
+  jobId?: string
 }
 
 export type CandidateActionResult = {
