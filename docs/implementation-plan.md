@@ -73,6 +73,8 @@ Build basic immediate email/password sign-up, sign-in, and sign-out plus the acc
 
 ### 4. Job and Candidate Intake
 
+**Status:** implemented. Recruiters can create and retrieve owned jobs, add candidates with shared validation, upload one PDF directly to the private `resumes` bucket, and revisit persisted candidate evidence. Live same-owner/cross-owner acceptance testing remains pending authenticated test accounts.
+
 **Depends on:** Milestones 2–3.
 
 Implement job fields and candidate fields for name, proposal, one portfolio URL, and one PDF. Upload directly from the authenticated browser to private Storage using an ownership-safe path; persist only the path. Enforce shared validation, PDF-only input, and the 2 MB maximum.

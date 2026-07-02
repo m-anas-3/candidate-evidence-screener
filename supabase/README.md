@@ -34,13 +34,15 @@ supabase db reset
 supabase db lint --local --schema public,storage --fail-on error
 ```
 
-Generate current application types after the migration succeeds:
+Regenerate the checked-in application type snapshot after the migration succeeds:
 
 ```bash
 supabase gen types typescript --local > lib/supabase/database.types.ts
 ```
 
-Review the generated diff before keeping it. Do not manually edit generated schema types.
+For the linked remote project, log in to the CLI and use `--linked` instead of
+`--local`. Review the generated diff before keeping it; the type snapshot must
+stay aligned with the applied migrations.
 
 ## Apply remotely
 
