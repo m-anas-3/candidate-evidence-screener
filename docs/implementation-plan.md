@@ -63,9 +63,11 @@ Create migrations for recruiter-owned jobs, candidates, screening reports, and c
 
 ### 3. Email/Password Authentication and App Shell
 
+**Status:** implemented. Immediate email/password sign-up, sign-in, sign-out, session refresh, protected dashboard routes, and jobs/candidates empty states compile and pass signed-out route smoke tests. Live sign-up acceptance requires Supabase **Confirm email** to be disabled for this one-week MVP.
+
 **Depends on:** Milestones 1–2 and Supabase email/password auth configured.
 
-Build basic sign-up, sign-in, and sign-out plus the accessible jobs/candidates shell. Redirect unauthenticated visitors away from protected product routes. Include validation, pending, authentication failure, loading, empty, and retry states without adding social login, teams, roles, invitations, or a pipeline.
+Build basic immediate email/password sign-up, sign-in, and sign-out plus the accessible jobs/candidates shell. Redirect unauthenticated visitors away from protected product routes. Include validation, pending, authentication failure, loading, empty, and retry states without adding email verification, social login, teams, roles, invitations, or a pipeline.
 
 **Gate:** a user can sign up, sign in, sign out, and cannot load protected product routes while signed out; server operations resolve the authenticated user ID; the shell passes keyboard/responsive checks plus lint, typecheck, and build.
 
@@ -145,7 +147,7 @@ Review RLS, defense-in-depth ownership, SSRF, secret/log exposure, duplicate ana
 | PDF parser/runtime incompatibility | Resume extraction fails in production | Verify the installed parser API, force Node runtime, use representative fixtures, and release resources on all paths |
 | Model output is malformed or unsupported | Misleading or partially stored report | Strict Zod validation, evidence requirements, no partial persistence, safe failure status, and malformed-output fixtures |
 | Duplicate analysis causes conflicting reports or cost | Inconsistent state and unnecessary API spend | Atomic processing transition/idempotency strategy and concurrent-request tests before UI release |
-| Public sign-up is abused or mistaken for invite-only access | Unexpected accounts or resource consumption | State that sign-up is public, apply provider rate limits and email verification as configured, protect every product route, and monitor usage |
+| Public unverified sign-up is abused or mistaken for invite-only access | Unexpected accounts, impersonated email addresses, or resource consumption | Label email verification as deferred, apply Supabase rate limits/CAPTCHA if exposed publicly, protect every product route with RLS, and monitor usage |
 | Model or package APIs change | Build/runtime drift | Pin through the lockfile, inspect installed-version docs at each integration milestone, and run all quality gates |
 
 ## Locked Implementation Defaults
@@ -154,6 +156,6 @@ Review RLS, defense-in-depth ownership, SSRF, secret/log exposure, duplicate ana
 - **Scoring:** 50 points for job requirements/skills, 20 for relevant experience evidence, 15 for proposal specificity, and 15 for portfolio relevance. Strong Fit is 80–100, Possible Fit is 60–79, and Weak Fit is 0–59. Unsupported criteria score zero, and a missing must-have caps the score at 79.
 - **Vercel:** begin on Hobby with Fluid Compute and use a 300-second maximum for the analysis Node Route Handler, with shorter internal timeouts.
 - **Tests:** Vitest is the unit/integration runner. Browser automation remains deferred unless an acceptance gap requires Playwright.
-- **Authentication:** use basic Supabase email/password sign-up, sign-in, and sign-out. Product routes require a valid session, RLS isolates recruiter data, and account data persists. Public sign-up is not invite-only access.
+- **Authentication:** for the one-week MVP, use immediate Supabase email/password sign-up with **Confirm email** disabled, plus sign-in and sign-out. Product routes require a valid session, RLS isolates recruiter data, and account data persists. Email ownership is not verified, and public sign-up is not invite-only access.
 
 Revalidate model availability, package compatibility, and provider limits when their milestones begin because those external capabilities may change. Such changes may refine implementation details but must not change the locked product flow, report fields, evidence rules, or exclusions.

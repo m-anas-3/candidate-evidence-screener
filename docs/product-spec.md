@@ -34,7 +34,7 @@ An unsupported criterion scores zero rather than being inferred. If any explicit
 - **Application:** Next.js 16 App Router, with frontend and server code deployed together on Vercel.
 - **Agent runtime:** the JavaScript `deepagents` package and `createDeepAgent()` run server-side in a protected Next.js Node.js Route Handler on Vercel. There is no Python or separate agent service.
 - **Model:** OpenAI `gpt-5.5`, configured as `OPENAI_MODEL=gpt-5.5` with medium reasoning as the initial setting. Confirm access and installed-adapter support during agent implementation.
-- **Authentication:** basic Supabase email/password sign-up, sign-in, and sign-out. Product routes require an authenticated account; public self-service sign-up does not make the product invite-only.
+- **Authentication:** basic Supabase email/password sign-up, sign-in, and sign-out. For the one-week MVP, Supabase email confirmation is disabled so sign-up returns a session immediately. This does not verify ownership of the submitted email address. Product routes still require an authenticated account, and public self-service sign-up does not make the product invite-only.
 - **Persistence:** Supabase PostgreSQL stores jobs, candidates, reports, and chat messages, and private Supabase Storage stores resumes.
 - **Uploads:** the authenticated browser uploads PDFs directly to private Storage. PDF bytes do not pass through a Vercel Route Handler; server code stores only the private object path.
 - **Server boundaries:** Server Actions may handle ordinary form mutations. Protected Node Route Handlers handle resume extraction, agent analysis, and follow-up chat. Every entry point validates input, authenticates the session, and verifies resource ownership.
@@ -70,6 +70,6 @@ The MVP excludes a pipeline board or candidate-stage workflow, interview-questio
 
 ## Current Repository Gap
 
-Installed today: Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/Radix-related UI packages, Supabase browser/server clients, Zod, ESLint, and Prettier. The Supabase environment/session foundation is present, and the linked project has the MVP tables, RLS policies, and private `resumes` bucket migration applied. Authentication UI and product workflows do not exist yet.
+Installed today: Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/Radix-related UI packages, Supabase browser/server clients, Zod, ESLint, and Prettier. The linked project has the MVP schema, RLS policies, and private `resumes` bucket. Immediate email/password sign-up, sign-in, sign-out, session refresh, protected dashboard routes, and the empty application shell are implemented. Product intake workflows do not exist yet.
 
-Not installed yet: PDF parsing, `deepagents`, LangChain packages, the OpenAI LangChain adapter, and Vitest. Not provisioned or verified yet: the Supabase email/password user flow and cross-user RLS acceptance tests, OpenAI credentials/model access, environment values, and a Vercel Hobby deployment with Fluid Compute. These are planned dependencies or verification work, not current capabilities.
+Not installed yet: PDF parsing, `deepagents`, LangChain packages, the OpenAI LangChain adapter, and Vitest. Not provisioned or verified yet: a live immediate sign-up test with Supabase **Confirm email** disabled, cross-user RLS acceptance tests, OpenAI credentials/model access, and a Vercel Hobby deployment with Fluid Compute. These are planned dependencies or verification work, not current capabilities.
