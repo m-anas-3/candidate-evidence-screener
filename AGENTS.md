@@ -2,32 +2,32 @@
 
 ## Project Structure & Module Organization
 
-This is a Next.js 16 App Router project. Route layouts, pages, and global styles live in `app/`; add route-specific code beneath the corresponding route segment. Shared React components belong in `components/`, while shadcn/ui primitives live in `components/ui/`. Put reusable hooks in `hooks/`, framework-independent helpers in `lib/`, and static files in `public/`. Root configuration includes `next.config.ts`, `tsconfig.json`, `eslint.config.mjs`, and `postcss.config.mjs`.
+This is a Next.js 16 App Router project. Pages, layouts, and Route Handlers live in `app/`. Shared components belong in `components/`, with shadcn/ui primitives in `components/ui/`. Put reusable hooks in `hooks/`, framework-independent helpers in `lib/`, and static assets in `public/`. Use the `@/` alias instead of long relative imports. Product behavior and planned architecture are documented in `docs/product-spec.md`.
 
 ## Build, Test, and Development Commands
 
-Use pnpm and keep `pnpm-lock.yaml` synchronized with dependency changes.
+Use pnpm and commit changes to `pnpm-lock.yaml` with dependency updates.
 
 - `pnpm dev` starts the local development server.
-- `pnpm build` creates a production build and catches integration errors.
-- `pnpm start` serves the completed production build.
+- `pnpm build` creates the production build.
+- `pnpm start` serves an existing production build.
 - `pnpm lint` runs the Next.js ESLint configuration.
-- `pnpm typecheck` checks strict TypeScript types without emitting files.
-- `pnpm format` formats all TypeScript and TSX files with Prettier.
-- `npx shadcn@latest add <component>` adds a shadcn/ui primitive.
+- `pnpm typecheck` runs strict TypeScript checks without emitting files.
+- `pnpm format` formats TypeScript and TSX files with Prettier.
+- `npx shadcn@latest add <component>` adds a UI primitive.
 
 ## Coding Style & Naming Conventions
 
-Use TypeScript, two-space indentation, and Prettier defaults. Components use PascalCase exports; utilities and hooks use camelCase, with hooks prefixed by `use`. Keep component filenames lowercase and hyphenated, such as `theme-provider.tsx`. Prefer the `@/` path alias over long relative imports. Use Server Components by default and add `"use client"` only when browser state or APIs require it. Compose Tailwind classes with `cn()` from `lib/utils.ts`.
+Use TypeScript, two-space indentation, and Prettier formatting. Components use PascalCase exports; functions, variables, and hooks use camelCase, with hooks prefixed by `use`. Name component files in lowercase kebab-case, such as `candidate-card.tsx`. Prefer Server Components. Add `"use client"` only when browser APIs, client state, or interactive event handlers require it; forms can use Server Actions without becoming Client Components. Merge Tailwind classes with `cn()` from `lib/utils.ts`. Avoid `any` when a precise type is practical.
 
 ## Testing Guidelines
 
-No automated test framework or coverage threshold is configured. Before submitting changes, run `pnpm lint`, `pnpm typecheck`, and `pnpm build`. When adding a test runner, colocate tests as `*.test.ts` or `*.test.tsx`, cover user-visible behavior, and add the command to `package.json` and this guide.
+No automated test runner or coverage threshold is configured. Before submitting changes, run `pnpm lint`, `pnpm typecheck`, and `pnpm build`. When tests are introduced, colocate them as `*.test.ts` or `*.test.tsx`, cover user-visible behavior, and add the test command to `package.json`.
 
 ## Commit & Pull Request Guidelines
 
-The current history uses Conventional Commit style (`feat: initial commit`). Continue with concise prefixes such as `feat:`, `fix:`, `refactor:`, or `docs:`. Pull requests should explain the change and its rationale, list verification commands, link relevant issues, and include screenshots for visual changes. Keep each PR focused and note any configuration or migration steps.
+Use Conventional Commit prefixes already present in history, such as `feat:`, `fix:`, `refactor:`, and `docs:`. Keep commits focused. Pull requests should explain what changed and why, list verification commands, link relevant issues, and include screenshots for visual changes. Document migrations or environment-variable additions explicitly.
 
-## Framework and Security Notes
+## Framework & Security Notes
 
-Next.js APIs in this repository may differ from prior releases. Before changing framework behavior, read the relevant guide under `node_modules/next/dist/docs/` and follow deprecation notices. Store secrets in ignored environment files such as `.env.local`; never commit credentials.
+Next.js 16 differs from earlier versions. Before changing framework behavior, read the relevant guide under `node_modules/next/dist/docs/` and heed deprecation notices. Keep secrets in `.env.local`; only browser-safe values may use the `NEXT_PUBLIC_` prefix. Never commit credentials or expose service-role/API keys to client code.
