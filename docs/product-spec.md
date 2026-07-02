@@ -2,7 +2,7 @@
 
 ## Status
 
-This is the implementation contract for the current locked MVP and supersedes the earlier anonymous-session plan. The repository is currently a starter Next.js application; the product backend, agent, and tests described below are planned, not implemented.
+This is the implementation contract for the current locked MVP and supersedes the earlier anonymous-session plan. Supabase persistence, authentication, job/candidate intake, and resume extraction are implemented. Agent analysis, reports, chat, synthetic evaluation data, deployment verification, and automated tests remain planned.
 
 ## Product and Core Flow
 
@@ -36,7 +36,7 @@ An unsupported criterion scores zero rather than being inferred. If any explicit
 - **Model:** OpenAI `gpt-5.5`, configured as `OPENAI_MODEL=gpt-5.5` with medium reasoning as the initial setting. Confirm access and installed-adapter support during agent implementation.
 - **Authentication:** basic Supabase email/password sign-up, sign-in, and sign-out. For the one-week MVP, Supabase email confirmation is disabled so sign-up returns a session immediately. This does not verify ownership of the submitted email address. Product routes still require an authenticated account, and public self-service sign-up does not make the product invite-only.
 - **Persistence:** Supabase PostgreSQL stores jobs, candidates, reports, and chat messages, and private Supabase Storage stores resumes.
-- **Uploads:** the authenticated browser uploads PDFs directly to private Storage. PDF bytes do not pass through a Vercel Route Handler; server code stores only the private object path.
+- **Uploads:** the authenticated browser uploads PDFs directly to private Storage, so upload bytes do not pass through a Vercel Route Handler. The protected extraction handler later downloads the private object by its stored path; PDF bytes are never sent to OpenAI.
 - **Server boundaries:** Server Actions may handle ordinary form mutations. Protected Node Route Handlers handle resume extraction, agent analysis, and follow-up chat. Every entry point validates input, authenticates the session, and verifies resource ownership.
 
 The Deep Agent has only four product tools:
@@ -68,8 +68,8 @@ The MVP is complete when the manual upload flow and the synthetic sample flow bo
 
 The MVP excludes a pipeline board or candidate-stage workflow, interview-question generation, multiple portfolio URLs, social login, teams, roles, invitations, account administration, payments, email sending, LinkedIn scraping, OCR, protected-characteristic inference, Supabase Edge Functions, Python, a separate agent service, general-purpose chat, and automatic hiring decisions.
 
-## Current Repository Gap
+## Current Repository Status
 
-Installed today: Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/Radix-related UI packages, Supabase browser/server clients, Zod, ESLint, and Prettier. The linked project has the MVP schema, RLS policies, and private `resumes` bucket. Immediate email/password sign-up, sign-in, sign-out, session refresh, protected dashboard routes, and the empty application shell are implemented. Product intake workflows do not exist yet.
+Installed today: Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/Radix-related UI packages, Supabase browser/server clients, Zod, `pdf-parse` 2.4.5, ESLint, and Prettier. The linked project has the MVP schema, RLS policies, and private `resumes` bucket. Immediate email/password authentication, protected dashboard routes, job/candidate intake, direct private PDF upload, and protected resume text extraction are implemented.
 
-Not installed yet: PDF parsing, `deepagents`, LangChain packages, the OpenAI LangChain adapter, and Vitest. Not provisioned or verified yet: a live immediate sign-up test with Supabase **Confirm email** disabled, cross-user RLS acceptance tests, OpenAI credentials/model access, and a Vercel Hobby deployment with Fluid Compute. These are planned dependencies or verification work, not current capabilities.
+Not installed yet: `deepagents`, LangChain packages, the OpenAI LangChain adapter, and Vitest. Not provisioned or verified yet: a live immediate sign-up/intake/extraction test, cross-user RLS acceptance tests, OpenAI credentials/model access, and a Vercel Hobby deployment with Fluid Compute. These are planned dependencies or verification work, not current capabilities.

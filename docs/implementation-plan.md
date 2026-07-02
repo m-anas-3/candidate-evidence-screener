@@ -14,7 +14,7 @@ No milestone may add a pipeline, interview-question generation, or another expli
 | UI | Installed: Tailwind CSS 4, shadcn/Radix-related packages, Tabler icons | Add only primitives needed by the workflow |
 | Supabase SDK | **Installed foundation** | `@supabase/supabase-js` 2.110.0 and `@supabase/ssr` 0.12.0; schema-dependent use follows |
 | Validation | **Installed foundation** | `zod` 4.4.3; shared input and strict report schemas follow in later milestones |
-| Resume parsing | **Not installed** | `pdf-parse`, after checking its installed-version API |
+| Resume parsing | **Installed and integrated** | `pdf-parse` 2.4.5 in a protected Node Route Handler; deployed runtime verification remains |
 | Agent/model | **Not installed** | `deepagents`, `langchain`, `@langchain/core`, `@langchain/openai` |
 | Automated tests | **Not installed/configured** | Vitest in Milestone 11; add browser testing only if later acceptance needs it |
 | Supabase project | **Schema applied remotely** | MVP tables, RLS, and private `resumes` bucket are migrated; auth-flow and cross-user tests remain |
@@ -79,9 +79,11 @@ Build basic immediate email/password sign-up, sign-in, and sign-out plus the acc
 
 Implement job fields and candidate fields for name, proposal, one portfolio URL, and one PDF. Upload directly from the authenticated browser to private Storage using an ownership-safe path; persist only the path. Enforce shared validation, PDF-only input, and the 2 MB maximum.
 
-**Gate:** create, refresh, and retrieve a job/candidate; valid upload succeeds; invalid, oversized, missing, and unauthorized inputs fail clearly; PDF bytes do not traverse a Route Handler.
+**Gate:** create, refresh, and retrieve a job/candidate; valid upload succeeds; invalid, oversized, missing, and unauthorized inputs fail clearly; PDF bytes do not traverse a Route Handler during upload.
 
 ### 5. Resume Text Extraction
+
+**Status:** implemented. A protected Node Route Handler revalidates ownership, object path, declared type, size, and PDF magic bytes; atomically claims extraction work; normalizes and persists text; releases parser resources; and records recoverable failures. `pdf-parse` 2.4.5 successfully extracted a representative 10 KB text PDF locally. Live authenticated and deployed Vercel acceptance tests remain pending.
 
 **Depends on:** Milestone 4 and the selected `pdf-parse` version.
 

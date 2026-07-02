@@ -7,6 +7,7 @@ import {
   IconFileCheck,
 } from "@tabler/icons-react"
 
+import { ResumeExtractionControl } from "@/components/resume-extraction-control"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = { title: "Candidate details" }
@@ -21,7 +22,7 @@ export default async function CandidateDetailsPage({
   const { data: candidate, error } = await supabase
     .from("candidates")
     .select(
-      "id, job_id, name, proposal_text, portfolio_url, analysis_status, analysis_error, created_at"
+      "id, job_id, name, proposal_text, portfolio_url, resume_text, analysis_status, analysis_error, created_at"
     )
     .eq("id", candidateId)
     .maybeSingle()
@@ -83,6 +84,18 @@ export default async function CandidateDetailsPage({
             </p>
           </article>
 
+          {candidate.resume_text ? (
+            <article className="rounded-3xl border border-border bg-card p-6">
+              <h2 className="font-semibold">Extracted resume text</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Stored privately and ready for evidence analysis.
+              </p>
+              <p className="mt-4 max-h-96 overflow-y-auto text-sm leading-6 whitespace-pre-wrap text-muted-foreground">
+                {candidate.resume_text}
+              </p>
+            </article>
+          ) : null}
+
           <article className="rounded-3xl border border-border bg-card p-6">
             <h2 className="font-semibold">Portfolio</h2>
             <a
@@ -117,18 +130,26 @@ export default async function CandidateDetailsPage({
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-5">
-            <h2 className="text-sm font-semibold">Analysis status</h2>
+            <h2 className="text-sm font-semibold">Processing status</h2>
             <p className="mt-2 inline-flex rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground capitalize">
               {candidate.analysis_status}
             </p>
             <p className="mt-3 text-xs leading-5 text-muted-foreground">
-              Resume extraction and evidence analysis are not implemented yet.
+              {candidate.analysis_status === "ready"
+                ? "Resume evidence is ready. AI analysis is the next module."
+                : "Extract text before running evidence analysis. Scanned PDFs require a text-based replacement."}
             </p>
             {candidate.analysis_error ? (
               <p className="mt-3 text-xs text-destructive">
                 {candidate.analysis_error}
               </p>
             ) : null}
+            <div className="mt-4">
+              <ResumeExtractionControl
+                candidateId={candidate.id}
+                status={candidate.analysis_status}
+              />
+            </div>
           </div>
         </aside>
       </div>
