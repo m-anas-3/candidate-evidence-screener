@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Manual Code Review",
+      "trigger": "UserPromptSubmit",
+      "description": "Manually triggered code review — fires when you type \"review my code\", \"run code review\", \"check my changes\", or \"code review\".",
+      "matcher": "review my code|run code review|check my changes|code review",
+      "action": {
+        "type": "agent",
+        "prompt": "The user has requested a manual code review. Run a thorough review of the current git diff (#Git Diff) and always respond with a clear, structured report — even if no issues are found.\n\nYour response format must be:\n\n---\n## 🔍 Code Review Report\n\n**Status:** ✅ No issues found  OR  ⚠️ Issues detected\n\n[If issues found, list them grouped by severity:]\n\n### 🔴 Critical\n- `filename`: Description of the critical issue\n\n### 🟠 Warning\n- `filename`: Description of the warning\n\n### 🟡 Info / Minor\n- `filename`: Description of the minor issue\n\n[If no issues found:]\n> ✅ No ambiguity or bad practices detected in the current changes. Your code looks clean!\n\n---\n\nCheck for the following:\n- Hardcoded secrets, API keys, passwords, tokens, or credentials\n- Missing error handling (unhandled promise rejections, bare try/catch with no action, swallowed errors)\n- Use of `any` type in TypeScript without justification\n- console.log / debug statements left in production code\n- SQL injection risks or raw string interpolation in queries\n- Insecure use of eval(), dangerouslySetInnerHTML, or similar\n- Sensitive data being logged or exposed in responses\n- Missing input validation on API routes\n- Deprecated or dangerous APIs (e.g., Math.random() for security tokens)\n- Dead code, commented-out code blocks, or TODO/FIXME left unresolved\n- Race conditions or missing async/await\n- Overly broad catch blocks that hide real errors\n- Missing authorization or authentication checks on API endpoints\n\nOnly report issues clearly visible in the diff. Do not speculate about code not shown. Always give the full report — never skip it, never say \"no issues\" without the full report block."
+      }
+    }
+  ]
+}

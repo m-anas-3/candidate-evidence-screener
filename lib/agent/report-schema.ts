@@ -14,19 +14,14 @@ export const evidenceItemSchema = z
     source: evidenceSourceSchema,
   })
   .strict()
-  .superRefine((item, context) => {
-    if (
-      item.source === "not_found" &&
-      item.evidence.toLowerCase() !== "not found"
-    ) {
-      context.addIssue({
-        code: "custom",
-        message:
-          'Evidence must be exactly "not found" when its source is not_found.',
-        path: ["evidence"],
-      })
-    }
-  })
+  .transform((item) => ({
+    ...item,
+    // When the source is not_found the evidence field must be exactly
+    // "not found". The LLM sometimes writes a descriptive sentence instead
+    // of the required sentinel value, which would fail strict validation.
+    // Auto-correct it here so the schema is robust to that common slip.
+    evidence: item.source === "not_found" ? "not found" : item.evidence,
+  }))
 
 const boundedEvidenceList = z.array(evidenceItemSchema).max(20)
 
@@ -50,14 +45,23 @@ export const portfolioEvidenceSchema = z
   })
   .strict()
 
-export const screeningReportSchema = z
+// The LLM-facing input schema. score and recommendation are accepted but
+// ignored — they are always derived from the sub-scores after parsing so LLM
+// arithmetic errors never cause a validation failure.
+const screeningReportInputSchema = z
   .object({
-    score: z.number().int().min(0).max(100),
-    recommendation: z.enum(["strong_fit", "possible_fit", "weak_fit"]),
+    // Accept score/recommendation from the model but do not validate them here;
+    // the transform below overwrites both with authoritative derived values.
+    score: z.number().int().min(0).max(100).optional(),
+    recommendation: z
+      .enum(["strong_fit", "possible_fit", "weak_fit"])
+      .optional(),
     scoring: z
       .object({
         jobRequirementsAndSkills: z.number().int().min(0).max(50),
         relevantExperience: z.number().int().min(0).max(20),
+        // proposalSpecificity and portfolioRelevance must still match their
+        // nested objects so the evidence and sub-scores stay consistent.
         proposalSpecificity: z.number().int().min(0).max(15),
         portfolioRelevance: z.number().int().min(0).max(15),
       })
@@ -72,64 +76,53 @@ export const screeningReportSchema = z
     reviewPoints: boundedEvidenceList,
     outreachMessage: z.string().trim().min(1).max(5_000),
   })
-  .strict()
-  .superRefine((report, context) => {
-    const calculatedScore =
-      report.scoring.jobRequirementsAndSkills +
-      report.scoring.relevantExperience +
-      report.scoring.proposalSpecificity +
-      report.scoring.portfolioRelevance
+  .transform((report) => {
+    // Auto-correct sub-score mismatches: when scoring.proposalSpecificity and
+    // proposalSpecificityFindings.score disagree, trust the nested findings
+    // object because it carries the evidence. Same for portfolioRelevance.
+    // This avoids hard failures on minor LLM inconsistencies.
+    const proposalScore = report.proposalSpecificityFindings.score
+    const portfolioScore = report.portfolioEvidence.score
 
-    if (report.score !== calculatedScore) {
-      context.addIssue({
-        code: "custom",
-        message: "Score must equal the four weighted scoring categories.",
-        path: ["score"],
-      })
+    const scoring =
+      report.scoring.proposalSpecificity !== proposalScore ||
+      report.scoring.portfolioRelevance !== portfolioScore
+        ? {
+            ...report.scoring,
+            proposalSpecificity: proposalScore,
+            portfolioRelevance: portfolioScore,
+          }
+        : report.scoring
+  
+    // Derive score from sub-scores — the LLM never has to do the arithmetic.
+    let computedScore =
+      scoring.jobRequirementsAndSkills +
+      scoring.relevantExperience +
+      scoring.proposalSpecificity +
+      scoring.portfolioRelevance
+
+    // Cap at 79 when any must-have skill is missing.
+    if (report.missingSkills.length > 0 && computedScore > 79) {
+      computedScore = 79
     }
 
-    const expectedRecommendation =
-      report.score >= 80
-        ? "strong_fit"
-        : report.score >= 60
-          ? "possible_fit"
-          : "weak_fit"
+    // Derive recommendation from the final score.
+    const computedRecommendation =
+      computedScore >= 80
+        ? ("strong_fit" as const)
+        : computedScore >= 60
+          ? ("possible_fit" as const)
+          : ("weak_fit" as const)
 
-    if (report.recommendation !== expectedRecommendation) {
-      context.addIssue({
-        code: "custom",
-        message: "Recommendation does not match the score band.",
-        path: ["recommendation"],
-      })
-    }
-
-    if (report.missingSkills.length > 0 && report.score > 79) {
-      context.addIssue({
-        code: "custom",
-        message: "A missing must-have skill caps the score at 79.",
-        path: ["score"],
-      })
-    }
-
-    if (
-      report.scoring.proposalSpecificity !==
-      report.proposalSpecificityFindings.score
-    ) {
-      context.addIssue({
-        code: "custom",
-        message: "Proposal scores must match.",
-        path: ["scoring", "proposalSpecificity"],
-      })
-    }
-
-    if (report.scoring.portfolioRelevance !== report.portfolioEvidence.score) {
-      context.addIssue({
-        code: "custom",
-        message: "Portfolio scores must match.",
-        path: ["scoring", "portfolioRelevance"],
-      })
+    return {
+      ...report,
+      scoring,
+      score: computedScore,
+      recommendation: computedRecommendation,
     }
   })
+
+export const screeningReportSchema = screeningReportInputSchema
 
 export type EvidenceItem = z.infer<typeof evidenceItemSchema>
 export type ProposalSpecificity = z.infer<typeof proposalSpecificitySchema>

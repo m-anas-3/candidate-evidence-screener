@@ -20,42 +20,117 @@ type AgentToolDependencies = {
   supabase: SupabaseClient<Database>
 }
 
-async function loadOwnedCandidate(dependencies: AgentToolDependencies) {
-  const { data: candidate, error } = await dependencies.supabase
-    .from("candidates")
-    .select(
-      `
-      id,
-      name,
-      proposal_text,
-      portfolio_url,
-      resume_text,
-      analysis_status,
-      jobs!inner (
+// ---------------------------------------------------------------------------
+// Shared data loader
+// Cached per-request in a module-level WeakMap keyed on the dependencies
+// object so the four tools never hit the database more than once per agent run.
+// ---------------------------------------------------------------------------
+
+type CandidateRow = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<SupabaseClient<Database>["from"]>["select"]
+    >
+  >["data"]
+>[number] & {
+  jobs:
+    | {
+        id: string
+        recruiter_id: string
+        title: string
+        description: string
+        requirements: string
+        must_have_skills: string[]
+      }
+    | {
+        id: string
+        recruiter_id: string
+        title: string
+        description: string
+        requirements: string
+        must_have_skills: string[]
+      }[]
+}
+
+type LoadedContext = {
+  candidate: {
+    id: string
+    name: string
+    portfolio_url: string | null
+    proposal_text: string | null
+    resume_text: string
+    analysis_status: string
+  }
+  job: {
+    id: string
+    recruiter_id: string
+    title: string
+    description: string
+    requirements: string
+    must_have_skills: string[]
+  }
+}
+
+// One cache entry per agent run (dependencies object is unique per invocation).
+const contextCache = new WeakMap<
+  AgentToolDependencies,
+  Promise<LoadedContext>
+>()
+
+function loadOwnedCandidate(
+  dependencies: AgentToolDependencies
+): Promise<LoadedContext> {
+  const cached = contextCache.get(dependencies)
+  if (cached) return cached
+
+  const promise = (async (): Promise<LoadedContext> => {
+    const { data: candidate, error } = await dependencies.supabase
+      .from("candidates")
+      .select(
+        `
         id,
-        recruiter_id,
-        title,
-        description,
-        requirements,
-        must_have_skills
+        name,
+        proposal_text,
+        portfolio_url,
+        resume_text,
+        analysis_status,
+        jobs!inner (
+          id,
+          recruiter_id,
+          title,
+          description,
+          requirements,
+          must_have_skills
+        )
+      `
       )
-    `
-    )
-    .eq("id", dependencies.candidateId)
-    .eq("jobs.recruiter_id", dependencies.recruiterId)
-    .maybeSingle()
+      .eq("id", dependencies.candidateId)
+      .eq("jobs.recruiter_id", dependencies.recruiterId)
+      .maybeSingle()
 
-  if (error)
-    throw new Error("Authorized candidate context could not be loaded.")
-  if (!candidate) throw new Error("Candidate not found.")
-  if (!candidate.resume_text)
-    throw new Error("Candidate resume text is not ready.")
+    if (error) throw new Error("Authorized candidate context could not be loaded.")
+    if (!candidate) throw new Error("Candidate not found.")
+    if (!candidate.resume_text) throw new Error("Candidate resume text is not ready.")
 
-  const jobValue = candidate.jobs
-  const job = Array.isArray(jobValue) ? jobValue[0] : jobValue
-  if (!job) throw new Error("Candidate job context could not be loaded.")
+    const jobValue = candidate.jobs
+    const job = Array.isArray(jobValue) ? jobValue[0] : jobValue
+    if (!job) throw new Error("Candidate job context could not be loaded.")
 
-  return { candidate, job }
+    return {
+      candidate: {
+        id: candidate.id,
+        name: candidate.name,
+        portfolio_url: candidate.portfolio_url,
+        proposal_text: candidate.proposal_text,
+        resume_text: candidate.resume_text,
+        analysis_status: candidate.analysis_status,
+      },
+      job,
+    }
+  })()
+
+  contextCache.set(dependencies, promise)
+  return promise
 }
 
 function requireBoundCandidate(
@@ -66,6 +141,10 @@ function requireBoundCandidate(
     throw new Error("Tool access is limited to the active candidate.")
   }
 }
+
+// ---------------------------------------------------------------------------
+// Tools
+// ---------------------------------------------------------------------------
 
 export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const loadCandidateContext = tool(
@@ -101,9 +180,10 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const assessProposal = tool(
     async ({ candidateId }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
+      // Reuses the cached DB fetch — no second round-trip.
       const { candidate, job } = await loadOwnedCandidate(dependencies)
       return assessProposalSpecificity(
-        candidate.proposal_text,
+        candidate.proposal_text ?? "",
         job.title,
         job.must_have_skills
       )
@@ -119,9 +199,10 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const inspectPortfolio = tool(
     async ({ candidateId }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
+      // Reuses the cached DB fetch — no second round-trip.
       const { candidate } = await loadOwnedCandidate(dependencies)
       try {
-        const result = await inspectPublicPortfolio(candidate.portfolio_url)
+        const result = await inspectPublicPortfolio(candidate.portfolio_url ?? "")
         return {
           ...result,
           securityNotice:
@@ -151,12 +232,15 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const saveReport = tool(
     async ({ candidateId, report }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
+      // Reuses the cached DB fetch — no second round-trip.
       const { candidate, job } = await loadOwnedCandidate(dependencies)
       if (candidate.analysis_status !== "processing") {
         throw new Error("The candidate is not in an active analysis run.")
       }
-      const validatedReport = screeningReportSchema.parse(report)
-      validateReportMustHaveCoverage(validatedReport, job.must_have_skills)
+      const validatedReport = validateReportMustHaveCoverage(
+        screeningReportSchema.parse(report),
+        job.must_have_skills
+      )
       const now = new Date().toISOString()
       const { error } = await dependencies.supabase
         .from("screening_reports")

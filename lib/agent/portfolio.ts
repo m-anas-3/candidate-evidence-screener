@@ -1,6 +1,6 @@
 import "server-only"
 
-import { lookup } from "node:dns/promises"
+import { resolve4 } from "node:dns/promises"
 import { request as httpRequest } from "node:http"
 import { request as httpsRequest } from "node:https"
 import { isIP } from "node:net"
@@ -100,7 +100,10 @@ async function validateAndResolve(rawUrl: string) {
 
   let addresses: ResolvedAddress[]
   try {
-    addresses = await lookup(url.hostname, { all: true, verbatim: true })
+    // Use resolve4 (network DNS client) instead of lookup (OS system resolver)
+    // to avoid the macOS mDNSResponder failure that blocks public hostnames.
+    const ipv4 = await resolve4(url.hostname)
+    addresses = ipv4.map((address) => ({ address, family: 4 }))
   } catch {
     throw new PortfolioInspectionError(
       "Portfolio host could not be resolved.",

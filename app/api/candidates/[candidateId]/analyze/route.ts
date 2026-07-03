@@ -248,6 +248,32 @@ export async function POST(
 
     return successResponse(candidateId)
   } catch (error) {
+    // Detailed server-side log so the real error is visible in the terminal.
+    console.error("[recruiter-agent] Agent run failed", {
+      reference: requestReference,
+      candidateId,
+      errorName: error instanceof Error ? error.name : typeof error,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      // Include cause chain, validation error code, and Zod issues when available
+      cause:
+        error instanceof Error && error.cause instanceof Error
+          ? error.cause.message
+          : undefined,
+      validationCode:
+        error != null &&
+        typeof error === "object" &&
+        "code" in error
+          ? (error as { code: unknown }).code
+          : undefined,
+      zodIssues:
+        error != null &&
+        typeof error === "object" &&
+        "issues" in error &&
+        Array.isArray((error as { issues: unknown }).issues)
+          ? (error as { issues: unknown[] }).issues
+          : undefined,
+      stack: error instanceof Error ? error.stack?.split("\n").slice(0, 6).join("\n") : undefined,
+    })
     logAnalysisFailure(
       requestReference,
       "agent_run",
@@ -317,7 +343,14 @@ async function finalizeCandidate(
     .maybeSingle()
 
   if (error) {
-    logAnalysisFailure(requestReference, "candidate_completion")
+    logAnalysisFailure(
+      requestReference,
+      "agent_run",
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : "UnknownError"
+    )
+
     return false
   }
 

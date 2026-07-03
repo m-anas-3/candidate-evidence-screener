@@ -73,7 +73,6 @@ export class CandidateAnalysisAgentConfiguration {
       apiKey: this.#apiKey,
       maxRetries: 1,
       model: this.modelIdentifier,
-      reasoning: { effort: "medium" },
       timeout: 240_000,
     })
   }
