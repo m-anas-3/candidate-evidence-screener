@@ -59,36 +59,72 @@ type CandidateAnalysisAgentOptions = {
   supabase: SupabaseClient<Database>
 }
 
-export function createCandidateAnalysisAgent(
-  options: CandidateAnalysisAgentOptions
-) {
-  // Parse and validate env vars. On failure, Zod includes field values in the
-  // error message, so we catch and rethrow with the API key masked to prevent
-  // accidental secret exposure in server logs or error tracking.
-  let environment: z.infer<typeof agentEnvironmentSchema>
-  try {
-    environment = agentEnvironmentSchema.parse({
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-      OPENAI_MODEL: process.env.OPENAI_MODEL || undefined,
-    })
-  } catch (error) {
-    // Re-throw a safe error that never includes the raw key value.
-    throw new Error(
-      `Agent environment configuration is invalid. Ensure OPENAI_API_KEY and OPENAI_MODEL are set correctly. Detail: ${error instanceof Error ? error.message.replace(process.env.OPENAI_API_KEY ?? "", "[REDACTED]") : "unknown"}`
-    )
+export class CandidateAnalysisAgentConfiguration {
+  readonly #apiKey: string
+  readonly modelIdentifier: string
+
+  constructor(apiKey: string, modelIdentifier: string) {
+    this.#apiKey = apiKey
+    this.modelIdentifier = modelIdentifier
   }
+
+  createModel() {
+    return new ChatOpenAI({
+      apiKey: this.#apiKey,
+      maxRetries: 1,
+      model: this.modelIdentifier,
+      reasoning: { effort: "medium" },
+      timeout: 240_000,
+    })
+  }
+}
+
+export class AgentConfigurationError extends Error {
+  constructor(cause?: unknown) {
+    super("Agent environment configuration is invalid.")
+    this.name = "AgentConfigurationError"
+    if (cause !== undefined) {
+      // Preserves the original Zod error for anyone inspecting the error
+      // chain (e.g. in Sentry) without exposing raw env values in the
+      // top-level message that gets shown to callers/logs by default.
+      this.cause = cause
+    }
+  }
+}
+
+export function getCandidateAnalysisAgentConfiguration(): CandidateAnalysisAgentConfiguration {
+  const result = agentEnvironmentSchema.safeParse({
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_MODEL: process.env.OPENAI_MODEL || undefined,
+  })
+
+  if (!result.success) {
+    // Zod's flatten() reports issues per-field (e.g. "Required",
+    // "String must contain at least 1 character(s)") without echoing back
+    // the actual secret value, so this is safe to log server-side.
+    console.error(
+      "[recruiter-agent] Agent environment configuration failed validation:",
+      JSON.stringify(result.error.flatten(), null, 2)
+    )
+    throw new AgentConfigurationError(result.error)
+  }
+
+  return new CandidateAnalysisAgentConfiguration(
+    result.data.OPENAI_API_KEY,
+    result.data.OPENAI_MODEL
+  )
+}
+
+export function createCandidateAnalysisAgent(
+  options: CandidateAnalysisAgentOptions,
+  configuration = getCandidateAnalysisAgentConfiguration()
+) {
   registerRestrictedAgentProfile()
 
-  const model = new ChatOpenAI({
-    apiKey: environment.OPENAI_API_KEY,
-    maxRetries: 1,
-    model: environment.OPENAI_MODEL,
-    reasoning: { effort: "medium" },
-    timeout: 240_000,
-  })
+  const model = configuration.createModel()
   const tools = createRecruiterTools({
     ...options,
-    modelIdentifier: environment.OPENAI_MODEL,
+    modelIdentifier: configuration.modelIdentifier,
     promptVersion: RECRUITER_PROMPT_VERSION,
   })
 

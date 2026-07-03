@@ -103,6 +103,8 @@ Create a server-only `createDeepAgent()` harness using `gpt-5.4-mini` with mediu
 
 ### 7. Candidate Analysis Route Handler
 
+**Status:** implemented locally. The protected Node Route Handler uses a 300-second maximum, authenticated ownership checks, optimistic duplicate-run claiming, stale-run recovery, bounded agent execution, completed-report verification, and recoverable safe failure states. A live OpenAI integration run and deployed Vercel duration verification remain pending configured credentials and infrastructure.
+
 **Depends on:** Milestone 6 and a Vercel Hobby project with Fluid Compute verified.
 
 Add the protected Node Route Handler with `runtime = "nodejs"` and a 300-second `maxDuration`. It validates `candidate_id`, verifies session ownership and extracted text, prevents concurrent duplicate runs, transitions status, invokes the Deep Agent, and returns typed safe results. Persist validated report and run metadata; persist a recoverable failure without leaking internals. Use shorter internal timeouts for portfolio and model operations so failures can be recorded before the function deadline.

@@ -151,7 +151,10 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const saveReport = tool(
     async ({ candidateId, report }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
-      const { job } = await loadOwnedCandidate(dependencies)
+      const { candidate, job } = await loadOwnedCandidate(dependencies)
+      if (candidate.analysis_status !== "processing") {
+        throw new Error("The candidate is not in an active analysis run.")
+      }
       const validatedReport = screeningReportSchema.parse(report)
       validateReportMustHaveCoverage(validatedReport, job.must_have_skills)
       const now = new Date().toISOString()
