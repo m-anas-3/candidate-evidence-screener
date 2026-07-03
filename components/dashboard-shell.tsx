@@ -22,18 +22,23 @@ export function DashboardShell({
     <TooltipProvider delayDuration={0}>
       <SidebarProvider>
         <AppSidebar email={email} />
-        <SidebarInset>
-          <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-border/50 bg-background/80 px-4 backdrop-blur-md sm:px-6">
-            <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-foreground transition-colors" />
-            <Separator className="h-4 bg-border/50" orientation="vertical" />
-            <div className="flex flex-1 items-center justify-end gap-3">
-              <span className="hidden max-w-56 truncate text-xs font-medium text-muted-foreground/80 sm:block">
-                Logged in as: <span className="text-foreground">{email}</span>
+        <SidebarInset className="bg-background">
+          {/* Top bar */}
+          <header className="sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b border-border/50 bg-background/85 px-4 backdrop-blur-md sm:px-5">
+            <SidebarTrigger className="-ml-0.5 size-7 rounded-md text-muted-foreground/60 hover:bg-muted hover:text-foreground transition-colors" />
+            <Separator
+              orientation="vertical"
+              className="mx-1 h-3.5 bg-border/60"
+            />
+            {/* Slot for per-page breadcrumbs — injected via children layout */}
+            <div className="flex flex-1 items-center justify-end">
+              <span className="hidden text-xs text-muted-foreground/50 sm:block">
+                {email}
               </span>
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col p-4 sm:p-6 lg:p-8 bg-background/50">
+          <main className="flex flex-1 flex-col gap-6 p-5 sm:p-7">
             {children}
           </main>
         </SidebarInset>

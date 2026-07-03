@@ -7,15 +7,17 @@ export const metadata: Metadata = { title: "Create account" }
 
 export default function SignUpPage() {
   return (
-    <div className="rounded-3xl border border-border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
-      <div className="mb-8 space-y-2">
-        <p className="text-sm font-medium text-primary">Recruiter workspace</p>
-        <h2 className="text-2xl font-semibold tracking-tight">
+    <div className="space-y-7">
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+          Recruiter workspace
+        </p>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
           Create your account
         </h2>
-        <p className="text-sm leading-6 text-muted-foreground">
-          Your account isolates jobs, candidate evidence, and private resumes
-          from other recruiters. You will enter the workspace immediately.
+        <p className="text-[13px] leading-6 text-muted-foreground">
+          Your workspace isolates jobs, candidates, and private resumes from
+          other recruiters.
         </p>
       </div>
       <AuthForm action={signUp} mode="sign-up" />

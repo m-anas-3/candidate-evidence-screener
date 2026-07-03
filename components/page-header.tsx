@@ -24,12 +24,12 @@ export function PageHeader({
     >
       <div className="space-y-1.5">
         {eyebrow ? (
-          <p className="text-xs font-semibold tracking-wider text-primary uppercase flex items-center gap-1.5">
-            <span className="inline-block w-5 h-px bg-primary/40" />
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary flex items-center gap-2">
+            <span className="h-px w-4 bg-primary/50 rounded-full inline-block" />
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
         {description ? (
           <p className="max-w-prose text-sm text-muted-foreground leading-relaxed">
             {description}

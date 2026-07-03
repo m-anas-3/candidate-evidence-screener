@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useActionState } from "react"
+import { IconLoader2 } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
 import type { AuthActionState } from "@/lib/auth/types"
@@ -23,118 +24,93 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
   const isSignUp = mode === "sign-up"
 
   return (
-    <form action={formAction} className="space-y-5" noValidate>
-      {notice ? (
+    <form action={formAction} className="space-y-4" noValidate>
+      {notice && (
         <p
-          className="rounded-xl border border-border bg-muted px-3 py-2 text-sm text-muted-foreground"
           role="status"
+          className="rounded-lg border border-border bg-muted/50 px-3.5 py-2.5 text-[13px] text-muted-foreground"
         >
           {notice}
         </p>
-      ) : null}
+      )}
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="email">
-          Email address
-        </label>
-        <input
-          aria-describedby={
-            state.fieldErrors?.email ? "email-error" : undefined
-          }
-          aria-invalid={Boolean(state.fieldErrors?.email)}
-          autoComplete="email"
-          className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm transition-shadow outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 aria-invalid:border-destructive"
-          disabled={pending}
-          id="email"
-          name="email"
-          placeholder="you@company.com"
-          required
-          type="email"
-        />
-        <FieldErrors errors={state.fieldErrors?.email} id="email-error" />
-      </div>
+      {/* Email */}
+      <Field
+        id="email"
+        label="Email address"
+        type="email"
+        autoComplete="email"
+        placeholder="you@company.com"
+        disabled={pending}
+        errors={state.fieldErrors?.email}
+        errorId="email-error"
+      />
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium" htmlFor="password">
-          Password
-        </label>
-        <input
-          aria-describedby={
-            state.fieldErrors?.password ? "password-error" : undefined
-          }
-          aria-invalid={Boolean(state.fieldErrors?.password)}
-          autoComplete={isSignUp ? "new-password" : "current-password"}
-          className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm transition-shadow outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 aria-invalid:border-destructive"
-          disabled={pending}
+      {/* Password */}
+      <div className="space-y-1.5">
+        <Field
           id="password"
-          name="password"
-          required
+          label="Password"
           type="password"
+          autoComplete={isSignUp ? "new-password" : "current-password"}
+          placeholder={isSignUp ? "Min. 8 characters" : "••••••••"}
+          disabled={pending}
+          errors={state.fieldErrors?.password}
+          errorId="password-error"
         />
-        {isSignUp ? (
-          <p className="text-xs text-muted-foreground">
+        {isSignUp && (
+          <p className="text-[11px] text-muted-foreground pl-0.5">
             At least 8 characters with a letter and number.
           </p>
-        ) : null}
-        <FieldErrors errors={state.fieldErrors?.password} id="password-error" />
+        )}
       </div>
 
-      {isSignUp ? (
-        <div className="space-y-2">
-          <label className="text-sm font-medium" htmlFor="confirmPassword">
-            Confirm password
-          </label>
-          <input
-            aria-describedby={
-              state.fieldErrors?.confirmPassword
-                ? "confirm-password-error"
-                : undefined
-            }
-            aria-invalid={Boolean(state.fieldErrors?.confirmPassword)}
-            autoComplete="new-password"
-            className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm transition-shadow outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20 aria-invalid:border-destructive"
-            disabled={pending}
-            id="confirmPassword"
-            name="confirmPassword"
-            required
-            type="password"
-          />
-          <FieldErrors
-            errors={state.fieldErrors?.confirmPassword}
-            id="confirm-password-error"
-          />
-        </div>
-      ) : null}
+      {/* Confirm password */}
+      {isSignUp && (
+        <Field
+          id="confirmPassword"
+          label="Confirm password"
+          type="password"
+          autoComplete="new-password"
+          placeholder="Re-enter password"
+          disabled={pending}
+          errors={state.fieldErrors?.confirmPassword}
+          errorId="confirm-password-error"
+        />
+      )}
 
-      {state.message ? (
+      {/* Global message */}
+      {state.message && (
         <p
-          className={cn(
-            "rounded-xl border px-3 py-2 text-sm",
-            state.status === "success"
-              ? "border-emerald-600/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-              : "border-destructive/30 bg-destructive/10 text-destructive"
-          )}
           role={state.status === "success" ? "status" : "alert"}
+          className={cn(
+            "rounded-lg border px-3.5 py-2.5 text-[13px]",
+            state.status === "success"
+              ? "border-emerald-500/25 bg-emerald-500/8 text-emerald-400"
+              : "border-destructive/25 bg-destructive/8 text-destructive"
+          )}
         >
           {state.message}
         </p>
-      ) : null}
+      )}
 
-      <Button className="w-full" disabled={pending} size="lg" type="submit">
+      <Button
+        className="mt-1 w-full h-10 text-[13px] font-semibold tracking-tight"
+        disabled={pending}
+        size="lg"
+        type="submit"
+      >
+        {pending && <IconLoader2 className="mr-2 size-3.5 animate-spin" />}
         {pending
-          ? isSignUp
-            ? "Creating account…"
-            : "Signing in…"
-          : isSignUp
-            ? "Create account"
-            : "Sign in"}
+          ? isSignUp ? "Creating account…" : "Signing in…"
+          : isSignUp ? "Create account" : "Sign in"}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        {isSignUp ? "Already have an account?" : "New to the screener?"}{" "}
+      <p className="text-center text-[12px] text-muted-foreground pt-1">
+        {isSignUp ? "Already have an account?" : "New here?"}{" "}
         <Link
-          className="font-medium text-foreground underline underline-offset-4"
           href={isSignUp ? "/login" : "/signup"}
+          className="font-semibold text-primary underline-offset-4 hover:underline"
         >
           {isSignUp ? "Sign in" : "Create an account"}
         </Link>
@@ -143,16 +119,67 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
   )
 }
 
-function FieldErrors({ errors, id }: { errors?: string[]; id: string }) {
-  if (!errors?.length) {
-    return null
-  }
+// ---------------------------------------------------------------------------
+// Reusable field
+// ---------------------------------------------------------------------------
 
+function Field({
+  id,
+  label,
+  type,
+  autoComplete,
+  placeholder,
+  disabled,
+  errors,
+  errorId,
+}: {
+  id: string
+  label: string
+  type: string
+  autoComplete: string
+  placeholder: string
+  disabled: boolean
+  errors?: string[]
+  errorId: string
+}) {
+  const hasError = Boolean(errors?.length)
   return (
-    <ul className="space-y-1 text-xs text-destructive" id={id}>
-      {errors.map((error) => (
-        <li key={error}>{error}</li>
-      ))}
-    </ul>
+    <div className="space-y-1.5">
+      <label
+        htmlFor={id}
+        className="block text-[13px] font-medium text-foreground"
+      >
+        {label}
+      </label>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        disabled={disabled}
+        required
+        aria-describedby={hasError ? errorId : undefined}
+        aria-invalid={hasError}
+        className={cn(
+          "h-10 w-full rounded-lg border bg-muted/30 px-3 text-[13px] text-foreground outline-none transition-all",
+          "placeholder:text-muted-foreground/50",
+          "focus:border-primary/60 focus:ring-2 focus:ring-primary/15",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          hasError
+            ? "border-destructive/50 focus:border-destructive focus:ring-destructive/15"
+            : "border-border"
+        )}
+      />
+      {hasError && (
+        <ul id={errorId} className="space-y-0.5">
+          {errors!.map((e) => (
+            <li key={e} className="text-[11px] text-destructive pl-0.5">
+              {e}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }

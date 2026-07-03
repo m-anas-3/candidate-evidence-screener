@@ -17,11 +17,15 @@ export default async function LoginPage({
   const { notice } = await searchParams
 
   return (
-    <div className="rounded-3xl border border-border bg-card p-6 text-card-foreground shadow-sm sm:p-8">
-      <div className="mb-8 space-y-2">
-        <p className="text-sm font-medium text-primary">Welcome back</p>
-        <h2 className="text-2xl font-semibold tracking-tight">Sign in</h2>
-        <p className="text-sm leading-6 text-muted-foreground">
+    <div className="space-y-7">
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+          Welcome back
+        </p>
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+          Sign in
+        </h2>
+        <p className="text-[13px] leading-6 text-muted-foreground">
           Access your private jobs, candidates, and screening reports.
         </p>
       </div>

@@ -11,81 +11,79 @@ import {
 } from "@tabler/icons-react"
 
 import { signOut } from "@/app/(app)/dashboard/actions"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarSeparator,
 } from "@/components/ui/sidebar"
+import { cn } from "@/lib/utils"
 
 const navItems = [
   {
     href: "/dashboard",
     icon: IconLayoutDashboard,
     label: "Dashboard",
-    isActive: (pathname: string) => pathname === "/dashboard",
+    isActive: (p: string) => p === "/dashboard",
   },
   {
     href: "/dashboard/jobs",
     icon: IconBriefcase,
-    label: "Your open roles",
-    isActive: (pathname: string) => pathname.startsWith("/dashboard/jobs"),
+    label: "Open Roles",
+    isActive: (p: string) => p.startsWith("/dashboard/jobs"),
   },
   {
     href: "/dashboard/candidates",
     icon: IconUserScan,
-    label: "All candidates",
-    isActive: (pathname: string) =>
-      pathname.startsWith("/dashboard/candidates") && !pathname.includes("/jobs/"),
+    label: "Candidates",
+    isActive: (p: string) =>
+      p.startsWith("/dashboard/candidates") && !p.includes("/jobs/"),
   },
 ] as const
 
-interface AppSidebarProps {
-  email?: string
-}
-
-export function AppSidebar({ email }: AppSidebarProps) {
+export function AppSidebar({ email }: { email?: string }) {
   const pathname = usePathname()
-  const initial = email ? email.substring(0, 2).toUpperCase() : "RC"
+  const initial = email ? email.slice(0, 2).toUpperCase() : "RC"
 
   return (
-    <Sidebar collapsible="icon" variant="inset" className="border-r border-sidebar-border/50">
-      <SidebarHeader className="border-b border-sidebar-border/50 p-4">
+    <Sidebar
+      collapsible="icon"
+      variant="inset"
+      className="border-r border-sidebar-border bg-sidebar"
+    >
+      {/* ── Logo ── */}
+      <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <Link
-          className="flex items-center gap-2.5 px-2 py-1 group-data-[collapsible=icon]:justify-center"
           href="/dashboard"
+          className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center"
         >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-md shadow-primary/25 ring-1 ring-primary/20">
-            <IconShieldCheck aria-hidden="true" className="size-4.5" />
+          <span className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20 transition-all hover:bg-primary/20">
+            <IconShieldCheck className="size-4 text-primary" />
           </span>
-          <span className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <span className="block truncate text-sm font-bold tracking-tight text-foreground">
+          <div className="min-w-0 group-data-[collapsible=icon]:hidden">
+            <span className="block truncate text-[13px] font-semibold tracking-tight text-sidebar-foreground">
               Evidence Screener
             </span>
-            <span className="block truncate text-2xs font-medium text-primary uppercase tracking-wider">
+            <span className="block truncate text-[10px] font-semibold uppercase tracking-[0.10em] text-primary/80">
               Recruiter HQ
             </span>
-          </span>
+          </div>
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="p-2">
+      {/* ── Nav ── */}
+      <SidebarContent className="px-2 py-3">
         <SidebarGroup>
-          <SidebarGroupLabel className="px-2 text-2xs font-semibold uppercase tracking-wider text-muted-foreground/60">
-            Navigation
-          </SidebarGroupLabel>
-          <SidebarGroupContent className="mt-1.5">
-            <SidebarMenu>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-0.5">
               {navItems.map((item) => {
                 const active = item.isActive(pathname)
                 return (
@@ -94,24 +92,26 @@ export function AppSidebar({ email }: AppSidebarProps) {
                       asChild
                       isActive={active}
                       tooltip={item.label}
-                      className={`relative px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground ${
+                      className={cn(
+                        "relative h-9 rounded-lg px-3 text-[13px] font-medium transition-all duration-150",
                         active
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : ""
-                      }`}
+                          ? "bg-primary/12 text-primary"
+                          : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                      )}
                     >
                       <Link href={item.href} className="flex items-center gap-3">
-                        {/* Active accent bar */}
                         {active && (
-                          <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
+                          <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
                         )}
                         <item.icon
-                          aria-hidden="true"
-                          className={`size-4.5 transition-colors ${
-                            active ? "text-primary" : "text-muted-foreground group-hover/menu-button:text-foreground"
-                          }`}
+                          className={cn(
+                            "size-4 shrink-0",
+                            active ? "text-primary" : "text-sidebar-foreground/50"
+                          )}
                         />
-                        <span className="text-xs group-data-[collapsible=icon]:hidden">{item.label}</span>
+                        <span className="group-data-[collapsible=icon]:hidden">
+                          {item.label}
+                        </span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -122,43 +122,42 @@ export function AppSidebar({ email }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
+      {/* ── Footer ── */}
       {email && (
-        <SidebarFooter className="border-t border-sidebar-border/50 p-4 group-data-[collapsible=icon]:p-2">
-          <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
-            <Avatar className="size-8 rounded-lg ring-1 ring-primary/15">
-              <AvatarFallback className="rounded-lg bg-gradient-to-br from-primary/15 to-primary/5 text-primary text-xs font-bold">
+        <SidebarFooter className="border-t border-sidebar-border p-3">
+          <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:justify-center">
+            <Avatar className="size-7 rounded-lg ring-1 ring-primary/15 shrink-0">
+              <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
                 {initial}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-              <span className="block text-xs font-semibold truncate text-foreground">
-                Recruiter Account
-              </span>
-              <span className="block text-2xs truncate text-muted-foreground">
+            <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+              <p className="truncate text-[11px] font-semibold text-sidebar-foreground">
                 {email}
-              </span>
+              </p>
+              <p className="text-[10px] text-sidebar-foreground/40">Recruiter account</p>
             </div>
-            <form action={signOut} className="group-data-[collapsible=icon]:hidden">
+            <form action={signOut} className="group-data-[collapsible=icon]:hidden shrink-0">
               <Button
-                size="icon-xs"
+                size="icon"
                 variant="ghost"
                 type="submit"
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                 title="Sign out"
+                className="size-7 rounded-lg text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
               >
                 <IconLogout className="size-3.5" />
               </Button>
             </form>
           </div>
-          {/* Collapsed fallback */}
-          <div className="hidden group-data-[collapsible=icon]:flex justify-center mt-2">
+          {/* Collapsed sign-out */}
+          <div className="mt-2 hidden group-data-[collapsible=icon]:flex justify-center">
             <form action={signOut}>
               <Button
-                size="icon-xs"
+                size="icon"
                 variant="ghost"
                 type="submit"
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                 title="Sign out"
+                className="size-7 rounded-lg text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10"
               >
                 <IconLogout className="size-3.5" />
               </Button>
@@ -167,7 +166,6 @@ export function AppSidebar({ email }: AppSidebarProps) {
         </SidebarFooter>
       )}
 
-      <SidebarSeparator />
       <SidebarRail />
     </Sidebar>
   )

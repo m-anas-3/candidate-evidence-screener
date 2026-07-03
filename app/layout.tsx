@@ -1,19 +1,21 @@
 import { Analytics } from "@vercel/analytics/next"
 import type { Metadata } from "next"
-import { Geist_Mono, Montserrat } from "next/font/google"
+import { Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
-const montserrat = Montserrat({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
 })
 
 const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -37,7 +39,7 @@ export default function RootLayout({
       className={cn(
         "font-sans antialiased",
         fontMono.variable,
-        montserrat.variable
+        inter.variable
       )}
     >
       <body>
