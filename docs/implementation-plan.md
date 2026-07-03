@@ -13,12 +13,12 @@ No milestone may add a pipeline, interview-question generation, or another expli
 | Web application | Installed: Next.js 16.2.6, React 19.2.4, TypeScript 5 | Keep App Router and deploy frontend/server together to Vercel |
 | UI | Installed: Tailwind CSS 4, shadcn/Radix-related packages, Tabler icons | Add only primitives needed by the workflow |
 | Supabase SDK | **Installed foundation** | `@supabase/supabase-js` 2.110.0 and `@supabase/ssr` 0.12.0; schema-dependent use follows |
-| Validation | **Installed foundation** | `zod` 4.4.3; shared input and strict report schemas follow in later milestones |
+| Validation | **Installed and integrated** | `zod` 4.4.3 with shared intake validation and the strict screening-report schema |
 | Resume parsing | **Installed and integrated** | `pdf-parse` 2.4.5 in a protected Node Route Handler; deployed runtime verification remains |
-| Agent/model | **Not installed** | `deepagents`, `langchain`, `@langchain/core`, `@langchain/openai` |
+| Agent/model | **Installed and integrated** | `deepagents` 1.10.5 with pinned LangChain/OpenAI packages; live model integration follows in Milestone 7 |
 | Automated tests | **Not installed/configured** | Vitest in Milestone 11; add browser testing only if later acceptance needs it |
 | Supabase project | **Schema applied remotely** | MVP tables, RLS, and private `resumes` bucket are migrated; auth-flow and cross-user tests remain |
-| OpenAI | **Not configured** | Server-only `OPENAI_API_KEY`; `OPENAI_MODEL=gpt-5.5` with medium reasoning initially |
+| OpenAI | **Not configured** | Server-only `OPENAI_API_KEY`; `OPENAI_MODEL=gpt-5.4-mini` with medium reasoning initially |
 | Vercel | **Not configured or verified** | Start on Hobby with Fluid Compute; Node Route Handler and 300-second analysis `maxDuration` |
 
 Dependencies are added only in the milestone that first uses them. Package changes use pnpm and include `pnpm-lock.yaml`.
@@ -93,9 +93,11 @@ Add a server-only extractor and protected Node Route Handler. Revalidate candida
 
 ### 6. Deep Agent, Prompt, Report Schema, and Tools
 
+**Status:** implemented. The server-only `createDeepAgent()` harness uses the locked model default and medium reasoning, a versioned recruiter prompt, strict evidence/report validation, four ownership-bound product tools, and an in-memory backend with non-product tools hidden. Portfolio inspection pins validated public DNS results per request, revalidates redirects, and caps redirects, time, bytes, ports, and content types. Live model integration remains part of Milestone 7.
+
 **Depends on:** Milestones 1–2 and 5; Deep Agents/LangChain/OpenAI packages and model configuration.
 
-Create a server-only `createDeepAgent()` harness using `gpt-5.5` with medium reasoning initially, a versioned recruiter prompt, strict report schema, and the four locked custom tools. Encode the locked 50/20/15/15 scoring weights, recommendation bands, zero-for-unsupported rule, and 79-point cap when a must-have lacks evidence. Enforce ownership in context loading and saving. Portfolio inspection must allow only public HTTP(S), revalidate every redirect, block private/reserved destinations, and cap time, bytes, and accepted content types. Treat fetched text as hostile evidence, not instructions.
+Create a server-only `createDeepAgent()` harness using `gpt-5.4-mini` with medium reasoning initially, a versioned recruiter prompt, strict report schema, and the four locked custom tools. Encode the locked 50/20/15/15 scoring weights, recommendation bands, zero-for-unsupported rule, and 79-point cap when a must-have lacks evidence. Enforce ownership in context loading and saving. Portfolio inspection must allow only public HTTP(S), revalidate every redirect, block private/reserved destinations, and cap time, bytes, and accepted content types. Treat fetched text as hostile evidence, not instructions.
 
 **Gate:** tool schemas and report schema compile; invalid reports cannot persist; unsafe URLs and redirects fail; claims require source evidence or `not found`; the agent has no shell, arbitrary filesystem, or unrestricted mutation tools.
 
@@ -156,7 +158,7 @@ Review RLS, defense-in-depth ownership, SSRF, secret/log exposure, duplicate ana
 
 ## Locked Implementation Defaults
 
-- **Model:** `gpt-5.5` with medium reasoning initially; benchmark representative candidates before changing model or effort.
+- **Model:** `gpt-5.4-mini` with medium reasoning initially; benchmark representative candidates before changing model or effort.
 - **Scoring:** 50 points for job requirements/skills, 20 for relevant experience evidence, 15 for proposal specificity, and 15 for portfolio relevance. Strong Fit is 80–100, Possible Fit is 60–79, and Weak Fit is 0–59. Unsupported criteria score zero, and a missing must-have caps the score at 79.
 - **Vercel:** begin on Hobby with Fluid Compute and use a 300-second maximum for the analysis Node Route Handler, with shorter internal timeouts.
 - **Tests:** Vitest is the unit/integration runner. Browser automation remains deferred unless an acceptance gap requires Playwright.
