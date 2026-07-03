@@ -113,6 +113,8 @@ Add the protected Node Route Handler with `runtime = "nodejs"` and a 300-second 
 
 ### 8. Evidence-Backed Report Experience
 
+**Status:** implemented locally. Candidate details provide analysis and retry controls, processing refresh behavior, strict persisted-report validation, complete score/evidence/source presentation, explicit `not found` and advisory states, and an editable/copyable outreach or rejection draft. Live end-to-end acceptance remains pending configured OpenAI credentials and deployment.
+
 **Depends on:** Milestone 7.
 
 Add analysis controls and the persisted report view. Display every locked report field with source labels, `not found` states, human-review language, retry behavior, and editable/copyable outreach or rejection text. Do not render fabricated placeholder analysis, interview questions, charts, or pipeline UI.
