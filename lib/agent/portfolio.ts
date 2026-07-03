@@ -1,6 +1,6 @@
 import "server-only"
 
-import { resolve4 } from "node:dns/promises"
+import { resolve4, resolve6 } from "node:dns/promises"
 import { request as httpRequest } from "node:http"
 import { request as httpsRequest } from "node:https"
 import { isIP } from "node:net"
@@ -16,7 +16,7 @@ const ALLOWED_CONTENT_TYPES = new Set([
 
 type ResolvedAddress = {
   address: string
-  family: number
+  family: 4 | 6
 }
 
 export class PortfolioInspectionError extends Error {
@@ -60,6 +60,9 @@ function isPrivateAddress(address: string) {
   }
 
   if (isIP(normalized) === 6) {
+    const mappedIpv4 = normalized.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/)?.[1]
+    if (mappedIpv4) return isPrivateAddress(mappedIpv4)
+
     return (
       normalized === "::" ||
       normalized === "::1" ||
@@ -70,8 +73,7 @@ function isPrivateAddress(address: string) {
       normalized.startsWith("fea") ||
       normalized.startsWith("feb") ||
       normalized.startsWith("ff") ||
-      normalized.startsWith("2001:db8:") ||
-      normalized.startsWith("::ffff:")
+      normalized.startsWith("2001:db8:")
     )
   }
 
@@ -98,23 +100,43 @@ async function validateAndResolve(rawUrl: string) {
     throw new PortfolioInspectionError("Portfolio URL is not public.", "unsafe")
   }
 
+  const literalFamily = isIP(url.hostname)
   let addresses: ResolvedAddress[]
-  try {
-    // Use resolve4 (network DNS client) instead of lookup (OS system resolver)
-    // to avoid the macOS mDNSResponder failure that blocks public hostnames.
-    const ipv4 = await resolve4(url.hostname)
-    addresses = ipv4.map((address) => ({ address, family: 4 }))
-  } catch {
+
+  if (literalFamily === 4 || literalFamily === 6) {
+    addresses = [{ address: url.hostname, family: literalFamily }]
+  } else {
+    // Resolve both families independently. A host remains usable when it only
+    // publishes A or AAAA records, while the request is still pinned to an
+    // address that passed the SSRF checks below.
+    const [ipv4Result, ipv6Result] = await Promise.allSettled([
+      resolve4(url.hostname),
+      resolve6(url.hostname),
+    ])
+    addresses = [
+      ...(ipv4Result.status === "fulfilled"
+        ? ipv4Result.value.map((address) => ({
+            address,
+            family: 4 as const,
+          }))
+        : []),
+      ...(ipv6Result.status === "fulfilled"
+        ? ipv6Result.value.map((address) => ({
+            address,
+            family: 6 as const,
+          }))
+        : []),
+    ]
+  }
+
+  if (addresses.length === 0) {
     throw new PortfolioInspectionError(
       "Portfolio host could not be resolved.",
       "unavailable"
     )
   }
 
-  if (
-    addresses.length === 0 ||
-    addresses.some(({ address }) => isPrivateAddress(address))
-  ) {
+  if (addresses.some(({ address }) => isPrivateAddress(address))) {
     throw new PortfolioInspectionError(
       "Portfolio host is not public.",
       "unsafe"

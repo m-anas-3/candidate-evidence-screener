@@ -255,11 +255,6 @@ export default async function DashboardPage() {
                     <IconArrowRight className="size-3.5 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                   </Link>
                 ))}
-                <div className="p-4">
-                  <Button asChild variant="outline" size="sm" className="w-full border-border/40 text-xs">
-                    <Link href="/dashboard/jobs">View all roles</Link>
-                  </Button>
-                </div>
               </>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
