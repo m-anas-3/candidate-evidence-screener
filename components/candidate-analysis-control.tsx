@@ -1,63 +1,82 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { IconLoader2, IconRefresh, IconSparkles } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
+import {
+  useCandidateStatus,
+  useInvalidateCandidateStatus,
+} from "@/lib/query/candidate-status"
 import type { Database } from "@/lib/supabase/database.types"
 
 type Status = Database["public"]["Enums"]["candidate_analysis_status"]
+
 type Result =
   | { candidateId: string; ok: true; status: "completed" }
   | { error: string; ok: false; reference?: string }
 
 export function CandidateAnalysisControl({
   candidateId,
-  status,
+  status: initialStatus,
 }: {
   candidateId: string
   status: Status
 }) {
   const router = useRouter()
+  const invalidate = useInvalidateCandidateStatus()
   const [message, setMessage] = useState<string>()
-  const [pending, setPending] = useState(false)
-  const processing = status === "processing" || pending
+  const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    if (status !== "processing") return
-    const interval = window.setInterval(() => router.refresh(), 3_000)
-    return () => window.clearInterval(interval)
-  }, [router, status])
+  // useCandidateStatus polls every 3 s while status is "processing" and
+  // stops automatically once a terminal status is reached. It is seeded
+  // with the server-rendered initialStatus so there is no loading flash.
+  const { data } = useCandidateStatus(candidateId, initialStatus)
+  const status = data.analysis_status
+
+  // When status transitions to completed, refresh the page so the Server
+  // Component re-runs and the report appears.
+  const wasProcessing =
+    initialStatus === "processing" || submitting
+  if (status === "completed" && wasProcessing) {
+    router.refresh()
+  }
+
+  const processing = status === "processing" || submitting
 
   async function analyze() {
-    setPending(true)
+    setSubmitting(true)
     setMessage(undefined)
+
     try {
       const response = await fetch(`/api/candidates/${candidateId}/analyze`, {
         method: "POST",
       })
       const result = (await response.json()) as Result
+
       if (!response.ok || !result.ok) {
-        const reference =
-          !result.ok && result.reference
-            ? ` Reference: ${result.reference}`
-            : ""
-        setMessage(
-          `${result.ok ? "Analysis failed." : result.error}${reference}`
-        )
+        const ref =
+          !result.ok && result.reference ? ` Ref: ${result.reference}` : ""
+        setMessage(`${!result.ok ? result.error : "Analysis failed."}${ref}`)
+        // Invalidate so the status refreshes immediately after an error
+        await invalidate(candidateId)
+        router.refresh()
       } else {
         setMessage("Evidence-backed report completed.")
+        await invalidate(candidateId)
+        router.refresh()
       }
-      router.refresh()
     } catch {
       setMessage("Analysis could not be started. Try again.")
+      await invalidate(candidateId)
     } finally {
-      setPending(false)
+      setSubmitting(false)
     }
   }
 
   if (status === "completed") return null
+
   return (
     <div className="space-y-2">
       <Button
@@ -79,16 +98,18 @@ export function CandidateAnalysisControl({
             ? "Retry fit analysis"
             : "Run fit analysis"}
       </Button>
-      {processing ? (
+
+      {processing && (
         <p className="text-xs text-muted-foreground" role="status">
           Reviewing all four evidence sources. Keep this page open.
         </p>
-      ) : null}
-      {message ? (
+      )}
+
+      {message && (
         <p className="text-xs text-muted-foreground" role="status">
           {message}
         </p>
-      ) : null}
+      )}
     </div>
   )
 }

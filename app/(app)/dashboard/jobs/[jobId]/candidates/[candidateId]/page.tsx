@@ -234,7 +234,7 @@ export default async function CandidateDetailsPage({
   )
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-0">
+    <div className="mx-auto w-full max-w-6xl space-y-0">
       {/* ── Top navigation ─────────────────────────────────────────────────── */}
       <div className="mb-5 flex items-center justify-between">
         <Breadcrumb>

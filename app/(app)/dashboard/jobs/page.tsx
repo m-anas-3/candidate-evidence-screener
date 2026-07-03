@@ -48,7 +48,7 @@ export default async function JobsPage() {
   if (error) throw new Error("Jobs could not be loaded.")
 
   return (
-    <section className="mx-auto w-full max-w-5xl space-y-6">
+    <section className="mx-auto w-full max-w-6xl space-y-6">
       {/* ── Header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>

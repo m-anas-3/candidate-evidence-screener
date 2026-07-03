@@ -9,6 +9,10 @@ import {
 } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
+import {
+  useCandidateStatus,
+  useInvalidateCandidateStatus,
+} from "@/lib/query/candidate-status"
 import type { Database } from "@/lib/supabase/database.types"
 import { cn } from "@/lib/utils"
 
@@ -20,24 +24,32 @@ type ExtractionResponse =
 
 export function ResumeExtractionControl({
   candidateId,
-  status,
+  status: initialStatus,
 }: {
   candidateId: string
   status: AnalysisStatus
 }) {
   const router = useRouter()
+  const invalidate = useInvalidateCandidateStatus()
   const [message, setMessage] = useState<string>()
-  const [pending, setPending] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+
+  // Seeded from the server-rendered status — no loading flash.
+  // Polls while status is "extracting" and stops on terminal states.
+  const { data } = useCandidateStatus(candidateId, initialStatus)
+  const status = data.analysis_status
 
   const isReady =
-    status === "ready" ||
-    status === "processing" ||
-    status === "completed"
-  const isExtracting = status === "extracting" || pending
-  const canExtract = !isReady && !isExtracting
+    status === "ready" || status === "processing" || status === "completed"
+  const isExtracting = status === "extracting" || submitting
+
+  // When extraction completes, refresh the page so the resume text appears
+  if (isReady && (initialStatus === "extracting" || submitting)) {
+    router.refresh()
+  }
 
   async function extractResume() {
-    setPending(true)
+    setSubmitting(true)
     setMessage(undefined)
 
     try {
@@ -49,31 +61,28 @@ export function ResumeExtractionControl({
 
       if (!response.ok || !result.ok) {
         setMessage(result.ok ? "Resume extraction failed." : result.error)
+        await invalidate(candidateId)
         router.refresh()
         return
       }
 
-      setMessage(
-        `Extracted ${result.characterCount.toLocaleString()} characters.`
-      )
+      setMessage(`Extracted ${result.characterCount.toLocaleString()} characters.`)
+      await invalidate(candidateId)
       router.refresh()
     } catch {
       setMessage("Resume extraction could not be started. Try again.")
+      await invalidate(candidateId)
     } finally {
-      setPending(false)
+      setSubmitting(false)
     }
   }
 
   if (isReady) {
     return (
       <div className="space-y-2">
-        <div
-          className={cn(
-            "flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5"
-          )}
-        >
+        <div className="flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5">
           <IconCircleCheck
-            aria-hidden="true"
+            aria-hidden
             className="size-4 shrink-0 text-emerald-400"
           />
           <div>
@@ -85,11 +94,11 @@ export function ResumeExtractionControl({
             </p>
           </div>
         </div>
-        {message ? (
+        {message && (
           <p className="text-xs leading-5 text-muted-foreground" role="status">
             {message}
           </p>
-        ) : null}
+        )}
       </div>
     )
   }
@@ -98,16 +107,15 @@ export function ResumeExtractionControl({
     <div className="space-y-2">
       <Button
         className="w-full"
-        disabled={!canExtract && !isExtracting}
+        disabled={isExtracting}
         onClick={extractResume}
         size="lg"
         type="button"
-        variant="default"
       >
         {isExtracting ? (
-          <IconLoader2 aria-hidden="true" className="animate-spin" />
+          <IconLoader2 aria-hidden className="animate-spin" />
         ) : (
-          <IconFileText aria-hidden="true" />
+          <IconFileText aria-hidden />
         )}
         {isExtracting
           ? "Extracting text…"
@@ -115,11 +123,12 @@ export function ResumeExtractionControl({
             ? "Retry extraction"
             : "Extract resume text"}
       </Button>
-      {message ? (
+
+      {message && (
         <p className="text-xs leading-5 text-muted-foreground" role="status">
           {message}
         </p>
-      ) : null}
+      )}
     </div>
   )
 }
