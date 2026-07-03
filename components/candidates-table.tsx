@@ -1,14 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
-import { IconFilter, IconSearch, IconUser, IconUserScan, IconX } from "@tabler/icons-react"
+import {
+  IconSearch,
+  IconUser,
+  IconUserScan,
+  IconX,
+} from "@tabler/icons-react"
 
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Table,
   TableBody,
@@ -17,6 +31,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import type { Database } from "@/lib/supabase/database.types"
+
+const PAGE_SIZE = 15
 
 interface CandidateItem {
   id: string
@@ -28,242 +45,317 @@ interface CandidateItem {
   screening_reports: { score: number | null; recommendation: string | null } | null
 }
 
-interface CandidatesTableProps {
-  candidates: CandidateItem[]
-  jobs: { id: string; title: string }[]
-}
-
-function getScoreBarColor(score: number): string {
+function getScoreColor(score: number) {
   if (score >= 80) return "oklch(0.72 0.18 192)"
   if (score >= 60) return "oklch(0.78 0.12 155)"
   if (score >= 40) return "oklch(0.82 0.14 60)"
   return "oklch(0.70 0.20 22)"
 }
 
-export function CandidatesTable({ candidates, jobs }: CandidatesTableProps) {
+export function CandidatesTable({
+  candidates,
+  jobs,
+}: {
+  candidates: CandidateItem[]
+  jobs: { id: string; title: string }[]
+}) {
   const [search, setSearch] = useState("")
-  const [selectedJob, setSelectedJob] = useState("all")
-  const [selectedStatus, setSelectedStatus] = useState("all")
+  const [jobFilter, setJobFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [page, setPage] = useState(1)
 
-  const filteredCandidates = candidates.filter((candidate) => {
-    const matchesSearch = candidate.name.toLowerCase().includes(search.toLowerCase())
-    const matchesJob = selectedJob === "all" || candidate.job_id === selectedJob
-    const matchesStatus = selectedStatus === "all" || candidate.analysis_status === selectedStatus
-    return matchesSearch && matchesJob && matchesStatus
-  })
+  const filtered = useMemo(() => {
+    return candidates.filter((c) => {
+      const matchName = c.name.toLowerCase().includes(search.toLowerCase())
+      const matchJob = jobFilter === "all" || c.job_id === jobFilter
+      const matchStatus = statusFilter === "all" || c.analysis_status === statusFilter
+      return matchName && matchJob && matchStatus
+    })
+  }, [candidates, search, jobFilter, statusFilter])
 
-  const hasActiveFilters = search || selectedJob !== "all" || selectedStatus !== "all"
+  // Reset to page 1 whenever filters change
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const safePage = Math.min(page, totalPages)
+  const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+
+  const hasFilters = search !== "" || jobFilter !== "all" || statusFilter !== "all"
+
+  function clearFilters() {
+    setSearch("")
+    setJobFilter("all")
+    setStatusFilter("all")
+    setPage(1)
+  }
+
+  function handleFilterChange(fn: () => void) {
+    fn()
+    setPage(1)
+  }
+
+  // Build page numbers to display
+  function pageNumbers(): (number | "ellipsis")[] {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1)
+    const pages: (number | "ellipsis")[] = [1]
+    if (safePage > 3) pages.push("ellipsis")
+    for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) {
+      pages.push(i)
+    }
+    if (safePage < totalPages - 2) pages.push("ellipsis")
+    pages.push(totalPages)
+    return pages
+  }
 
   return (
     <div className="space-y-4">
-      {/* Filters Bar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between bg-card/50 p-4 rounded-xl border border-border/40 backdrop-blur-sm">
+      {/* ── Filters ─────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         {/* Search */}
-        <div className="relative flex-1 max-w-md">
-          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <div className="relative max-w-xs flex-1">
+          <IconSearch className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search candidates by name…"
+            placeholder="Search by name…"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-8 h-9 border-border/50"
+            onChange={(e) => handleFilterChange(() => setSearch(e.target.value))}
+            className="h-9 pl-8 pr-8 text-sm border-border/50"
           />
           {search && (
             <button
-              onClick={() => setSearch("")}
+              type="button"
+              onClick={() => handleFilterChange(() => setSearch(""))}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              <IconX className="size-4" />
+              <IconX className="size-3.5" />
             </button>
           )}
         </div>
 
-        {/* Dropdown Filters */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1">
-            <IconFilter className="size-3.5" />
-            <span className="hidden sm:inline">Filters:</span>
-          </div>
-
-          {/* Job Filter */}
+          {/* Role filter */}
           <select
-            value={selectedJob}
-            onChange={(e) => setSelectedJob(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-border/50 bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 transition-colors hover:border-primary/20"
+            value={jobFilter}
+            onChange={(e) => handleFilterChange(() => setJobFilter(e.target.value))}
+            className="h-9 rounded-lg border border-border/50 bg-background px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 hover:border-primary/20 transition-colors"
           >
             <option value="all">All Roles</option>
-            {jobs.map((job) => (
-              <option key={job.id} value={job.id}>
-                {job.title}
-              </option>
+            {jobs.map((j) => (
+              <option key={j.id} value={j.id}>{j.title}</option>
             ))}
           </select>
 
-          {/* Status Filter */}
+          {/* Status filter */}
           <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="h-9 px-3 rounded-lg border border-border/50 bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 transition-colors hover:border-primary/20"
+            value={statusFilter}
+            onChange={(e) => handleFilterChange(() => setStatusFilter(e.target.value))}
+            className="h-9 rounded-lg border border-border/50 bg-background px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 hover:border-primary/20 transition-colors"
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="extracting">Extracting</option>
             <option value="ready">Ready</option>
             <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
+            <option value="completed">Analyzed</option>
             <option value="failed">Failed</option>
           </select>
 
-          {/* Reset */}
-          {hasActiveFilters && (
+          {hasFilters && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                setSearch("")
-                setSelectedJob("all")
-                setSelectedStatus("all")
-              }}
-              className="h-9 text-xs px-2.5 text-muted-foreground hover:text-primary"
+              onClick={clearFilters}
+              className="h-9 px-2.5 text-xs text-muted-foreground hover:text-primary"
             >
-              <IconX className="size-3 mr-1" />
+              <IconX className="mr-1 size-3" />
               Clear
             </Button>
           )}
         </div>
+
+        {/* Results count */}
+        {hasFilters && (
+          <p className="ml-auto text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">{filtered.length}</span>
+            {" "}of{" "}
+            <span className="font-semibold text-foreground">{candidates.length}</span>
+          </p>
+        )}
       </div>
 
-      {/* Results count */}
-      {hasActiveFilters && (
-        <p className="text-xs text-muted-foreground px-1">
-          Showing <span className="font-semibold text-foreground">{filteredCandidates.length}</span> of{" "}
-          <span className="font-semibold text-foreground">{candidates.length}</span> candidates
-        </p>
-      )}
-
-      {/* Table */}
-      {filteredCandidates.length > 0 ? (
-        <Card className="border-border/40 shadow-sm overflow-hidden">
-          <Table>
-            <TableHeader className="bg-muted/20 border-b border-border/40">
-              <TableRow>
-                <TableHead className="w-[28%] pl-6 font-semibold text-xs">Candidate</TableHead>
-                <TableHead className="w-[22%] font-semibold text-xs">Role</TableHead>
-                <TableHead className="font-semibold text-xs">Status</TableHead>
-                <TableHead className="font-semibold text-xs">Score</TableHead>
-                <TableHead className="font-semibold text-xs">Recommendation</TableHead>
-                <TableHead className="font-semibold text-xs">Date</TableHead>
-                <TableHead className="w-[10%] text-right pr-6 font-semibold text-xs">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCandidates.map((candidate) => {
-                const report = candidate.screening_reports
-                const hasReport = report !== null
-
-                return (
-                  <TableRow key={candidate.id} className="group hover:bg-muted/10 transition-colors">
-                    <TableCell className="pl-6 font-medium">
-                      <div className="flex items-center gap-2.5">
-                        <span className="flex size-7 items-center justify-center rounded-full bg-primary/8 text-primary ring-1 ring-primary/10">
-                          <IconUser className="size-3.5" />
-                        </span>
-                        <span className="text-foreground text-sm font-semibold truncate max-w-[180px] group-hover:text-primary transition-colors">
-                          {candidate.name}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {candidate.jobs ? (
-                        <Link
-                          href={`/dashboard/jobs/${candidate.job_id}`}
-                          className="text-xs text-muted-foreground hover:text-primary font-medium truncate block max-w-[200px] transition-colors"
-                        >
-                          {candidate.jobs.title}
-                        </Link>
-                      ) : (
-                        <span className="text-xs text-muted-foreground italic">Unavailable</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <AnalysisStatusBadge status={candidate.analysis_status as any} />
-                    </TableCell>
-                    <TableCell>
-                      {hasReport && report.score !== null ? (
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-14 rounded-full bg-muted/40 overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width: `${report.score}%`,
-                                backgroundColor: getScoreBarColor(report.score),
-                              }}
-                            />
-                          </div>
-                          <span className="font-mono text-xs font-semibold">{report.score}</span>
+      {/* ── Table ───────────────────────────────────────────────────── */}
+      {pageItems.length > 0 ? (
+        <>
+          <Card className="overflow-hidden border-border/40">
+            <Table>
+              <TableHeader className="border-b border-border/40 bg-muted/20">
+                <TableRow>
+                  <TableHead className="w-[26%] pl-5 text-xs font-semibold">Candidate</TableHead>
+                  <TableHead className="w-[22%] text-xs font-semibold">Role</TableHead>
+                  <TableHead className="text-xs font-semibold">Status</TableHead>
+                  <TableHead className="text-xs font-semibold">Score</TableHead>
+                  <TableHead className="text-xs font-semibold">Recommendation</TableHead>
+                  <TableHead className="text-xs font-semibold">Added</TableHead>
+                  <TableHead className="w-[9%] pr-5 text-right text-xs font-semibold" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pageItems.map((c) => {
+                  const report = c.screening_reports
+                  return (
+                    <TableRow key={c.id} className="group hover:bg-muted/10 transition-colors">
+                      {/* Name */}
+                      <TableCell className="pl-5 py-3.5">
+                        <div className="flex items-center gap-2.5">
+                          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary ring-1 ring-primary/10">
+                            <IconUser className="size-3.5" />
+                          </span>
+                          <span className="max-w-[160px] truncate text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {c.name}
+                          </span>
                         </div>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {hasReport && report.recommendation ? (
-                        <RecommendationBadge rec={report.recommendation} />
-                      ) : (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {new Date(candidate.created_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <Button
-                        asChild
-                        size="sm"
-                        variant="outline"
-                        className="border-border/50 hover:border-primary/20 hover:bg-primary/5 hover:text-primary transition-all"
-                      >
-                        <Link
-                          href={`/dashboard/jobs/${candidate.job_id}/candidates/${candidate.id}`}
+                      </TableCell>
+
+                      {/* Role */}
+                      <TableCell className="py-3.5">
+                        {c.jobs ? (
+                          <Link
+                            href={`/dashboard/jobs/${c.job_id}`}
+                            className="block max-w-[170px] truncate text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+                          >
+                            {c.jobs.title}
+                          </Link>
+                        ) : (
+                          <span className="text-xs italic text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+
+                      {/* Status */}
+                      <TableCell className="py-3.5">
+                        <AnalysisStatusBadge
+                          status={c.analysis_status as Database["public"]["Enums"]["candidate_analysis_status"]}
+                        />
+                      </TableCell>
+
+                      {/* Score */}
+                      <TableCell className="py-3.5">
+                        {report?.score != null ? (
+                          <div className="flex items-center gap-2">
+                            <div className="h-1.5 w-14 overflow-hidden rounded-full bg-muted/40">
+                              <div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{
+                                  width: `${report.score}%`,
+                                  backgroundColor: getScoreColor(report.score),
+                                }}
+                              />
+                            </div>
+                            <span className="font-mono text-xs font-semibold">
+                              {report.score}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+
+                      {/* Recommendation */}
+                      <TableCell className="py-3.5">
+                        {report?.recommendation ? (
+                          <RecBadge rec={report.recommendation} />
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+
+                      {/* Date */}
+                      <TableCell className="py-3.5 text-xs text-muted-foreground">
+                        {new Date(c.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </TableCell>
+
+                      {/* Action */}
+                      <TableCell className="py-3.5 pr-5 text-right">
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="border-border/50 text-xs hover:border-primary/25 hover:bg-primary/5 hover:text-primary transition-all"
                         >
-                          Review
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </Card>
+                          <Link
+                            href={`/dashboard/jobs/${c.job_id}/candidates/${c.id}`}
+                          >
+                            Review
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </Card>
+
+          {/* ── Pagination ─────────────────────────────────────────── */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-1">
+              <p className="text-xs text-muted-foreground">
+                Page {safePage} of {totalPages} ·{" "}
+                <span className="font-medium text-foreground">{filtered.length}</span> candidates
+              </p>
+              <Pagination className="w-auto">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={safePage === 1}
+                    />
+                  </PaginationItem>
+
+                  {pageNumbers().map((p, i) =>
+                    p === "ellipsis" ? (
+                      <PaginationItem key={`ellipsis-${i}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          isActive={p === safePage}
+                          onClick={() => setPage(p)}
+                        >
+                          {p}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  )}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={safePage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </>
       ) : (
-        <Card className="border-dashed border-2 border-border/40">
-          <CardContent className="flex min-h-56 flex-col items-center justify-center py-10 text-center">
-            <span className="mb-3 flex size-12 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground ring-1 ring-border/30">
-              <IconUserScan className="size-5" />
+        <Card className="border-2 border-dashed border-border/40">
+          <CardContent className="flex min-h-56 flex-col items-center justify-center py-12 text-center">
+            <span className="mb-3 flex size-12 items-center justify-center rounded-xl bg-muted/50 ring-1 ring-border/30">
+              <IconUserScan className="size-5 text-muted-foreground" />
             </span>
-            <h3 className="text-sm font-semibold text-foreground">
-              {hasActiveFilters ? "No matching candidates" : "No candidates yet"}
+            <h3 className="text-sm font-semibold">
+              {hasFilters ? "No matching candidates" : "No candidates yet"}
             </h3>
-            <p className="mt-1 max-w-sm text-xs text-muted-foreground/80 leading-relaxed">
-              {hasActiveFilters
-                ? "No candidates found matching your search and filter criteria. Try adjusting your filters."
-                : "Candidates will appear here after you add them to a job role. Start by creating a role and uploading candidate evidence."}
+            <p className="mt-1 max-w-xs text-xs text-muted-foreground/80 leading-relaxed">
+              {hasFilters
+                ? "Try adjusting your search or filters."
+                : "Add candidates to a role to see them here."}
             </p>
-            {hasActiveFilters && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-4"
-                onClick={() => {
-                  setSearch("")
-                  setSelectedJob("all")
-                  setSelectedStatus("all")
-                }}
-              >
+            {hasFilters && (
+              <Button variant="outline" size="sm" onClick={clearFilters} className="mt-4">
                 Reset filters
               </Button>
             )}
@@ -274,24 +366,15 @@ export function CandidatesTable({ candidates, jobs }: CandidatesTableProps) {
   )
 }
 
-function RecommendationBadge({ rec }: { rec: string }) {
-  const config: Record<string, { label: string; className: string }> = {
-    strong_fit: {
-      label: "Strong Fit",
-      className: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
-    },
-    possible_fit: {
-      label: "Possible Fit",
-      className: "border-amber-500/20 bg-amber-500/10 text-amber-400",
-    },
-    weak_fit: {
-      label: "Weak Fit",
-      className: "border-destructive/20 bg-destructive/10 text-destructive",
-    },
+function RecBadge({ rec }: { rec: string }) {
+  const map: Record<string, { label: string; cls: string }> = {
+    strong_fit:   { label: "Strong Fit",   cls: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400" },
+    possible_fit: { label: "Possible Fit", cls: "border-amber-500/20 bg-amber-500/10 text-amber-400" },
+    weak_fit:     { label: "Weak Fit",     cls: "border-destructive/20 bg-destructive/10 text-destructive" },
   }
-  const item = config[rec] || { label: rec, className: "border-border bg-muted text-muted-foreground" }
+  const item = map[rec] ?? { label: rec, cls: "border-border bg-muted text-muted-foreground" }
   return (
-    <Badge variant="outline" className={`text-2xs font-normal ${item.className}`}>
+    <Badge variant="outline" className={`text-[10px] font-normal ${item.cls}`}>
       {item.label}
     </Badge>
   )

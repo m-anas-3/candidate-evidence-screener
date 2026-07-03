@@ -193,6 +193,11 @@
   }
 }
 
+@keyframes progress {
+  from { width: 0% }
+  to   { width: 100% }
+}
+
 /* Subtle noise texture on dark backgrounds for depth */
 .dark body::before {
   content: "";

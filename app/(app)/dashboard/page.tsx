@@ -29,14 +29,16 @@ import { Separator } from "@/components/ui/separator"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
-  title: "Dashboard Overview",
+  title: "Dashboard",
   description: "At-a-glance screening progress and quick actions.",
 }
 
 export default async function DashboardPage() {
   const supabase = await createClient()
+  const { data: authData } = await supabase.auth.getClaims()
+  const email = typeof authData?.claims?.email === "string" ? authData.claims.email : ""
+  const firstName = email.split("@")[0] ?? "there"
 
-  // Run stats queries in parallel
   const [
     jobsRes,
     candidatesRes,
@@ -60,16 +62,9 @@ export default async function DashboardPage() {
       .from("jobs")
       .select("id, title, must_have_skills, created_at")
       .order("created_at", { ascending: false })
-      .limit(5),
-    // For charts: get all candidates with their analysis status
-    supabase
-      .from("candidates")
-      .select("analysis_status, created_at"),
-    // For score chart: get all screening report scores
-    supabase
-      .from("screening_reports")
-      .select("score")
-      .eq("status", "completed"),
+      .limit(6),
+    supabase.from("candidates").select("analysis_status"),
+    supabase.from("screening_reports").select("score").eq("status", "completed"),
   ])
 
   const totalJobs = jobsRes.count ?? 0
@@ -80,15 +75,13 @@ export default async function DashboardPage() {
   const allCandidates = allCandidatesRes.data ?? []
   const allReports = allReportsRes.data ?? []
 
-  // ─── Build chart data ─────────────────────────────────────────────────────
-  // Pipeline chart: group candidates by status
   const statusCounts = allCandidates.reduce(
     (acc, c) => {
       const s = c.analysis_status as string
       if (s === "completed") acc.completed++
       else if (s === "ready") acc.ready++
       else if (s === "failed") acc.failed++
-      else acc.pending++ // pending, extracting, processing
+      else acc.pending++
       return acc
     },
     { completed: 0, ready: 0, pending: 0, failed: 0 },
@@ -100,7 +93,6 @@ export default async function DashboardPage() {
     { label: "Analyzed", completed: statusCounts.completed, ready: statusCounts.ready, pending: statusCounts.pending, failed: statusCounts.failed },
   ]
 
-  // Score distribution: bucket scores into ranges
   const scoreBuckets = [
     { range: "0–20", count: 0 },
     { range: "21–40", count: 0 },
@@ -108,7 +100,6 @@ export default async function DashboardPage() {
     { range: "61–80", count: 0 },
     { range: "81–100", count: 0 },
   ]
-
   for (const r of allReports) {
     const s = r.score ?? 0
     if (s <= 20) scoreBuckets[0].count++
@@ -120,111 +111,105 @@ export default async function DashboardPage() {
 
   const hasChartData = allCandidates.length > 0
   const hasScoreData = allReports.length > 0
+  const completionRate = totalCandidates > 0
+    ? Math.round((reportsReady / totalCandidates) * 100)
+    : 0
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-8">
-      {/* Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-primary/8 via-card to-card p-6 md:p-8">
-        <div className="absolute -top-12 -right-12 size-40 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute -bottom-8 -left-8 size-32 rounded-full bg-primary/3 blur-2xl" />
-        <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold tracking-wider text-primary uppercase flex items-center gap-1.5">
-              <IconTrendingUp className="size-3.5" />
-              Dashboard
-            </p>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mt-1.5">
-              Recruiting Overview
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1 max-w-md">
-              Monitor candidate screening progress and manage your hiring pipeline at a glance.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button asChild variant="outline" className="border-border/50">
-              <Link href="/dashboard/candidates">
-                <IconUsers className="size-4 mr-1.5" />
-                All candidates
-              </Link>
-            </Button>
-            <CreateJobDialog />
-          </div>
+    <div className="mx-auto w-full max-w-6xl space-y-7">
+      {/* ── Greeting ──────────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+            Overview
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
+            Welcome back{firstName ? `, ${firstName}` : ""} 👋
+          </h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Here&apos;s your recruiting activity at a glance.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button asChild variant="outline" size="sm" className="border-border/50">
+            <Link href="/dashboard/candidates">
+              <IconUsers className="mr-1.5 size-3.5" />
+              All candidates
+            </Link>
+          </Button>
+          <CreateJobDialog />
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ── Stats row ─────────────────────────────────────────────────── */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={<IconBriefcase className="size-4" />}
-          iconColor="text-primary bg-primary/10"
+          accent="text-primary bg-primary/10"
           label="Open Roles"
           value={totalJobs}
-          subtitle="Active job requirements"
+          sub="Active job criteria"
         />
         <StatCard
           icon={<IconUsers className="size-4" />}
-          iconColor="text-sky-400 bg-sky-500/10"
-          label="Total Candidates"
+          accent="text-sky-400 bg-sky-500/10"
+          label="Candidates"
           value={totalCandidates}
-          subtitle="Uploaded resumes & proposals"
+          sub="Across all roles"
         />
         <StatCard
           icon={<IconClock className="size-4" />}
-          iconColor="text-amber-400 bg-amber-500/10"
-          label="Awaiting Analysis"
+          accent="text-amber-400 bg-amber-500/10"
+          label="In Progress"
           value={awaitingAnalysis}
-          subtitle="Pending extraction or screening"
-          valueColor="text-amber-400"
+          sub="Awaiting extraction or analysis"
+          valueClass="text-amber-400"
         />
         <StatCard
           icon={<IconCircleCheck className="size-4" />}
-          iconColor="text-emerald-400 bg-emerald-500/10"
+          accent="text-emerald-400 bg-emerald-500/10"
           label="Reports Ready"
           value={reportsReady}
-          subtitle="Fully analyzed evidence reports"
-          valueColor="text-emerald-400"
+          sub={`${completionRate}% completion rate`}
+          valueClass="text-emerald-400"
         />
       </div>
 
-      {/* Charts Row */}
+      {/* ── Charts ────────────────────────────────────────────────────── */}
       {(hasChartData || hasScoreData) && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           {hasChartData && (
-            <Card className="border-border/40 shadow-sm">
+            <Card className="border-border/40">
               <CardHeader className="border-b pb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <IconTrendingUp className="size-3.5" />
                   </span>
                   <div>
                     <CardTitle className="text-sm font-semibold">Candidate Pipeline</CardTitle>
-                    <CardDescription className="text-xs">
-                      Distribution across screening stages
-                    </CardDescription>
+                    <CardDescription className="text-xs">Stages across all roles</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-4 pb-2">
+              <CardContent className="pb-3 pt-4">
                 <CandidatePipelineChart data={pipelineData} />
               </CardContent>
             </Card>
           )}
           {hasScoreData && (
-            <Card className="border-border/40 shadow-sm">
+            <Card className="border-border/40">
               <CardHeader className="border-b pb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <IconChartBar className="size-3.5" />
                   </span>
                   <div>
                     <CardTitle className="text-sm font-semibold">Score Distribution</CardTitle>
-                    <CardDescription className="text-xs">
-                      Fit scores across all analyzed candidates
-                    </CardDescription>
+                    <CardDescription className="text-xs">Fit scores across analyzed candidates</CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-4 pb-2">
+              <CardContent className="pb-3 pt-4">
                 <ScoreDistributionChart data={scoreBuckets} />
               </CardContent>
             </Card>
@@ -232,109 +217,97 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Recent Activity Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Recent Jobs list */}
-        <Card className="flex flex-col border-border/40 shadow-sm">
-          <CardHeader className="border-b pb-4">
+      {/* ── Bottom grid ───────────────────────────────────────────────── */}
+      <div className="grid gap-5 lg:grid-cols-[1fr_18rem]">
+        {/* Recent roles */}
+        <Card className="border-border/40">
+          <CardHeader className="border-b pb-3">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base font-semibold">Your active roles</CardTitle>
-                <CardDescription className="text-xs">
-                  Quick shortcuts to recently defined job criteria.
-                </CardDescription>
+                <CardTitle className="text-sm font-semibold">Recent Roles</CardTitle>
+                <CardDescription className="text-xs">Your latest job criteria</CardDescription>
               </div>
-              <Badge variant="secondary" className="text-2xs font-normal">
-                {totalJobs} total
-              </Badge>
+              <Badge variant="secondary" className="text-[10px]">{totalJobs} total</Badge>
             </div>
           </CardHeader>
-          <CardContent className="flex-1 pt-4">
+          <CardContent className="p-0">
             {recentJobs.length > 0 ? (
-              <div className="space-y-2">
-                {recentJobs.map((job) => (
+              <>
+                {recentJobs.map((job, i) => (
                   <Link
                     key={job.id}
                     href={`/dashboard/jobs/${job.id}`}
-                    className="group flex items-center justify-between p-3 rounded-xl border border-border/40 bg-card hover:bg-muted/20 hover:border-primary/15 transition-all duration-200"
+                    className="group flex items-center gap-3 border-b border-border/30 px-5 py-3.5 last:border-0 hover:bg-muted/15 transition-colors"
                   >
-                    <div className="min-w-0 flex-1 pr-3">
-                      <h3 className="text-sm font-semibold truncate group-hover:text-primary transition-colors">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <IconBriefcase className="size-3.5" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
                         {job.title}
-                      </h3>
-                      <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
                         {job.must_have_skills.length > 0
                           ? job.must_have_skills.slice(0, 3).join(" · ")
                           : "No must-have skills"}
                       </p>
                     </div>
-                    <span className="flex size-7 items-center justify-center rounded-full group-hover:bg-primary/10 group-hover:text-primary transition-all duration-200 text-muted-foreground">
-                      <IconArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-                    </span>
+                    <IconArrowRight className="size-3.5 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                   </Link>
                 ))}
-                <div className="pt-3">
-                  <Button asChild size="sm" variant="outline" className="w-full border-border/40">
+                <div className="p-4">
+                  <Button asChild variant="outline" size="sm" className="w-full border-border/40 text-xs">
                     <Link href="/dashboard/jobs">View all roles</Link>
                   </Button>
                 </div>
-              </div>
+              </>
             ) : (
-              <div className="flex flex-col items-center justify-center py-10 text-center">
-                <span className="flex size-12 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground mb-3">
-                  <IconBriefcase className="size-5" />
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <span className="mb-3 flex size-11 items-center justify-center rounded-xl bg-muted/50">
+                  <IconBriefcase className="size-5 text-muted-foreground" />
                 </span>
-                <p className="text-sm font-semibold">No roles created yet</p>
-                <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                  Create your first job posting to start uploading and analyzing candidates.
+                <p className="text-sm font-semibold">No roles yet</p>
+                <p className="mt-1 max-w-xs text-xs text-muted-foreground">
+                  Create your first role to start screening candidates.
                 </p>
                 <div className="mt-4">
-                  <CreateJobDialog
-                    trigger={
-                      <Button size="sm" className="bg-primary hover:bg-primary/85">
-                        <IconPlus className="size-3.5 mr-1" />
-                        Create role
-                      </Button>
-                    }
-                  />
+                  <CreateJobDialog trigger={
+                    <Button size="sm">
+                      <IconPlus className="mr-1.5 size-3.5" />
+                      Create role
+                    </Button>
+                  } />
                 </div>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Getting Started Guide */}
-        <Card className="border-border/40 shadow-sm">
-          <CardHeader className="border-b pb-4">
-            <CardTitle className="text-base font-semibold">How it works</CardTitle>
-            <CardDescription className="text-xs">
-              Follow this workflow to evaluate candidates with evidence-based screening.
-            </CardDescription>
+        {/* How it works */}
+        <Card className="border-border/40 h-fit">
+          <CardHeader className="border-b pb-3">
+            <CardTitle className="text-sm font-semibold">How it works</CardTitle>
           </CardHeader>
-          <CardContent className="pt-5 space-y-5">
-            <StepGuide
-              step={1}
-              title="Create a Role"
-              description="Specify description, requirements, and must-have skills to anchor candidate analysis."
-            />
-            <Separator className="bg-border/30" />
-            <StepGuide
-              step={2}
-              title="Upload Candidate Evidence"
-              description="Provide candidate name, proposal cover letter, portfolio link, and a PDF resume."
-            />
-            <Separator className="bg-border/30" />
-            <StepGuide
-              step={3}
-              title="Extract Resume Text"
-              description="Extract and persist candidate resume text directly in the platform before screening."
-            />
-            <Separator className="bg-border/30" />
-            <StepGuide
-              step={4}
-              title="Review Evidence Report"
-              description="Inspect the structured fit score, strengths/weaknesses list, and follow up in chat."
-            />
+          <CardContent className="p-0">
+            {[
+              { n: 1, title: "Create a Role", desc: "Define requirements and must-have skills." },
+              { n: 2, title: "Add Candidates", desc: "Upload resume, proposal, and portfolio URL." },
+              { n: 3, title: "Extract Resume", desc: "Parse PDF text for evidence analysis." },
+              { n: 4, title: "Run Analysis", desc: "Get a 100-point evidence-backed report." },
+            ].map((step, i, arr) => (
+              <div key={step.n}>
+                <div className="flex items-start gap-3 px-5 py-3.5">
+                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary ring-2 ring-primary/10">
+                    {step.n}
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-semibold text-foreground">{step.title}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{step.desc}</p>
+                  </div>
+                </div>
+                {i < arr.length - 1 && <Separator className="bg-border/30" />}
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
@@ -342,64 +315,29 @@ export default async function DashboardPage() {
   )
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
 function StatCard({
-  icon,
-  iconColor,
-  label,
-  value,
-  subtitle,
-  valueColor,
+  icon, accent, label, value, sub, valueClass,
 }: {
   icon: React.ReactNode
-  iconColor: string
+  accent: string
   label: string
   value: number
-  subtitle: string
-  valueColor?: string
+  sub: string
+  valueClass?: string
 }) {
   return (
-    <Card className="group relative overflow-hidden border-border/40 shadow-sm hover:shadow-md hover:border-primary/15 transition-all duration-300">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <CardHeader className="flex flex-row items-center justify-between pb-2 relative">
-        <CardDescription className="text-xs font-medium uppercase tracking-wider">
-          {label}
-        </CardDescription>
-        <span className={`flex size-8 items-center justify-center rounded-lg ${iconColor}`}>
-          {icon}
-        </span>
-      </CardHeader>
-      <CardContent className="relative">
-        <div className={`text-3xl font-bold tracking-tight ${valueColor ?? "text-foreground"}`}>
-          {value}
+    <Card className="group relative overflow-hidden border-border/40 transition-all duration-300 hover:border-primary/20 hover:shadow-md">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/4 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <CardContent className="relative p-5">
+        <div className="flex items-start justify-between">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+          <span className={`flex size-8 items-center justify-center rounded-lg ${accent}`}>{icon}</span>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+        <p className={`mt-3 font-mono text-3xl font-bold tracking-tight ${valueClass ?? "text-foreground"}`}>
+          {value}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">{sub}</p>
       </CardContent>
     </Card>
-  )
-}
-
-function StepGuide({
-  step,
-  title,
-  description,
-}: {
-  step: number
-  title: string
-  description: string
-}) {
-  return (
-    <div className="flex gap-3.5">
-      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold ring-2 ring-primary/5">
-        {step}
-      </span>
-      <div className="pt-0.5">
-        <h4 className="text-sm font-semibold">{title}</h4>
-        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-          {description}
-        </p>
-      </div>
-    </div>
   )
 }
