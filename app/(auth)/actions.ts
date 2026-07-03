@@ -79,7 +79,7 @@ export async function signIn(
   }
 
   revalidatePath("/", "layout")
-  redirect("/dashboard/jobs")
+  redirect("/dashboard")
 }
 
 export async function signUp(
@@ -118,5 +118,5 @@ export async function signUp(
   }
 
   revalidatePath("/", "layout")
-  redirect("/dashboard/jobs")
+  redirect("/dashboard")
 }

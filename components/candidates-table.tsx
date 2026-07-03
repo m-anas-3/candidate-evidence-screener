@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   IconSearch,
   IconUser,
@@ -60,6 +61,7 @@ export function CandidatesTable({
   candidates: CandidateItem[]
   jobs: { id: string; title: string }[]
 }) {
+  const router = useRouter()
   const [search, setSearch] = useState("")
   const [jobFilter, setJobFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -200,8 +202,33 @@ export function CandidatesTable({
               <TableBody>
                 {pageItems.map((c) => {
                   const report = c.screening_reports
+                  const candidateHref = `/dashboard/jobs/${c.job_id}/candidates/${c.id}?from=${encodeURIComponent("/dashboard/candidates")}`
                   return (
-                    <TableRow key={c.id} className="group hover:bg-muted/10 transition-colors">
+                    <TableRow
+                      key={c.id}
+                      role="link"
+                      tabIndex={0}
+                      aria-label={`Review ${c.name}`}
+                      className="group cursor-pointer transition-colors hover:bg-muted/10 focus-visible:bg-muted/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                      onClick={(event) => {
+                        if (
+                          event.target instanceof Element &&
+                          event.target.closest("a, button, input, select, textarea")
+                        ) {
+                          return
+                        }
+                        router.push(candidateHref)
+                      }}
+                      onKeyDown={(event) => {
+                        if (
+                          event.target === event.currentTarget &&
+                          (event.key === "Enter" || event.key === " ")
+                        ) {
+                          event.preventDefault()
+                          router.push(candidateHref)
+                        }
+                      }}
+                    >
                       {/* Name */}
                       <TableCell className="pl-5 py-3.5">
                         <div className="flex items-center gap-2.5">
@@ -275,21 +302,9 @@ export function CandidatesTable({
                         })}
                       </TableCell>
 
-                      {/* Action */}
+                      {/* Delete action */}
                       <TableCell className="py-3.5 pr-5">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            asChild
-                            size="sm"
-                            variant="outline"
-                            className="border-border/50 text-xs hover:border-primary/25 hover:bg-primary/5 hover:text-primary transition-all"
-                          >
-                            <Link
-                              href={`/dashboard/jobs/${c.job_id}/candidates/${c.id}`}
-                            >
-                              Review
-                            </Link>
-                          </Button>
+                        <div className="flex items-center justify-end">
                           <DeleteRecordButton
                             id={c.id}
                             name={c.name}

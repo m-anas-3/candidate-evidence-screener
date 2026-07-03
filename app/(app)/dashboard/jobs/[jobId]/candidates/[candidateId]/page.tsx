@@ -37,10 +37,13 @@ export const metadata: Metadata = { title: "Candidate Evaluation" }
 
 export default async function CandidateDetailsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ jobId: string; candidateId: string }>
+  searchParams: Promise<{ from?: string }>
 }) {
   const { jobId, candidateId } = await params
+  const { from } = await searchParams
   const supabase = await createClient()
 
   const [
@@ -70,8 +73,14 @@ export default async function CandidateDetailsPage({
       .limit(50),
   ])
 
-  if (candidateError || !candidate) notFound()
+  if (candidateError || !candidate || candidate.job_id !== jobId) notFound()
   if (jobError || !job) notFound()
+
+  const cameFromCandidates = from === "/dashboard/candidates"
+  const backHref = cameFromCandidates
+    ? "/dashboard/candidates"
+    : `/dashboard/jobs/${job.id}`
+  const backLabel = cameFromCandidates ? "Back to candidates" : "Back to role"
 
   const reportResult = screeningReportSchema.safeParse(
     reportRaw?.status === "completed" ? reportRaw.raw_structured_output : null
@@ -256,16 +265,16 @@ export default async function CandidateDetailsPage({
         </Breadcrumb>
         <div className="flex items-center gap-2">
           <Button asChild size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
-            <Link href={`/dashboard/jobs/${job.id}`}>
+            <Link href={backHref}>
               <IconArrowLeft className="mr-1.5 size-3.5" />
-              Back
+              {backLabel}
             </Link>
           </Button>
           <DeleteRecordButton
             id={candidate.id}
             name={candidate.name}
             recordType="candidate"
-            redirectTo={`/dashboard/jobs/${job.id}`}
+            redirectTo={backHref}
             showLabel
           />
         </div>
@@ -348,6 +357,7 @@ export default async function CandidateDetailsPage({
         evidencePanel={evidencePanel}
         reportPanel={reportPanel}
         chatPanel={chatPanel}
+        returnToCandidates={cameFromCandidates}
       />
     </div>
   )

@@ -26,6 +26,7 @@ export function CandidatePageTabs({
   evidencePanel,
   reportPanel,
   chatPanel,
+  returnToCandidates = false,
 }: {
   hasReport: boolean
   candidateId: string
@@ -33,6 +34,7 @@ export function CandidatePageTabs({
   evidencePanel: ReactNode
   reportPanel: ReactNode
   chatPanel: ReactNode
+  returnToCandidates?: boolean
 }) {
   const [active, setActive] = useState<Tab>(hasReport ? "report" : "evidence")
 
@@ -90,7 +92,9 @@ export function CandidatePageTabs({
               variant="ghost"
               className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-primary"
             >
-              <Link href={`/dashboard/jobs/${jobId}/candidates/${candidateId}/chat`}>
+              <Link
+                href={`/dashboard/jobs/${jobId}/candidates/${candidateId}/chat${returnToCandidates ? `?from=${encodeURIComponent("/dashboard/candidates")}` : ""}`}
+              >
                 Full page
                 <IconArrowUpRight className="size-3.5" />
               </Link>

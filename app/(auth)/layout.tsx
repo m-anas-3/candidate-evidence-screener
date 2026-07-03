@@ -14,7 +14,7 @@ export default async function AuthLayout({
   const { data } = await supabase.auth.getClaims()
 
   if (data?.claims) {
-    redirect("/dashboard/jobs")
+    redirect("/dashboard")
   }
 
   return (

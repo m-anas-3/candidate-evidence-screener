@@ -22,10 +22,13 @@ export const metadata: Metadata = { title: "Candidate AI Chat" }
 
 export default async function CandidateChatPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ jobId: string; candidateId: string }>
+  searchParams: Promise<{ from?: string }>
 }) {
   const { jobId, candidateId } = await params
+  const { from } = await searchParams
   const supabase = await createClient()
 
   const [
@@ -71,6 +74,7 @@ export default async function CandidateChatPage({
     role: m.role as "user" | "assistant",
     content: m.content,
   }))
+  const candidateHref = `/dashboard/jobs/${job.id}/candidates/${candidate.id}${from === "/dashboard/candidates" ? `?from=${encodeURIComponent("/dashboard/candidates")}` : ""}`
 
   return (
     <div className="mx-auto flex h-[calc(100vh-4rem)] w-full max-w-4xl flex-col gap-0">
@@ -94,7 +98,7 @@ export default async function CandidateChatPage({
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
                   <Link
-                    href={`/dashboard/jobs/${job.id}/candidates/${candidate.id}`}
+                    href={candidateHref}
                   >
                     {candidate.name}
                   </Link>
@@ -130,7 +134,7 @@ export default async function CandidateChatPage({
           className="self-start border-border/50 sm:self-auto"
         >
           <Link
-            href={`/dashboard/jobs/${job.id}/candidates/${candidate.id}`}
+            href={candidateHref}
           >
             <IconArrowLeft className="mr-1.5 size-3.5" />
             Back to candidate

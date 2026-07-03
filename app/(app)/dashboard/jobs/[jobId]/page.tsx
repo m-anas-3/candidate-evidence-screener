@@ -13,6 +13,7 @@ import {
 
 import { AddCandidateSheet } from "@/components/add-candidate-sheet"
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
+import { ClickableTableRow } from "@/components/clickable-table-row"
 import { DeleteRecordButton } from "@/components/delete-record-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -296,7 +297,12 @@ export default async function JobDetailsPage({
                   const hasReport = report !== undefined && report !== null
 
                   return (
-                    <TableRow key={candidate.id} className="group hover:bg-muted/15 transition-colors">
+                    <ClickableTableRow
+                      key={candidate.id}
+                      href={`/dashboard/jobs/${job.id}/candidates/${candidate.id}`}
+                      navigationLabel={`Review ${candidate.name}`}
+                      className="group hover:bg-muted/15"
+                    >
                       <TableCell className="pl-6 font-medium">
                         <div className="flex items-center gap-2.5">
                           <span className="flex size-7 items-center justify-center rounded-full bg-primary/8 text-primary ring-1 ring-primary/10">
@@ -350,12 +356,7 @@ export default async function JobDetailsPage({
                         })}
                       </TableCell>
                       <TableCell className="pr-6">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button asChild size="sm" variant="outline" className="border-border/50 hover:border-primary/20 hover:bg-primary/5 hover:text-primary transition-all">
-                            <Link href={`/dashboard/jobs/${job.id}/candidates/${candidate.id}`}>
-                              Review evidence
-                            </Link>
-                          </Button>
+                        <div className="flex items-center justify-end">
                           <DeleteRecordButton
                             id={candidate.id}
                             name={candidate.name}
@@ -363,7 +364,7 @@ export default async function JobDetailsPage({
                           />
                         </div>
                       </TableCell>
-                    </TableRow>
+                    </ClickableTableRow>
                   )
                 })}
               </TableBody>
