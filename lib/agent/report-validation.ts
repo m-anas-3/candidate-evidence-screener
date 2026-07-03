@@ -1,4 +1,4 @@
-import type { ScreeningReport } from "./report-schema"
+import { screeningReportSchema, type ScreeningReport } from "./report-schema"
 import { mentionsSkill } from "./skill-matching"
 
 export type ReportContextValidationErrorCode =
@@ -31,7 +31,7 @@ export function validateReportMustHaveCoverage(
   report: ScreeningReport,
   mustHaveSkills: string[]
 ): ScreeningReport {
-  let missingSkills = [...report.missingSkills]
+  const missingSkills = [...report.missingSkills]
   let changed = false
 
   for (const skill of mustHaveSkills) {
@@ -65,8 +65,7 @@ export function validateReportMustHaveCoverage(
 
   if (!changed) return report
 
-  // Return a new report object with the repaired missingSkills list.
-  // Score and recommendation are re-derived from sub-scores by the schema
-  // transform, so they don't need updating here.
-  return { ...report, missingSkills }
+  // Parse again after repairing coverage. This re-derives the total and
+  // recommendation, including the 79-point cap for a missing must-have.
+  return screeningReportSchema.parse({ ...report, missingSkills })
 }

@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import type { AuthActionState } from "@/lib/auth/types"
@@ -22,6 +23,12 @@ type AuthFormProps = {
 export function AuthForm({ action, mode, notice }: AuthFormProps) {
   const [state, formAction, pending] = useActionState(action, initialState)
   const isSignUp = mode === "sign-up"
+
+  useEffect(() => {
+    if (!state.message) return
+    if (state.status === "success") toast.success(state.message)
+    if (state.status === "error") toast.error(state.message)
+  }, [state])
 
   return (
     <form action={formAction} className="space-y-4" noValidate>
@@ -59,7 +66,7 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
           errorId="password-error"
         />
         {isSignUp && (
-          <p className="text-[11px] text-muted-foreground pl-0.5">
+          <p className="pl-0.5 text-[11px] text-muted-foreground">
             At least 8 characters with a letter and number.
           </p>
         )}
@@ -95,18 +102,22 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
       )}
 
       <Button
-        className="mt-1 w-full h-10 text-[13px] font-semibold tracking-tight"
+        className="mt-1 h-10 w-full text-[13px] font-semibold tracking-tight"
         disabled={pending}
         size="lg"
         type="submit"
       >
         {pending && <IconLoader2 className="mr-2 size-3.5 animate-spin" />}
         {pending
-          ? isSignUp ? "Creating account…" : "Signing in…"
-          : isSignUp ? "Create account" : "Sign in"}
+          ? isSignUp
+            ? "Creating account…"
+            : "Signing in…"
+          : isSignUp
+            ? "Create account"
+            : "Sign in"}
       </Button>
 
-      <p className="text-center text-[12px] text-muted-foreground pt-1">
+      <p className="pt-1 text-center text-[12px] text-muted-foreground">
         {isSignUp ? "Already have an account?" : "New here?"}{" "}
         <Link
           href={isSignUp ? "/login" : "/signup"}
@@ -162,7 +173,7 @@ function Field({
         aria-describedby={hasError ? errorId : undefined}
         aria-invalid={hasError}
         className={cn(
-          "h-10 w-full rounded-lg border bg-muted/30 px-3 text-[13px] text-foreground outline-none transition-all",
+          "h-10 w-full rounded-lg border bg-muted/30 px-3 text-[13px] text-foreground transition-all outline-none",
           "placeholder:text-muted-foreground/50",
           "focus:border-primary/60 focus:ring-2 focus:ring-primary/15",
           "disabled:cursor-not-allowed disabled:opacity-50",
@@ -174,7 +185,7 @@ function Field({
       {hasError && (
         <ul id={errorId} className="space-y-0.5">
           {errors!.map((e) => (
-            <li key={e} className="text-[11px] text-destructive pl-0.5">
+            <li key={e} className="pl-0.5 text-[11px] text-destructive">
               {e}
             </li>
           ))}

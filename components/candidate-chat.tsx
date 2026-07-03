@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { toast } from "sonner"
 import {
   IconLoader2,
   IconMessageCircle,
@@ -123,9 +124,10 @@ export function CandidateChat({
         }
       }
     } catch (err) {
-      setError(
+      const message =
         err instanceof Error ? err.message : "Something went wrong. Try again."
-      )
+      setError(message)
+      toast.error("Could not answer that question", { description: message })
       setMessages((prev) => prev.filter((m) => m.id !== assistantId))
     } finally {
       setStreaming(false)
@@ -153,15 +155,8 @@ export function CandidateChat({
     )
   }
 
-  const scrollAreaHeight = fullPage ? "flex-1 min-h-0" : "h-[440px]"
-
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-3",
-        fullPage && "h-full"
-      )}
-    >
+    <div className={cn("flex flex-col gap-3", fullPage && "h-full")}>
       {/* Advisory note */}
       <p className="shrink-0 text-xs text-muted-foreground">
         Answers are grounded in this candidate&apos;s resume, proposal, and
@@ -175,7 +170,7 @@ export function CandidateChat({
       <ScrollArea
         className={cn(
           "rounded-xl border border-border/40 bg-muted/5",
-          fullPage ? "flex-1 min-h-0" : "h-[440px]"
+          fullPage ? "min-h-0 flex-1" : "h-[440px]"
         )}
       >
         <div className="space-y-1 p-4 pr-5">
@@ -207,9 +202,7 @@ export function CandidateChat({
               </div>
             </div>
           ) : (
-            messages.map((msg) => (
-              <MessageBubble key={msg.id} message={msg} />
-            ))
+            messages.map((msg) => <MessageBubble key={msg.id} message={msg} />)
           )}
 
           {streaming &&
@@ -324,7 +317,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             <MarkdownContent content={message.content} />
           )
         ) : (
-          <span className="italic text-muted-foreground opacity-60">…</span>
+          <span className="text-muted-foreground italic opacity-60">…</span>
         )}
       </div>
     </div>
@@ -342,17 +335,17 @@ function MarkdownContent({ content }: { content: string }) {
       components={{
         // Headings
         h1: ({ children }) => (
-          <h1 className="mb-2 mt-3 text-base font-semibold first:mt-0">
+          <h1 className="mt-3 mb-2 text-base font-semibold first:mt-0">
             {children}
           </h1>
         ),
         h2: ({ children }) => (
-          <h2 className="mb-1.5 mt-3 text-sm font-semibold first:mt-0">
+          <h2 className="mt-3 mb-1.5 text-sm font-semibold first:mt-0">
             {children}
           </h2>
         ),
         h3: ({ children }) => (
-          <h3 className="mb-1 mt-2.5 text-sm font-semibold text-foreground/90 first:mt-0">
+          <h3 className="mt-2.5 mb-1 text-sm font-semibold text-foreground/90 first:mt-0">
             {children}
           </h3>
         ),
@@ -362,12 +355,12 @@ function MarkdownContent({ content }: { content: string }) {
         ),
         // Lists
         ul: ({ children }) => (
-          <ul className="mb-2 ml-4 space-y-1 list-disc last:mb-0">
+          <ul className="mb-2 ml-4 list-disc space-y-1 last:mb-0">
             {children}
           </ul>
         ),
         ol: ({ children }) => (
-          <ol className="mb-2 ml-4 space-y-1 list-decimal last:mb-0">
+          <ol className="mb-2 ml-4 list-decimal space-y-1 last:mb-0">
             {children}
           </ol>
         ),
@@ -379,7 +372,7 @@ function MarkdownContent({ content }: { content: string }) {
           <strong className="font-semibold text-foreground">{children}</strong>
         ),
         em: ({ children }) => (
-          <em className="italic text-foreground/80">{children}</em>
+          <em className="text-foreground/80 italic">{children}</em>
         ),
         // Inline code
         code: ({ children }) => (

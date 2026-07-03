@@ -1,7 +1,8 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 import { createJob } from "@/app/(app)/dashboard/jobs/actions"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,10 @@ const initialState: IntakeActionState = {}
 
 export function JobForm() {
   const [state, formAction, pending] = useActionState(createJob, initialState)
+
+  useEffect(() => {
+    if (state.status === "error" && state.message) toast.error(state.message)
+  }, [state])
 
   return (
     <form action={formAction} className="space-y-4" noValidate>
@@ -103,7 +108,7 @@ export function JobForm() {
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-2 pt-2">
+      <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-2">
         <Button
           asChild
           variant="outline"
@@ -114,7 +119,7 @@ export function JobForm() {
           <Link href="/dashboard/jobs">Cancel</Link>
         </Button>
         <Button
-          className="flex-1 sm:flex-none bg-primary hover:bg-primary/80"
+          className="flex-1 bg-primary hover:bg-primary/80 sm:flex-none"
           disabled={pending}
           type="submit"
         >
@@ -142,9 +147,7 @@ function FormField({
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
       {children}
-      {hint ? (
-        <p className="text-xs text-muted-foreground">{hint}</p>
-      ) : null}
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
       {error?.length ? (
         <ul className="space-y-1 text-xs text-destructive" id={`${id}-error`}>
           {error.map((message) => (

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { IconCheck, IconCopy } from "@tabler/icons-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -12,9 +13,11 @@ export function OutreachMessageEditor({ message }: { message: string }) {
     try {
       await navigator.clipboard.writeText(value)
       setCopied(true)
+      toast.success("Message copied to clipboard")
       window.setTimeout(() => setCopied(false), 2_000)
     } catch {
       setCopied(false)
+      toast.error("Could not copy the message")
     }
   }
   return (

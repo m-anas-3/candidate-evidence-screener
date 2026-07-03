@@ -5,6 +5,7 @@ import { Geist_Mono, Inter } from "next/font/google"
 import "./globals.css"
 import { QueryProvider } from "@/components/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
 
 const inter = Inter({
@@ -37,17 +38,12 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(
-        "font-sans antialiased",
-        fontMono.variable,
-        inter.variable
-      )}
+      className={cn("font-sans antialiased", fontMono.variable, inter.variable)}
     >
       <body>
         <ThemeProvider>
-          <QueryProvider>
-            {children}
-          </QueryProvider>
+          <QueryProvider>{children}</QueryProvider>
+          <Toaster closeButton position="top-right" richColors />
           <Analytics />
         </ThemeProvider>
       </body>

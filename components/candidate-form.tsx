@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { toast } from "sonner"
 
 import { createCandidate } from "@/app/(app)/dashboard/candidates/actions"
 import { Button } from "@/components/ui/button"
@@ -29,6 +30,10 @@ export function CandidateForm({
   const [errors, setErrors] = useState<FormErrors>({})
   const [message, setMessage] = useState<string>()
   const [pending, setPending] = useState(false)
+
+  useEffect(() => {
+    if (message) toast.error(message)
+  }, [message])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -97,6 +102,9 @@ export function CandidateForm({
       }
 
       router.push(`/dashboard/jobs/${jobId}/candidates/${candidateId}`)
+      toast.success("Candidate added", {
+        description: "The resume is ready to be extracted and analyzed.",
+      })
       router.refresh()
     } catch {
       // A transport failure can occur after the database insert commits. Keep
@@ -198,7 +206,7 @@ export function CandidateForm({
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end sm:gap-2 pt-2">
+      <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-2">
         <Button
           asChild
           variant="outline"
@@ -209,7 +217,7 @@ export function CandidateForm({
           <Link href={`/dashboard/jobs/${jobId}`}>Cancel</Link>
         </Button>
         <Button
-          className="flex-1 sm:flex-none bg-primary hover:bg-primary/80"
+          className="flex-1 bg-primary hover:bg-primary/80 sm:flex-none"
           disabled={pending}
           type="submit"
         >
@@ -241,9 +249,7 @@ function FormField({
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
       {children}
-      {hint ? (
-        <p className="text-xs text-muted-foreground">{hint}</p>
-      ) : null}
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
       {error?.length ? (
         <ul className="space-y-1 text-xs text-destructive" id={`${id}-error`}>
           {error.map((item) => (

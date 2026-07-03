@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import {
   IconBrain,
   IconFileText,
@@ -101,7 +102,6 @@ export function CandidateAnalysisControl({
 }) {
   const router = useRouter()
   const invalidate = useInvalidateCandidateStatus()
-  const [message, setMessage] = useState<string>()
   const [submitting, setSubmitting] = useState(false)
 
   // useCandidateStatus polls every 3 s while status is "processing" and
@@ -122,8 +122,6 @@ export function CandidateAnalysisControl({
 
   async function analyze() {
     setSubmitting(true)
-    setMessage(undefined)
-
     try {
       const response = await fetch(`/api/candidates/${candidateId}/analyze`, {
         method: "POST",
@@ -133,17 +131,23 @@ export function CandidateAnalysisControl({
       if (!response.ok || !result.ok) {
         const ref =
           !result.ok && result.reference ? ` Ref: ${result.reference}` : ""
-        setMessage(`${!result.ok ? result.error : "Analysis failed."}${ref}`)
+        toast.error(!result.ok ? result.error : "Analysis failed.", {
+          description: ref ? ref.trim() : undefined,
+        })
         // Invalidate so the status refreshes immediately after an error
         await invalidate(candidateId)
         router.refresh()
       } else {
-        setMessage("Evidence-backed report completed.")
+        toast.success("Candidate analysis complete", {
+          description: "The evidence-backed report is ready to review.",
+        })
         await invalidate(candidateId)
         router.refresh()
       }
     } catch {
-      setMessage("Analysis could not be started. Try again.")
+      toast.error("Analysis could not be started", {
+        description: "Check your connection and try again.",
+      })
       await invalidate(candidateId)
     } finally {
       setSubmitting(false)
@@ -175,12 +179,6 @@ export function CandidateAnalysisControl({
       </Button>
 
       {processing && <AgentWorkingState />}
-
-      {message && (
-        <p className="text-xs text-muted-foreground" role="status">
-          {message}
-        </p>
-      )}
     </div>
   )
 }

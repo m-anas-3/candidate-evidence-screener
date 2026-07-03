@@ -1,12 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  IconCircleCheck,
-  IconFileText,
-  IconLoader2,
-} from "@tabler/icons-react"
+import { toast } from "sonner"
+import { IconCircleCheck, IconFileText, IconLoader2 } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +11,6 @@ import {
   useInvalidateCandidateStatus,
 } from "@/lib/query/candidate-status"
 import type { Database } from "@/lib/supabase/database.types"
-import { cn } from "@/lib/utils"
 
 type AnalysisStatus = Database["public"]["Enums"]["candidate_analysis_status"]
 
@@ -31,7 +27,6 @@ export function ResumeExtractionControl({
 }) {
   const router = useRouter()
   const invalidate = useInvalidateCandidateStatus()
-  const [message, setMessage] = useState<string>()
   const [submitting, setSubmitting] = useState(false)
 
   // Seeded from the server-rendered status — no loading flash.
@@ -44,14 +39,12 @@ export function ResumeExtractionControl({
   const isExtracting = status === "extracting" || submitting
 
   // When extraction completes, refresh the page so the resume text appears
-  if (isReady && (initialStatus === "extracting" || submitting)) {
-    router.refresh()
-  }
+  useEffect(() => {
+    if (isReady && initialStatus === "extracting") router.refresh()
+  }, [initialStatus, isReady, router])
 
   async function extractResume() {
     setSubmitting(true)
-    setMessage(undefined)
-
     try {
       const response = await fetch(
         `/api/candidates/${candidateId}/extract-resume`,
@@ -60,17 +53,21 @@ export function ResumeExtractionControl({
       const result = (await response.json()) as ExtractionResponse
 
       if (!response.ok || !result.ok) {
-        setMessage(result.ok ? "Resume extraction failed." : result.error)
+        toast.error(result.ok ? "Resume extraction failed." : result.error)
         await invalidate(candidateId)
         router.refresh()
         return
       }
 
-      setMessage(`Extracted ${result.characterCount.toLocaleString()} characters.`)
+      toast.success("Resume is ready", {
+        description: `${result.characterCount.toLocaleString()} characters were prepared for analysis.`,
+      })
       await invalidate(candidateId)
       router.refresh()
     } catch {
-      setMessage("Resume extraction could not be started. Try again.")
+      toast.error("Resume extraction could not be started", {
+        description: "Check your connection and try again.",
+      })
       await invalidate(candidateId)
     } finally {
       setSubmitting(false)
@@ -94,11 +91,6 @@ export function ResumeExtractionControl({
             </p>
           </div>
         </div>
-        {message && (
-          <p className="text-xs leading-5 text-muted-foreground" role="status">
-            {message}
-          </p>
-        )}
       </div>
     )
   }
@@ -123,12 +115,6 @@ export function ResumeExtractionControl({
             ? "Retry extraction"
             : "Extract resume text"}
       </Button>
-
-      {message && (
-        <p className="text-xs leading-5 text-muted-foreground" role="status">
-          {message}
-        </p>
-      )}
     </div>
   )
 }

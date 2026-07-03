@@ -26,32 +26,6 @@ type AgentToolDependencies = {
 // object so the four tools never hit the database more than once per agent run.
 // ---------------------------------------------------------------------------
 
-type CandidateRow = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<SupabaseClient<Database>["from"]>["select"]
-    >
-  >["data"]
->[number] & {
-  jobs:
-    | {
-        id: string
-        recruiter_id: string
-        title: string
-        description: string
-        requirements: string
-        must_have_skills: string[]
-      }
-    | {
-        id: string
-        recruiter_id: string
-        title: string
-        description: string
-        requirements: string
-        must_have_skills: string[]
-      }[]
-}
-
 type LoadedContext = {
   candidate: {
     id: string
@@ -108,9 +82,11 @@ function loadOwnedCandidate(
       .eq("jobs.recruiter_id", dependencies.recruiterId)
       .maybeSingle()
 
-    if (error) throw new Error("Authorized candidate context could not be loaded.")
+    if (error)
+      throw new Error("Authorized candidate context could not be loaded.")
     if (!candidate) throw new Error("Candidate not found.")
-    if (!candidate.resume_text) throw new Error("Candidate resume text is not ready.")
+    if (!candidate.resume_text)
+      throw new Error("Candidate resume text is not ready.")
 
     const jobValue = candidate.jobs
     const job = Array.isArray(jobValue) ? jobValue[0] : jobValue
@@ -147,10 +123,23 @@ function requireBoundCandidate(
 // ---------------------------------------------------------------------------
 
 export function createRecruiterTools(dependencies: AgentToolDependencies) {
+  // Prompt instructions are not a sufficient workflow guarantee. Track the
+  // completed steps per run and reject skipped or repeated tool calls.
+  const workflow = {
+    contextLoaded: false,
+    portfolioInspected: false,
+    proposalAssessed: false,
+    reportSaved: false,
+  }
+
   const loadCandidateContext = tool(
     async ({ candidateId }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
+      if (workflow.contextLoaded) {
+        throw new Error("Candidate context has already been loaded.")
+      }
       const { candidate, job } = await loadOwnedCandidate(dependencies)
+      workflow.contextLoaded = true
       return {
         candidate: {
           id: candidate.id,
@@ -180,13 +169,21 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const assessProposal = tool(
     async ({ candidateId }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
+      if (!workflow.contextLoaded) {
+        throw new Error("Load candidate context before assessing the proposal.")
+      }
+      if (workflow.proposalAssessed) {
+        throw new Error("The proposal has already been assessed.")
+      }
       // Reuses the cached DB fetch — no second round-trip.
       const { candidate, job } = await loadOwnedCandidate(dependencies)
-      return assessProposalSpecificity(
+      const result = assessProposalSpecificity(
         candidate.proposal_text ?? "",
         job.title,
         job.must_have_skills
       )
+      workflow.proposalAssessed = true
+      return result
     },
     {
       name: "assess_proposal_specificity",
@@ -199,10 +196,19 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const inspectPortfolio = tool(
     async ({ candidateId }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
+      if (!workflow.proposalAssessed) {
+        throw new Error("Assess the proposal before inspecting the portfolio.")
+      }
+      if (workflow.portfolioInspected) {
+        throw new Error("The portfolio has already been inspected.")
+      }
       // Reuses the cached DB fetch — no second round-trip.
       const { candidate } = await loadOwnedCandidate(dependencies)
       try {
-        const result = await inspectPublicPortfolio(candidate.portfolio_url ?? "")
+        const result = await inspectPublicPortfolio(
+          candidate.portfolio_url ?? ""
+        )
+        workflow.portfolioInspected = true
         return {
           ...result,
           securityNotice:
@@ -211,6 +217,9 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
         }
       } catch (error) {
         if (error instanceof PortfolioInspectionError) {
+          // An unavailable or unsafe portfolio is still a completed inspection
+          // step and must be represented as missing evidence in the report.
+          workflow.portfolioInspected = true
           return {
             finalUrl: null,
             status: error.code,
@@ -232,6 +241,12 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
   const saveReport = tool(
     async ({ candidateId, report }) => {
       requireBoundCandidate(candidateId, dependencies.candidateId)
+      if (!workflow.portfolioInspected) {
+        throw new Error("Inspect the portfolio before saving the report.")
+      }
+      if (workflow.reportSaved) {
+        throw new Error("The screening report has already been saved.")
+      }
       // Reuses the cached DB fetch — no second round-trip.
       const { candidate, job } = await loadOwnedCandidate(dependencies)
       if (candidate.analysis_status !== "processing") {
@@ -270,6 +285,7 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
         )
 
       if (error) throw new Error("Validated report could not be saved.")
+      workflow.reportSaved = true
       return { candidateId, saved: true, status: "completed" as const }
     },
     {

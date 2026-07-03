@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import {
   IconLink,
   IconNotes,
@@ -62,6 +63,10 @@ function CandidateSheetForm({
   const [message, setMessage] = useState<string>()
   const [pending, setPending] = useState(false)
   const [fileName, setFileName] = useState<string>()
+
+  useEffect(() => {
+    if (message) toast.error(message)
+  }, [message])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -134,22 +139,29 @@ function CandidateSheetForm({
   }
 
   return (
-    <form className="space-y-5 mt-2 px-6" noValidate onSubmit={handleSubmit}>
+    <form className="mt-2 space-y-5 px-6" noValidate onSubmit={handleSubmit}>
       {/* Job context banner */}
-      <div className="rounded-lg border border-primary/15 bg-primary/5 px-3.5 py-3 space-y-1.5">
-        <p className="text-2xs font-semibold uppercase tracking-wider text-primary/80">
+      <div className="space-y-1.5 rounded-lg border border-primary/15 bg-primary/5 px-3.5 py-3">
+        <p className="text-2xs font-semibold tracking-wider text-primary/80 uppercase">
           Adding to role
         </p>
         <p className="text-sm font-semibold text-foreground">{job.title}</p>
         {job.must_have_skills.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-0.5">
             {job.must_have_skills.slice(0, 4).map((skill) => (
-              <Badge key={skill} variant="secondary" className="text-2xs font-normal px-1.5 py-0">
+              <Badge
+                key={skill}
+                variant="secondary"
+                className="text-2xs px-1.5 py-0 font-normal"
+              >
                 {skill}
               </Badge>
             ))}
             {job.must_have_skills.length > 4 && (
-              <Badge variant="outline" className="text-2xs font-normal px-1.5 py-0">
+              <Badge
+                variant="outline"
+                className="text-2xs px-1.5 py-0 font-normal"
+              >
                 +{job.must_have_skills.length - 4}
               </Badge>
             )}
@@ -161,7 +173,10 @@ function CandidateSheetForm({
 
       {/* Name */}
       <div className="space-y-2">
-        <Label htmlFor="sheet-name" className="text-sm font-medium flex items-center gap-1.5">
+        <Label
+          htmlFor="sheet-name"
+          className="flex items-center gap-1.5 text-sm font-medium"
+        >
           <IconUser className="size-3.5 text-muted-foreground" />
           Candidate name <span className="text-destructive">*</span>
         </Label>
@@ -177,15 +192,20 @@ function CandidateSheetForm({
           aria-invalid={Boolean(errors.name)}
         />
         {errors.name && (
-          <ul className="text-xs text-destructive space-y-0.5">
-            {errors.name.map((m) => <li key={m}>{m}</li>)}
+          <ul className="space-y-0.5 text-xs text-destructive">
+            {errors.name.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
 
       {/* Proposal */}
       <div className="space-y-2">
-        <Label htmlFor="sheet-proposal" className="text-sm font-medium flex items-center gap-1.5">
+        <Label
+          htmlFor="sheet-proposal"
+          className="flex items-center gap-1.5 text-sm font-medium"
+        >
           <IconNotes className="size-3.5 text-muted-foreground" />
           Proposal / Cover Letter <span className="text-destructive">*</span>
         </Label>
@@ -200,19 +220,26 @@ function CandidateSheetForm({
           aria-invalid={Boolean(errors.proposalText)}
         />
         {errors.proposalText && (
-          <ul className="text-xs text-destructive space-y-0.5">
-            {errors.proposalText.map((m) => <li key={m}>{m}</li>)}
+          <ul className="space-y-0.5 text-xs text-destructive">
+            {errors.proposalText.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
 
       {/* Portfolio */}
       <div className="space-y-2">
-        <Label htmlFor="sheet-portfolio" className="text-sm font-medium flex items-center gap-1.5">
+        <Label
+          htmlFor="sheet-portfolio"
+          className="flex items-center gap-1.5 text-sm font-medium"
+        >
           <IconLink className="size-3.5 text-muted-foreground" />
           Portfolio URL <span className="text-destructive">*</span>
         </Label>
-        <p className="text-xs text-muted-foreground -mt-1">Public URL — will be inspected during analysis.</p>
+        <p className="-mt-1 text-xs text-muted-foreground">
+          Public URL — will be inspected during analysis.
+        </p>
         <Input
           id="sheet-portfolio"
           name="portfolioUrl"
@@ -225,24 +252,32 @@ function CandidateSheetForm({
           aria-invalid={Boolean(errors.portfolioUrl)}
         />
         {errors.portfolioUrl && (
-          <ul className="text-xs text-destructive space-y-0.5">
-            {errors.portfolioUrl.map((m) => <li key={m}>{m}</li>)}
+          <ul className="space-y-0.5 text-xs text-destructive">
+            {errors.portfolioUrl.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
 
       {/* Resume */}
       <div className="space-y-2">
-        <Label htmlFor="sheet-resume" className="text-sm font-medium flex items-center gap-1.5">
+        <Label
+          htmlFor="sheet-resume"
+          className="flex items-center gap-1.5 text-sm font-medium"
+        >
           <IconUpload className="size-3.5 text-muted-foreground" />
           PDF Resume <span className="text-destructive">*</span>
         </Label>
-        <p className="text-xs text-muted-foreground -mt-1">
-          PDF only · Max {MAX_RESUME_BYTES / 1024 / 1024} MB · Stored in private storage.
+        <p className="-mt-1 text-xs text-muted-foreground">
+          PDF only · Max {MAX_RESUME_BYTES / 1024 / 1024} MB · Stored in private
+          storage.
         </p>
         <div
           className={`relative rounded-lg border-2 border-dashed transition-colors ${
-            errors.resume ? "border-destructive/40 bg-destructive/5" : "border-border/60 bg-muted/20 hover:border-primary/30 hover:bg-primary/5"
+            errors.resume
+              ? "border-destructive/40 bg-destructive/5"
+              : "border-border/60 bg-muted/20 hover:border-primary/30 hover:bg-primary/5"
           }`}
         >
           <input
@@ -252,24 +287,30 @@ function CandidateSheetForm({
             accept="application/pdf,.pdf"
             disabled={pending}
             required
-            className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            className="absolute inset-0 cursor-pointer opacity-0 disabled:cursor-not-allowed"
             aria-invalid={Boolean(errors.resume)}
             onChange={(e) => {
               const file = e.target.files?.[0]
               setFileName(file?.name)
             }}
           />
-          <div className="flex flex-col items-center justify-center py-5 px-4 text-center pointer-events-none">
-            <IconUpload className={`size-6 mb-2 ${fileName ? "text-primary" : "text-muted-foreground"}`} />
+          <div className="pointer-events-none flex flex-col items-center justify-center px-4 py-5 text-center">
+            <IconUpload
+              className={`mb-2 size-6 ${fileName ? "text-primary" : "text-muted-foreground"}`}
+            />
             <p className="text-sm font-medium text-foreground">
               {fileName ? fileName : "Click to upload resume"}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5">PDF files only</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              PDF files only
+            </p>
           </div>
         </div>
         {errors.resume && (
-          <ul className="text-xs text-destructive space-y-0.5">
-            {errors.resume.map((m) => <li key={m}>{m}</li>)}
+          <ul className="space-y-0.5 text-xs text-destructive">
+            {errors.resume.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
@@ -297,16 +338,16 @@ function CandidateSheetForm({
         <Button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-primary hover:bg-primary/85 font-semibold"
+          className="flex-1 bg-primary font-semibold hover:bg-primary/85"
         >
           {pending ? (
             <>
-              <IconUserPlus className="size-3.5 mr-1.5 animate-pulse" />
+              <IconUserPlus className="mr-1.5 size-3.5 animate-pulse" />
               Uploading…
             </>
           ) : (
             <>
-              <IconUserPlus className="size-3.5 mr-1.5" />
+              <IconUserPlus className="mr-1.5 size-3.5" />
               Add candidate
             </>
           )}
@@ -316,12 +357,19 @@ function CandidateSheetForm({
   )
 }
 
-export function AddCandidateSheet({ job, userId, trigger }: AddCandidateSheetProps) {
+export function AddCandidateSheet({
+  job,
+  userId,
+  trigger,
+}: AddCandidateSheetProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
   function handleSuccess(candidateId: string) {
     setOpen(false)
+    toast.success("Candidate added", {
+      description: "The resume is ready to be extracted and analyzed.",
+    })
     router.push(`/dashboard/jobs/${job.id}/candidates/${candidateId}`)
     router.refresh()
   }
@@ -330,20 +378,25 @@ export function AddCandidateSheet({ job, userId, trigger }: AddCandidateSheetPro
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {trigger ?? (
-          <Button className="bg-primary hover:bg-primary/85 font-semibold">
-            <IconPlus className="size-4 mr-1.5" />
+          <Button className="bg-primary font-semibold hover:bg-primary/85">
+            <IconPlus className="mr-1.5 size-4" />
             Add candidate
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-[500px] overflow-y-auto" side="right">
+      <SheetContent
+        className="w-full overflow-y-auto sm:max-w-[500px]"
+        side="right"
+      >
         <SheetHeader className="pb-2">
           <div className="flex items-center gap-2.5">
             <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <IconUserPlus className="size-4" />
             </span>
             <div>
-              <SheetTitle className="text-base font-semibold">Add candidate</SheetTitle>
+              <SheetTitle className="text-base font-semibold">
+                Add candidate
+              </SheetTitle>
               <SheetDescription className="text-xs">
                 Upload evidence to screen against role criteria.
               </SheetDescription>

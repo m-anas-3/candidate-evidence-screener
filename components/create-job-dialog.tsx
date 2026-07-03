@@ -2,6 +2,7 @@
 
 import { useEffect, useActionState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { IconBriefcase, IconPlus, IconSparkles } from "@tabler/icons-react"
 
 import { createJobForDialog } from "@/app/(app)/dashboard/jobs/actions"
@@ -24,11 +25,16 @@ import { useState } from "react"
 const initialState: IntakeActionState = {}
 
 function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
-  const [state, formAction, pending] = useActionState(createJobForDialog, initialState)
+  const [state, formAction, pending] = useActionState(
+    createJobForDialog,
+    initialState
+  )
 
   useEffect(() => {
     if (state.status === "success" && state.jobId) {
       onSuccess(state.jobId)
+    } else if (state.status === "error" && state.message) {
+      toast.error(state.message)
     }
   }, [state, onSuccess])
 
@@ -51,7 +57,9 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
         />
         {state.fieldErrors?.title && (
           <ul className="space-y-0.5 text-xs text-destructive">
-            {state.fieldErrors.title.map((m) => <li key={m}>{m}</li>)}
+            {state.fieldErrors.title.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
@@ -75,7 +83,9 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
         />
         {state.fieldErrors?.description && (
           <ul className="space-y-0.5 text-xs text-destructive">
-            {state.fieldErrors.description.map((m) => <li key={m}>{m}</li>)}
+            {state.fieldErrors.description.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
@@ -97,7 +107,9 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
         />
         {state.fieldErrors?.requirements && (
           <ul className="space-y-0.5 text-xs text-destructive">
-            {state.fieldErrors.requirements.map((m) => <li key={m}>{m}</li>)}
+            {state.fieldErrors.requirements.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
@@ -107,7 +119,9 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
         <Label htmlFor="dialog-skills" className="text-sm font-medium">
           Must-have skills
         </Label>
-        <p className="text-xs text-muted-foreground -mt-1">Separate with commas or new lines.</p>
+        <p className="-mt-1 text-xs text-muted-foreground">
+          Separate with commas or new lines.
+        </p>
         <Textarea
           id="dialog-skills"
           name="mustHaveSkills"
@@ -118,14 +132,19 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
         />
         {state.fieldErrors?.mustHaveSkills && (
           <ul className="space-y-0.5 text-xs text-destructive">
-            {state.fieldErrors.mustHaveSkills.map((m) => <li key={m}>{m}</li>)}
+            {state.fieldErrors.mustHaveSkills.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
           </ul>
         )}
       </div>
 
       {/* Global error */}
       {state.status === "error" && state.message && (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/8 px-3 py-2.5 text-xs text-destructive" role="alert">
+        <div
+          className="rounded-lg border border-destructive/20 bg-destructive/8 px-3 py-2.5 text-xs text-destructive"
+          role="alert"
+        >
           {state.message}
         </div>
       )}
@@ -134,16 +153,16 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
         <Button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-primary hover:bg-primary/85 font-semibold"
+          className="flex-1 bg-primary font-semibold hover:bg-primary/85"
         >
           {pending ? (
             <>
-              <IconSparkles className="size-3.5 mr-1.5 animate-pulse" />
+              <IconSparkles className="mr-1.5 size-3.5 animate-pulse" />
               Creating role…
             </>
           ) : (
             <>
-              <IconBriefcase className="size-3.5 mr-1.5" />
+              <IconBriefcase className="mr-1.5 size-3.5" />
               Create role
             </>
           )}
@@ -163,6 +182,7 @@ export function CreateJobDialog({ trigger }: CreateJobDialogProps) {
 
   function handleSuccess(jobId: string) {
     setOpen(false)
+    toast.success("Role created")
     router.push(`/dashboard/jobs/${jobId}`)
     router.refresh()
   }
@@ -171,26 +191,29 @@ export function CreateJobDialog({ trigger }: CreateJobDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button className="bg-primary hover:bg-primary/85 font-semibold">
-            <IconPlus className="size-4 mr-1.5" />
+          <Button className="bg-primary font-semibold hover:bg-primary/85">
+            <IconPlus className="mr-1.5 size-4" />
             Create role
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[560px]">
         <DialogHeader className="pb-2">
-          <div className="flex items-center gap-2.5 mb-1">
+          <div className="mb-1 flex items-center gap-2.5">
             <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <IconBriefcase className="size-4" />
             </span>
-            <DialogTitle className="text-lg font-semibold">Create a new role</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">
+              Create a new role
+            </DialogTitle>
           </div>
-          <DialogDescription className="text-xs text-muted-foreground pl-10">
-            Define the screening criteria. Candidates added to this role will be evaluated against these requirements.
+          <DialogDescription className="pl-10 text-xs text-muted-foreground">
+            Define the screening criteria. Candidates added to this role will be
+            evaluated against these requirements.
           </DialogDescription>
         </DialogHeader>
 
-        <Separator className="bg-border/40 mb-4" />
+        <Separator className="mb-4 bg-border/40" />
 
         <JobDialogForm onSuccess={handleSuccess} />
       </DialogContent>
