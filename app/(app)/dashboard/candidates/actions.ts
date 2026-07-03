@@ -88,3 +88,49 @@ export async function createCandidate(
 
   return { ok: true }
 }
+
+export async function deleteCandidate(
+  candidateId: string
+): Promise<{ ok: boolean; message?: string }> {
+  const supabase = await createClient()
+  const { data: authData, error: authError } = await supabase.auth.getClaims()
+
+  if (authError || !authData?.claims?.sub) {
+    return { ok: false, message: "Your session expired. Sign in and try again." }
+  }
+
+  const { data: candidate, error: candidateError } = await supabase
+    .from("candidates")
+    .select("id, job_id, resume_path")
+    .eq("id", candidateId)
+    .maybeSingle()
+
+  if (candidateError || !candidate) {
+    return { ok: false, message: "The candidate is unavailable or was already deleted." }
+  }
+
+  const { data: deletedCandidate, error: deleteError } = await supabase
+    .from("candidates")
+    .delete()
+    .eq("id", candidateId)
+    .select("id")
+    .maybeSingle()
+
+  if (deleteError || !deletedCandidate) {
+    console.error("Candidate deletion failed", { code: deleteError?.code })
+    return { ok: false, message: "The candidate could not be deleted. Try again." }
+  }
+
+  const { error: storageError } = await supabase.storage
+    .from("resumes")
+    .remove([candidate.resume_path])
+
+  if (storageError) {
+    console.error("Candidate resume cleanup failed", { code: storageError.name })
+  }
+
+  revalidatePath("/dashboard")
+  revalidatePath("/dashboard/candidates")
+  revalidatePath(`/dashboard/jobs/${candidate.job_id}`)
+  return { ok: true }
+}

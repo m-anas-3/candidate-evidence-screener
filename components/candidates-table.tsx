@@ -10,6 +10,7 @@ import {
 } from "@tabler/icons-react"
 
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
+import { DeleteRecordButton } from "@/components/delete-record-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -275,19 +276,26 @@ export function CandidatesTable({
                       </TableCell>
 
                       {/* Action */}
-                      <TableCell className="py-3.5 pr-5 text-right">
-                        <Button
-                          asChild
-                          size="sm"
-                          variant="outline"
-                          className="border-border/50 text-xs hover:border-primary/25 hover:bg-primary/5 hover:text-primary transition-all"
-                        >
-                          <Link
-                            href={`/dashboard/jobs/${c.job_id}/candidates/${c.id}`}
+                      <TableCell className="py-3.5 pr-5">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            asChild
+                            size="sm"
+                            variant="outline"
+                            className="border-border/50 text-xs hover:border-primary/25 hover:bg-primary/5 hover:text-primary transition-all"
                           >
-                            Review
-                          </Link>
-                        </Button>
+                            <Link
+                              href={`/dashboard/jobs/${c.job_id}/candidates/${c.id}`}
+                            >
+                              Review
+                            </Link>
+                          </Button>
+                          <DeleteRecordButton
+                            id={c.id}
+                            name={c.name}
+                            recordType="candidate"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   )

@@ -13,6 +13,7 @@ import {
 
 import { AddCandidateSheet } from "@/components/add-candidate-sheet"
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
+import { DeleteRecordButton } from "@/components/delete-record-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,7 +27,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -246,6 +246,14 @@ export default async function JobDetailsPage({
                   </Button>
                 }
               />
+              <DeleteRecordButton
+                id={job.id}
+                name={job.title}
+                recordType="role"
+                redirectTo="/dashboard/jobs"
+                showLabel
+                className="w-full"
+              />
             </CardContent>
           </Card>
         </div>
@@ -341,12 +349,19 @@ export default async function JobDetailsPage({
                           year: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="text-right pr-6">
-                        <Button asChild size="sm" variant="outline" className="border-border/50 hover:border-primary/20 hover:bg-primary/5 hover:text-primary transition-all">
-                          <Link href={`/dashboard/jobs/${job.id}/candidates/${candidate.id}`}>
-                            Review evidence
-                          </Link>
-                        </Button>
+                      <TableCell className="pr-6">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button asChild size="sm" variant="outline" className="border-border/50 hover:border-primary/20 hover:bg-primary/5 hover:text-primary transition-all">
+                            <Link href={`/dashboard/jobs/${job.id}/candidates/${candidate.id}`}>
+                              Review evidence
+                            </Link>
+                          </Button>
+                          <DeleteRecordButton
+                            id={candidate.id}
+                            name={candidate.name}
+                            recordType="candidate"
+                          />
+                        </div>
                       </TableCell>
                     </TableRow>
                   )

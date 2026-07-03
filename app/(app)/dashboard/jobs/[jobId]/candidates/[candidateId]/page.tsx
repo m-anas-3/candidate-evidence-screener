@@ -7,7 +7,6 @@ import {
   IconExternalLink,
   IconFileText,
   IconLink,
-  IconMessageCircle,
   IconNotes,
   IconSparkles,
 } from "@tabler/icons-react"
@@ -17,9 +16,9 @@ import { CandidateAnalysisControl } from "@/components/candidate-analysis-contro
 import { CandidateChat } from "@/components/candidate-chat"
 import type { ChatMessage } from "@/components/candidate-chat"
 import { CandidatePageTabs } from "@/components/candidate-page-tabs"
+import { DeleteRecordButton } from "@/components/delete-record-button"
 import { ResumeExtractionControl } from "@/components/resume-extraction-control"
 import { ScreeningReportView } from "@/components/screening-report-view"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Breadcrumb,
@@ -31,7 +30,6 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { screeningReportSchema } from "@/lib/agent/report-schema"
 import { createClient } from "@/lib/supabase/server"
 
@@ -256,12 +254,21 @@ export default async function CandidateDetailsPage({
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <Button asChild size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
-          <Link href={`/dashboard/jobs/${job.id}`}>
-            <IconArrowLeft className="mr-1.5 size-3.5" />
-            Back
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
+            <Link href={`/dashboard/jobs/${job.id}`}>
+              <IconArrowLeft className="mr-1.5 size-3.5" />
+              Back
+            </Link>
+          </Button>
+          <DeleteRecordButton
+            id={candidate.id}
+            name={candidate.name}
+            recordType="candidate"
+            redirectTo={`/dashboard/jobs/${job.id}`}
+            showLabel
+          />
+        </div>
       </div>
 
       {/* ── Candidate identity card ─────────────────────────────────────────── */}

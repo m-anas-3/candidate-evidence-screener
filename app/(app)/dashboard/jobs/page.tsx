@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react"
 
 import { CreateJobDialog } from "@/components/create-job-dialog"
-import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
+import { DeleteRecordButton } from "@/components/delete-record-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -165,17 +165,24 @@ export default async function JobsPage() {
                     </TableCell>
 
                     {/* Action */}
-                    <TableCell className="py-4 pr-5 text-right">
-                      <Button
-                        asChild
-                        size="sm"
-                        variant="outline"
-                        className="border-border/50 text-xs hover:border-primary/25 hover:bg-primary/5 hover:text-primary transition-all"
-                      >
-                        <Link href={`/dashboard/jobs/${job.id}`}>
-                          Open
-                        </Link>
-                      </Button>
+                    <TableCell className="py-4 pr-5">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="border-border/50 text-xs hover:border-primary/25 hover:bg-primary/5 hover:text-primary transition-all"
+                        >
+                          <Link href={`/dashboard/jobs/${job.id}`}>
+                            Open
+                          </Link>
+                        </Button>
+                        <DeleteRecordButton
+                          id={job.id}
+                          name={job.title}
+                          recordType="role"
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
