@@ -76,9 +76,9 @@ export async function POST(
 
   // --- Model config ---
   // Chat uses a cheap fast model — no tool-use or structured output needed.
-  // Falls back to gpt-4.1-nano if the env var is not set.
+  // Falls back to gpt-5.4-mini if the env var is not set.
   const openaiApiKey = process.env.OPENAI_API_KEY?.trim()
-  const chatModelId = process.env.OPENAI_CHAT_MODEL?.trim() || "gpt-4.1-nano"
+  const chatModelId = process.env.OPENAI_CHAT_MODEL?.trim() || "gpt-5.4-mini"
 
   if (!openaiApiKey) {
     return Response.json({ error: "Chat is not configured." }, { status: 503 })

@@ -1,4 +1,4 @@
-# Freelance Candidate Evidence Screener
+# Candidate Evidence Screener
 
 A recruiter-facing application for evaluating a freelance candidate against a
 specific role using documented resume and proposal evidence. The application
