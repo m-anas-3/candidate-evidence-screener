@@ -1,7 +1,7 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["pdf-parse", "@napi-rs/canvas", "deepagents"],
+  serverExternalPackages: ["pdf-parse", "@napi-rs/canvas"],
   turbopack: {
     root: process.cwd(),
   },
