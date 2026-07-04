@@ -210,16 +210,6 @@
   }
 }
 
-@keyframes agent-scan {
-  0% {
-    transform: translateX(-110%);
-  }
-  50%,
-  100% {
-    transform: translateX(300%);
-  }
-}
-
 /* Subtle noise texture on dark backgrounds for depth */
 .dark body::before {
   content: "";

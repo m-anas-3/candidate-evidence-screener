@@ -64,7 +64,7 @@ export default async function DashboardPage() {
       .from("jobs")
       .select("id, title, must_have_skills, created_at")
       .order("created_at", { ascending: false })
-      .limit(6),
+      .limit(4),
     supabase.from("candidates").select("analysis_status"),
     supabase
       .from("screening_reports")
@@ -205,7 +205,9 @@ export default async function DashboardPage() {
 
       {/* ── Charts ────────────────────────────────────────────────────── */}
       {(hasChartData || hasScoreData) && (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div
+          className={`grid gap-4 ${hasChartData && hasScoreData ? "lg:grid-cols-2" : "grid-cols-1"}`}
+        >
           {hasChartData && (
             <Card className="border-border/40">
               <CardHeader className="border-b pb-3">

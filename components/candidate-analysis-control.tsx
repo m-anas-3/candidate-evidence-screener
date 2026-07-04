@@ -4,12 +4,10 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
-  IconBrain,
   IconFileText,
+  IconLoader2,
   IconRefresh,
-  IconReportAnalytics,
   IconSparkles,
-  IconWorldSearch,
 } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
@@ -25,69 +23,37 @@ type Result =
   | { candidateId: string; ok: true; status: "completed" }
   | { error: string; ok: false; reference?: string }
 
-const analysisSteps = [
-  { icon: IconFileText, label: "Reading candidate evidence" },
-  { icon: IconWorldSearch, label: "Reviewing submitted evidence" },
-  { icon: IconBrain, label: "Matching skills to the role" },
-  { icon: IconReportAnalytics, label: "Building the screening report" },
-] as const
-
 function AgentWorkingState() {
-  const [activeStep, setActiveStep] = useState(0)
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setActiveStep((step) => (step + 1) % analysisSteps.length)
-    }, 2200)
-    return () => window.clearInterval(interval)
-  }, [])
-
   return (
-    <div className="relative overflow-hidden rounded-lg border border-primary/20 bg-primary/[0.04] p-3">
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent motion-safe:animate-pulse"
-      />
-      <div className="mb-3 flex items-center gap-2">
-        <span className="relative flex size-2">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60 motion-reduce:animate-none" />
-          <span className="relative inline-flex size-2 rounded-full bg-primary" />
+    <div
+      aria-live="polite"
+      className="w-full min-w-0 overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm sm:max-w-sm sm:min-w-80"
+      role="status"
+    >
+      <div className="flex items-start gap-3 p-4">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <IconLoader2
+            aria-hidden="true"
+            className="size-4 motion-safe:animate-spin"
+          />
         </span>
-        <p className="text-xs font-medium text-foreground" role="status">
-          Screening agent is working
-          <span className="sr-only">: {analysisSteps[activeStep].label}</span>
-        </p>
+        <div className="min-w-0 text-left">
+          <p className="text-sm font-semibold text-foreground">
+            Analyzing candidate
+          </p>
+          <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+            Comparing the submitted evidence with the role requirements.
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5" aria-hidden="true">
-        {analysisSteps.map((step, index) => {
-          const Icon = step.icon
-          const isActive = index === activeStep
-          return (
-            <div
-              className={`flex min-w-0 flex-col items-center gap-1.5 rounded-md px-1 py-2 transition-all duration-500 ${
-                isActive
-                  ? "bg-primary/15 text-primary shadow-[0_0_18px_-8px_var(--primary)]"
-                  : "text-muted-foreground"
-              }`}
-              key={step.label}
-            >
-              <Icon
-                className={`size-4 transition-transform duration-500 ${isActive ? "scale-110 motion-safe:animate-pulse" : ""}`}
-              />
-              <span className="line-clamp-2 text-center text-[9px] leading-tight">
-                {step.label}
-              </span>
-            </div>
-          )
-        })}
+      <div className="h-1 overflow-hidden bg-muted/60" aria-hidden="true">
+        <div className="h-full w-full origin-left bg-primary/70 motion-safe:animate-pulse" />
       </div>
 
-      <div className="mt-2.5 h-0.5 overflow-hidden rounded-full bg-primary/10">
-        <div
-          className="h-full w-1/3 rounded-full bg-gradient-to-r from-transparent via-primary to-transparent motion-safe:animate-[agent-scan_1.8s_ease-in-out_infinite]"
-          aria-hidden="true"
-        />
+      <div className="flex items-center gap-2 border-t border-border/40 bg-muted/15 px-4 py-2.5 text-[11px] text-muted-foreground">
+        <IconFileText aria-hidden="true" className="size-3.5 shrink-0" />
+        <span>Resume, proposal, and role criteria are being reviewed</span>
       </div>
     </div>
   )
@@ -156,29 +122,16 @@ export function CandidateAnalysisControl({
 
   if (status === "completed") return null
 
-  return (
-    <div className="space-y-2">
-      <Button
-        className="w-full"
-        disabled={processing}
-        onClick={analyze}
-        type="button"
-      >
-        {processing ? (
-          <IconSparkles className="motion-safe:animate-pulse" />
-        ) : status === "failed" ? (
-          <IconRefresh />
-        ) : (
-          <IconSparkles />
-        )}
-        {processing
-          ? "Analyzing evidence…"
-          : status === "failed"
-            ? "Retry fit analysis"
-            : "Run fit analysis"}
-      </Button>
+  if (processing) return <AgentWorkingState />
 
-      {processing && <AgentWorkingState />}
-    </div>
+  return (
+    <Button
+      className="w-full rounded-lg px-4 shadow-sm sm:w-auto"
+      onClick={analyze}
+      type="button"
+    >
+      {status === "failed" ? <IconRefresh /> : <IconSparkles />}
+      {status === "failed" ? "Retry fit analysis" : "Run fit analysis"}
+    </Button>
   )
 }

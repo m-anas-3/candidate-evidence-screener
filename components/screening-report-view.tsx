@@ -73,6 +73,7 @@ const recConfig: Record<
 export function ScreeningReportView({ report }: { report: ScreeningReport }) {
   const rec = recConfig[report.recommendation]
   const brief = getRecruiterBrief(report)
+  const isLegacyReport = report.scoring.portfolioRelevance !== undefined
 
   return (
     <div className="space-y-4">
@@ -162,13 +163,13 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
               <ScoreBar
                 label="Role requirements"
                 value={report.scoring.jobRequirementsAndSkills}
-                max={55}
+                max={isLegacyReport ? 50 : 55}
                 barClass={rec.bar}
               />
               <ScoreBar
                 label="Relevant experience"
                 value={report.scoring.relevantExperience}
-                max={30}
+                max={isLegacyReport ? 20 : 30}
                 barClass={rec.bar}
               />
               <ScoreBar
@@ -177,10 +178,10 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
                 max={15}
                 barClass={rec.bar}
               />
-              {report.scoring.portfolioRelevance !== undefined && (
+              {isLegacyReport && (
                 <ScoreBar
                   label="Portfolio (legacy report)"
-                  value={report.scoring.portfolioRelevance}
+                  value={report.scoring.portfolioRelevance ?? 0}
                   max={15}
                   barClass={rec.bar}
                 />
@@ -236,10 +237,17 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm">
               <IconExternalLink className="size-4 text-primary" />
-              Portfolio — manual review
+              {isLegacyReport
+                ? "Portfolio (legacy report)"
+                : "Portfolio — manual review"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 pt-0">
+            {isLegacyReport && (
+              <p className="font-mono text-sm font-semibold">
+                {report.scoring.portfolioRelevance ?? 0}/15
+              </p>
+            )}
             {report.portfolioEvidence.inspectedUrl ? (
               <a
                 href={report.portfolioEvidence.inspectedUrl}
@@ -256,8 +264,13 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
               <p className="text-xs text-muted-foreground">Not provided.</p>
             )}
             <p className="text-xs leading-5 text-muted-foreground">
-              Not analyzed or scored. Review it manually if useful.
+              {isLegacyReport
+                ? report.portfolioEvidence.summary
+                : "Not analyzed or scored. Review it manually if useful."}
             </p>
+            {isLegacyReport && report.portfolioEvidence.findings.length > 0 && (
+              <EvidenceItemList items={report.portfolioEvidence.findings} />
+            )}
           </CardContent>
         </Card>
       </div>

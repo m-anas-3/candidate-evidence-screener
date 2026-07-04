@@ -430,9 +430,10 @@ export default async function CandidateDetailsPage({
         {/* Action bar at the bottom of the identity card */}
         {candidate.resume_text && !hasReport && (
           <div className="border-t border-border/30 bg-background/30 px-6 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground">
-                Resume extracted. Ready for AI fit analysis.
+            <div className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <p className="min-w-0 text-left text-xs leading-5 text-muted-foreground">
+                Generate an evidence-backed fit report from the submitted
+                materials.
               </p>
               <CandidateAnalysisControl
                 candidateId={candidate.id}

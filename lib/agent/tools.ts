@@ -4,7 +4,11 @@ import { tool } from "langchain"
 import { z } from "zod"
 
 import { assessProposalSpecificity } from "./proposal-specificity"
-import { screeningReportSchema } from "./report-schema"
+import {
+  normalizeModelReportScores,
+  screeningReportSchema,
+  screeningReportToolInputSchema,
+} from "./report-schema"
 import { bindToolResultsToReport } from "./report-binding"
 import type { ProposalSpecificity } from "./report-schema"
 import type { Database, Json } from "@/lib/supabase/database.types"
@@ -18,7 +22,7 @@ const candidateInputSchema = z.object({ candidateId: z.uuid() }).strip()
 const saveReportInputSchema = z
   .object({
     candidateId: z.uuid(),
-    report: screeningReportSchema,
+    report: screeningReportToolInputSchema,
   })
   .strip()
 
@@ -221,7 +225,7 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
         throw new Error("Required tool results are unavailable for this run.")
       }
       const validatedReport = bindToolResultsToReport(
-        screeningReportSchema.parse(report),
+        screeningReportSchema.parse(normalizeModelReportScores(report)),
         proposalResult,
         candidate.portfolio_url,
         job.must_have_skills
