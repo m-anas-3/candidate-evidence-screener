@@ -12,10 +12,9 @@ const evidence = {
 function report() {
   return screeningReportSchema.parse({
     scoring: {
-      jobRequirementsAndSkills: 50,
-      relevantExperience: 20,
+      jobRequirementsAndSkills: 55,
+      relevantExperience: 30,
       proposalSpecificity: 15,
-      portfolioRelevance: 15,
     },
     summary: "Documented match.",
     strengths: [evidence],
@@ -34,7 +33,7 @@ function report() {
       inspectedUrl: "https://wrong.example/",
       status: "inspected",
       findings: [{ ...evidence, source: "portfolio" }],
-      summary: "Relevant work was found.",
+      summary: "Fabricated portfolio result.",
     },
     reviewPoints: [],
     outreachMessage: "Draft message.",
@@ -60,57 +59,61 @@ describe("bindToolResultsToReport", () => {
     const bound = bindToolResultsToReport(
       report(),
       proposalResult,
-      { finalUrl: "https://portfolio.example/work", status: "inspected" },
+      "https://portfolio.example/work",
       ["TypeScript"]
     )
 
     expect(bound.proposalSpecificityFindings).toEqual(proposalResult)
     expect(bound.scoring.proposalSpecificity).toBe(4)
+    expect(bound.score).toBe(89)
   })
 
-  it("binds an inspected portfolio status and final URL", () => {
+  it("leaves a submitted portfolio for manual review without scoring it", () => {
     const bound = bindToolResultsToReport(
       report(),
       proposalResult,
-      { finalUrl: "https://portfolio.example/final", status: "inspected" },
+      "https://portfolio.example/work",
       ["TypeScript"]
     )
 
-    expect(bound.portfolioEvidence.inspectedUrl).toBe(
-      "https://portfolio.example/final"
-    )
-    expect(bound.portfolioEvidence.status).toBe("inspected")
-  })
-
-  it.each([
-    ["unavailable", "source was unavailable"],
-    ["unsafe", "blocked for safety"],
-    ["not_provided", "was not provided"],
-  ] as const)("zeroes and clears %s portfolio evidence", (status, summary) => {
-    const bound = bindToolResultsToReport(
-      report(),
-      proposalResult,
-      { finalUrl: null, status },
-      ["TypeScript"]
-    )
-
-    expect(bound.portfolioEvidence).toMatchObject({
+    expect(bound.portfolioEvidence).toEqual({
       findings: [],
+      inspectedUrl: "https://portfolio.example/work",
+      score: 0,
+      status: "manual_review",
+      summary:
+        "Portfolio review is left to the recruiter and does not affect the score.",
+    })
+    expect(bound.scoring).not.toHaveProperty("portfolioRelevance")
+  })
+
+  it("does not penalize a candidate without a portfolio", () => {
+    const withPortfolio = bindToolResultsToReport(
+      report(),
+      proposalResult,
+      "https://portfolio.example/work",
+      ["TypeScript"]
+    )
+    const withoutPortfolio = bindToolResultsToReport(
+      report(),
+      proposalResult,
+      null,
+      ["TypeScript"]
+    )
+
+    expect(withoutPortfolio.score).toBe(withPortfolio.score)
+    expect(withoutPortfolio.portfolioEvidence).toMatchObject({
       inspectedUrl: null,
       score: 0,
-      status,
+      status: "manual_review",
     })
-    expect(bound.portfolioEvidence.summary).toContain(summary)
-    expect(bound.scoring.portfolioRelevance).toBe(0)
   })
 
-  it("repairs omitted must-haves and derives the capped score", () => {
-    const bound = bindToolResultsToReport(
-      report(),
-      proposalResult,
-      { finalUrl: "https://portfolio.example/", status: "inspected" },
-      ["TypeScript", "Kubernetes"]
-    )
+  it("repairs omitted must-haves and applies the score cap", () => {
+    const bound = bindToolResultsToReport(report(), proposalResult, null, [
+      "TypeScript",
+      "Kubernetes",
+    ])
 
     expect(bound.missingSkills).toContainEqual({
       claim: "Kubernetes",
@@ -121,17 +124,17 @@ describe("bindToolResultsToReport", () => {
     expect(bound.recommendation).toBe("possible_fit")
   })
 
-  it("overwrites contradictory model tool data and re-derives totals", () => {
+  it("overwrites contradictory model-authored portfolio data", () => {
     const bound = bindToolResultsToReport(
       report(),
       { ...proposalResult, score: 0 },
-      { finalUrl: null, status: "unsafe" },
+      null,
       ["TypeScript"]
     )
 
-    expect(bound.score).toBe(70)
-    expect(bound.recommendation).toBe("possible_fit")
-    expect(bound.proposalSpecificityFindings.score).toBe(0)
+    expect(bound.score).toBe(85)
+    expect(bound.portfolioEvidence.findings).toEqual([])
     expect(bound.portfolioEvidence.score).toBe(0)
+    expect(bound.scoring).not.toHaveProperty("portfolioRelevance")
   })
 })

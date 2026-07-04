@@ -80,7 +80,7 @@ export async function POST(
     supabase
       .from("candidates")
       .select(
-        `id, name, resume_text, proposal_text, portfolio_url,
+        `id, name, resume_text, proposal_text,
          jobs!inner ( recruiter_id, title, requirements, must_have_skills )`
       )
       .eq("id", candidateId)

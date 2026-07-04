@@ -415,7 +415,7 @@ export function CandidatesTable({
             <h3 className="text-sm font-semibold">
               {hasFilters ? "No matching candidates" : "No candidates yet"}
             </h3>
-            <p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground/80">
+            <p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground">
               {hasFilters
                 ? "Try adjusting your search or filters."
                 : "Add candidates to a role to see them here."}
@@ -441,11 +441,11 @@ function RecBadge({ rec }: { rec: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     strong_fit: {
       label: "Strong documented match",
-      cls: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+      cls: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
     },
     possible_fit: {
       label: "Potential documented match",
-      cls: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+      cls: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
     },
     weak_fit: {
       label: "Limited documented match",

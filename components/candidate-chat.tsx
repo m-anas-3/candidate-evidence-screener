@@ -35,12 +35,10 @@ export function CandidateChat({
   candidateId,
   initialMessages,
   hasReport,
-  fullPage = false,
 }: {
   candidateId: string
   initialMessages: ChatMessage[]
   hasReport: boolean
-  fullPage?: boolean
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
   const [input, setInput] = useState("")
@@ -55,6 +53,7 @@ export function CandidateChat({
   async function send() {
     const trimmed = input.trim()
     if (!trimmed || streaming) return
+    setInput("")
 
     const userMessage: ChatMessage = {
       id: crypto.randomUUID(),
@@ -123,6 +122,7 @@ export function CandidateChat({
       const message =
         err instanceof Error ? err.message : "Something went wrong. Try again."
       toast.error("Could not answer that question", { description: message })
+      setInput(trimmed)
       setMessages((prev) => prev.filter((m) => m.id !== assistantId))
     } finally {
       setStreaming(false)
@@ -151,7 +151,7 @@ export function CandidateChat({
   }
 
   return (
-    <div className={cn("flex flex-col gap-3", fullPage && "h-full")}>
+    <div className="flex flex-col gap-3">
       {/* Advisory note */}
       <p className="shrink-0 text-xs text-muted-foreground">
         Answers are grounded in this candidate&apos;s resume, proposal, and
@@ -162,12 +162,7 @@ export function CandidateChat({
       </p>
 
       {/* Message list */}
-      <ScrollArea
-        className={cn(
-          "rounded-xl border border-border/40 bg-muted/5",
-          fullPage ? "min-h-0 flex-1" : "h-[440px]"
-        )}
-      >
+      <ScrollArea className="h-[440px] rounded-xl border border-border/40 bg-muted/5">
         <div className="space-y-1 p-4 pr-5">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -245,7 +240,7 @@ export function CandidateChat({
             )}
           </Button>
         </div>
-        <p className="text-[10px] text-muted-foreground/60">
+        <p className="text-[10px] text-muted-foreground">
           <kbd className="rounded border border-border/40 px-1 font-mono text-[10px]">
             Enter
           </kbd>{" "}

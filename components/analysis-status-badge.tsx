@@ -32,7 +32,7 @@ const statusConfig: Record<
     icon: IconLoader2,
     variant: "outline",
     className:
-      "border-amber-500/25 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15",
+      "border-amber-500/25 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-400",
   },
   ready: {
     label: "Ready",
@@ -46,14 +46,14 @@ const statusConfig: Record<
     icon: IconSparkles,
     variant: "outline",
     className:
-      "border-sky-500/25 bg-sky-500/10 text-sky-400 hover:bg-sky-500/15",
+      "border-sky-500/25 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-400",
   },
   completed: {
     label: "Analyzed",
     icon: IconCircleCheck,
     variant: "outline",
     className:
-      "border-emerald-500/25 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/15",
+      "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-400",
   },
   failed: {
     label: "Failed",
@@ -77,7 +77,11 @@ export function AnalysisStatusBadge({
 
   return (
     <Badge
-      className={cn("text-2xs font-medium gap-1 px-2 py-0.5", config.className, className)}
+      className={cn(
+        "text-2xs gap-1 px-2 py-0.5 font-medium",
+        config.className,
+        className
+      )}
       variant={config.variant ?? "outline"}
     >
       <Icon className={cn("size-3", isAnimating && "animate-spin")} />

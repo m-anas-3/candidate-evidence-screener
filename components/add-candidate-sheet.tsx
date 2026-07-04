@@ -140,7 +140,7 @@ function CandidateSheetForm({
     <form className="mt-2 space-y-5 px-6" noValidate onSubmit={handleSubmit}>
       {/* Job context banner */}
       <div className="space-y-1.5 rounded-lg border border-primary/15 bg-primary/5 px-3.5 py-3">
-        <p className="text-2xs font-semibold tracking-wider text-primary/80 uppercase">
+        <p className="text-2xs font-semibold tracking-wider text-primary uppercase">
           Adding to role
         </p>
         <p className="text-sm font-semibold text-foreground">{job.title}</p>
@@ -233,10 +233,11 @@ function CandidateSheetForm({
           className="flex items-center gap-1.5 text-sm font-medium"
         >
           <IconLink className="size-3.5 text-muted-foreground" />
-          Portfolio URL <span className="text-destructive">*</span>
+          Portfolio URL{" "}
+          <span className="text-muted-foreground">(optional)</span>
         </Label>
         <p className="-mt-1 text-xs text-muted-foreground">
-          Public URL — will be inspected during analysis.
+          Available for manual recruiter review. It is not analyzed or scored.
         </p>
         <Input
           id="sheet-portfolio"
@@ -245,7 +246,6 @@ function CandidateSheetForm({
           placeholder="https://github.com/alexmorgan"
           disabled={pending}
           maxLength={2048}
-          required
           className="h-10"
           aria-invalid={Boolean(errors.portfolioUrl)}
         />

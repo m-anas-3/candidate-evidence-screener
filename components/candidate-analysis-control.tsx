@@ -27,7 +27,7 @@ type Result =
 
 const analysisSteps = [
   { icon: IconFileText, label: "Reading candidate evidence" },
-  { icon: IconWorldSearch, label: "Securely inspecting portfolio" },
+  { icon: IconWorldSearch, label: "Reviewing submitted evidence" },
   { icon: IconBrain, label: "Matching skills to the role" },
   { icon: IconReportAnalytics, label: "Building the screening report" },
 ] as const
@@ -68,7 +68,7 @@ function AgentWorkingState() {
               className={`flex min-w-0 flex-col items-center gap-1.5 rounded-md px-1 py-2 transition-all duration-500 ${
                 isActive
                   ? "bg-primary/15 text-primary shadow-[0_0_18px_-8px_var(--primary)]"
-                  : "text-muted-foreground/50"
+                  : "text-muted-foreground"
               }`}
               key={step.label}
             >

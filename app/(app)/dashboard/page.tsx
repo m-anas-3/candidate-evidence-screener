@@ -180,26 +180,26 @@ export default async function DashboardPage() {
         />
         <StatCard
           icon={<IconUsers className="size-4" />}
-          accent="text-sky-400 bg-sky-500/10"
+          accent="text-sky-700 bg-sky-500/10 dark:text-sky-400"
           label="Candidates"
           value={totalCandidates}
           sub="Across all roles"
         />
         <StatCard
           icon={<IconClock className="size-4" />}
-          accent="text-amber-400 bg-amber-500/10"
+          accent="text-amber-700 bg-amber-500/10 dark:text-amber-400"
           label="In Progress"
           value={awaitingAnalysis}
           sub="Awaiting extraction or analysis"
-          valueClass="text-amber-400"
+          valueClass="text-amber-700 dark:text-amber-400"
         />
         <StatCard
           icon={<IconCircleCheck className="size-4" />}
-          accent="text-emerald-400 bg-emerald-500/10"
+          accent="text-emerald-700 bg-emerald-500/10 dark:text-emerald-400"
           label="Reports Ready"
           value={reportsReady}
           sub={`${completionRate}% completion rate`}
-          valueClass="text-emerald-400"
+          valueClass="text-emerald-700 dark:text-emerald-400"
         />
       </div>
 
@@ -339,7 +339,7 @@ export default async function DashboardPage() {
               {
                 n: 2,
                 title: "Add Candidates",
-                desc: "Upload resume, proposal, and portfolio URL.",
+                desc: "Upload a resume and proposal; portfolio is optional.",
               },
               {
                 n: 3,

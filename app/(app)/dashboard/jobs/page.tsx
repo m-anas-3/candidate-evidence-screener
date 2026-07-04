@@ -175,8 +175,8 @@ export default async function JobsPage({
                     {/* Reports ready */}
                     <TableCell className="py-4">
                       <div className="flex items-center gap-1.5 text-xs">
-                        <IconCircleCheck className="size-3.5 text-emerald-400" />
-                        <span className="font-medium text-emerald-400">
+                        <IconCircleCheck className="size-3.5 text-emerald-700 dark:text-emerald-400" />
+                        <span className="font-medium text-emerald-700 dark:text-emerald-400">
                           {reportCount}
                         </span>
                         {candidateCount > 0 && (
@@ -227,7 +227,7 @@ export default async function JobsPage({
               <IconBriefcase className="size-6 text-muted-foreground" />
             </span>
             <h2 className="text-base font-semibold">No roles yet</h2>
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground/80">
+            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
               Define a role with requirements and must-have skills. Candidates
               added to it will be evaluated against those criteria.
             </p>

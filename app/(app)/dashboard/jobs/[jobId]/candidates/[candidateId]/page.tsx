@@ -119,15 +119,15 @@ export default async function CandidateDetailsPage({
       label: "Strong documented match",
       ring: "border-emerald-500/50",
       bg: "bg-emerald-500/8",
-      text: "text-emerald-400",
-      score: "text-emerald-400",
+      text: "text-emerald-700 dark:text-emerald-400",
+      score: "text-emerald-700 dark:text-emerald-400",
     },
     possible_fit: {
       label: "Potential documented match",
       ring: "border-amber-500/50",
       bg: "bg-amber-500/8",
-      text: "text-amber-400",
-      score: "text-amber-400",
+      text: "text-amber-700 dark:text-amber-400",
+      score: "text-amber-700 dark:text-amber-400",
     },
     weak_fit: {
       label: "Limited documented match",
@@ -147,7 +147,7 @@ export default async function CandidateDetailsPage({
       <Card className="border-border/40">
         <CardHeader className="border-b pb-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-400">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-700 dark:text-violet-400">
               <IconNotes className="size-4" />
             </span>
             <div>
@@ -174,7 +174,7 @@ export default async function CandidateDetailsPage({
         <Card className="border-border/40">
           <CardHeader className="border-b pb-4">
             <div className="flex items-center gap-3">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-sky-500/10 text-sky-400">
+              <span className="flex size-8 items-center justify-center rounded-lg bg-sky-500/10 text-sky-700 dark:text-sky-400">
                 <IconFileText className="size-4" />
               </span>
               <div>
@@ -217,7 +217,7 @@ export default async function CandidateDetailsPage({
       <Card className="border-border/40">
         <CardHeader className="border-b pb-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400">
               <IconLink className="size-4" />
             </span>
             <div>
@@ -225,7 +225,7 @@ export default async function CandidateDetailsPage({
                 Portfolio URL
               </CardTitle>
               <CardDescription className="text-xs">
-                Scraped for evidence during analysis.
+                Optional link for manual recruiter review. It is not scored.
               </CardDescription>
             </div>
           </div>
@@ -446,12 +446,9 @@ export default async function CandidateDetailsPage({
       {/* ── Tabbed content area ──────────────────────────────────────────────── */}
       <CandidatePageTabs
         hasReport={hasReport}
-        candidateId={candidate.id}
-        jobId={job.id}
         evidencePanel={evidencePanel}
         reportPanel={reportPanel}
         chatPanel={chatPanel}
-        returnToCandidates={cameFromCandidates}
       />
     </div>
   )

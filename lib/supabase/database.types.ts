@@ -17,7 +17,7 @@ export type Database = {
           id: string
           job_id: string
           name: string
-          portfolio_url: string
+          portfolio_url: string | null
           proposal_text: string
           resume_path: string
           resume_text: string | null
@@ -30,7 +30,7 @@ export type Database = {
           id?: string
           job_id: string
           name: string
-          portfolio_url: string
+          portfolio_url?: string | null
           proposal_text: string
           resume_path: string
           resume_text?: string | null
@@ -43,7 +43,7 @@ export type Database = {
           id?: string
           job_id?: string
           name?: string
-          portfolio_url?: string
+          portfolio_url?: string | null
           proposal_text?: string
           resume_path?: string
           resume_text?: string | null

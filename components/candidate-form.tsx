@@ -156,7 +156,7 @@ export function CandidateForm({
 
       <FormField
         error={errors.portfolioUrl}
-        hint="One public HTTP or HTTPS URL. It will be inspected safely during analysis."
+        hint="Optional public URL for manual recruiter review. It is not analyzed or scored."
         id="portfolioUrl"
         label="Portfolio URL"
       >
@@ -170,8 +170,7 @@ export function CandidateForm({
           id="portfolioUrl"
           maxLength={2048}
           name="portfolioUrl"
-          placeholder="https://example.com/portfolio"
-          required
+          placeholder="https://example.com/portfolio (optional)"
           type="url"
         />
       </FormField>

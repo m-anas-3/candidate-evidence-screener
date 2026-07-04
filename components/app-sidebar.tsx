@@ -72,7 +72,7 @@ export function AppSidebar({ email }: { email?: string }) {
             <span className="block truncate text-[13px] font-semibold tracking-tight text-sidebar-foreground">
               Evidence Screener
             </span>
-            <span className="block truncate text-[10px] font-semibold uppercase tracking-[0.10em] text-primary/80">
+            <span className="block truncate text-[10px] font-semibold tracking-[0.10em] text-primary uppercase">
               Recruiter HQ
             </span>
           </div>
@@ -96,17 +96,20 @@ export function AppSidebar({ email }: { email?: string }) {
                         "relative h-9 rounded-lg px-3 text-[13px] font-medium transition-all duration-150",
                         active
                           ? "bg-primary/12 text-primary"
-                          : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                       )}
                     >
-                      <Link href={item.href} className="flex items-center gap-3">
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-3"
+                      >
                         {active && (
-                          <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
+                          <span className="absolute top-1/2 left-0 h-4 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
                         )}
                         <item.icon
                           className={cn(
                             "size-4 shrink-0",
-                            active ? "text-primary" : "text-sidebar-foreground/50"
+                            active ? "text-primary" : "text-sidebar-foreground"
                           )}
                         />
                         <span className="group-data-[collapsible=icon]:hidden">
@@ -126,8 +129,8 @@ export function AppSidebar({ email }: { email?: string }) {
       {email && (
         <SidebarFooter className="border-t border-sidebar-border p-3">
           <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:justify-center">
-            <Avatar className="size-7 rounded-lg ring-1 ring-primary/15 shrink-0">
-              <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
+            <Avatar className="size-7 shrink-0 rounded-lg ring-1 ring-primary/15">
+              <AvatarFallback className="rounded-lg bg-primary/10 text-[10px] font-bold text-primary">
                 {initial}
               </AvatarFallback>
             </Avatar>
@@ -135,29 +138,34 @@ export function AppSidebar({ email }: { email?: string }) {
               <p className="truncate text-[11px] font-semibold text-sidebar-foreground">
                 {email}
               </p>
-              <p className="text-[10px] text-sidebar-foreground/40">Recruiter account</p>
+              <p className="text-[10px] text-sidebar-foreground">
+                Recruiter account
+              </p>
             </div>
-            <form action={signOut} className="group-data-[collapsible=icon]:hidden shrink-0">
+            <form
+              action={signOut}
+              className="shrink-0 group-data-[collapsible=icon]:hidden"
+            >
               <Button
                 size="icon"
                 variant="ghost"
                 type="submit"
                 title="Sign out"
-                className="size-7 rounded-lg text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                className="size-7 rounded-lg text-sidebar-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
               >
                 <IconLogout className="size-3.5" />
               </Button>
             </form>
           </div>
           {/* Collapsed sign-out */}
-          <div className="mt-2 hidden group-data-[collapsible=icon]:flex justify-center">
+          <div className="mt-2 hidden justify-center group-data-[collapsible=icon]:flex">
             <form action={signOut}>
               <Button
                 size="icon"
                 variant="ghost"
                 type="submit"
                 title="Sign out"
-                className="size-7 rounded-lg text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10"
+                className="size-7 rounded-lg text-sidebar-foreground hover:bg-destructive/10 hover:text-destructive"
               >
                 <IconLogout className="size-3.5" />
               </Button>

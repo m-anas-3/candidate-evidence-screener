@@ -10,8 +10,6 @@ import {
   IconExternalLink,
   IconMessageCircle,
   IconNotes,
-  IconShieldCheck,
-  IconStar,
   IconUserCheck,
 } from "@tabler/icons-react"
 
@@ -34,9 +32,11 @@ const sourceLabels: Record<EvidenceItem["source"], string> = {
 }
 
 const sourceStyles: Record<EvidenceItem["source"], string> = {
-  resume: "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  proposal: "border-violet-500/30 bg-violet-500/10 text-violet-400",
-  portfolio: "border-amber-500/30 bg-amber-500/10 text-amber-400",
+  resume: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400",
+  proposal:
+    "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-400",
+  portfolio:
+    "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
   not_found: "border-destructive/30 bg-destructive/10 text-destructive",
 }
 
@@ -48,13 +48,13 @@ const recConfig: Record<
 > = {
   strong_fit: {
     label: "Strong documented match",
-    color: "text-emerald-400",
+    color: "text-emerald-700 dark:text-emerald-400",
     ring: "border-emerald-500/40",
     bar: "bg-emerald-500",
   },
   possible_fit: {
     label: "Potential documented match",
-    color: "text-amber-400",
+    color: "text-amber-700 dark:text-amber-400",
     ring: "border-amber-500/40",
     bar: "bg-amber-500",
   },
@@ -78,7 +78,7 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
     <div className="space-y-4">
       {/* Keep the human-review requirement visible without leading with legal copy. */}
       <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-        <IconAlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" />
+        <IconAlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-400" />
         <p className="text-xs leading-5 text-muted-foreground">
           <span className="font-semibold text-foreground">
             Recruiter review required.
@@ -162,13 +162,13 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
               <ScoreBar
                 label="Role requirements"
                 value={report.scoring.jobRequirementsAndSkills}
-                max={50}
+                max={55}
                 barClass={rec.bar}
               />
               <ScoreBar
                 label="Relevant experience"
                 value={report.scoring.relevantExperience}
-                max={20}
+                max={30}
                 barClass={rec.bar}
               />
               <ScoreBar
@@ -177,12 +177,14 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
                 max={15}
                 barClass={rec.bar}
               />
-              <ScoreBar
-                label="Relevant portfolio"
-                value={report.scoring.portfolioRelevance}
-                max={15}
-                barClass={rec.bar}
-              />
+              {report.scoring.portfolioRelevance !== undefined && (
+                <ScoreBar
+                  label="Portfolio (legacy report)"
+                  value={report.scoring.portfolioRelevance}
+                  max={15}
+                  barClass={rec.bar}
+                />
+              )}
             </div>
           </div>
         </CardContent>
@@ -197,7 +199,9 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
       <div className="grid gap-4 md:grid-cols-2">
         <SkillPills
           title="Supported requirements"
-          icon={<IconCircleCheck className="size-4 text-emerald-400" />}
+          icon={
+            <IconCircleCheck className="size-4 text-emerald-700 dark:text-emerald-400" />
+          }
           items={report.matchedSkills.filter((i) => i.source !== "not_found")}
           emptyText="No supported requirements were identified."
         />
@@ -210,97 +214,92 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
         />
       </div>
 
-      {/* Decision factors are the most useful recruiter detail, so show them. */}
-      <CollapsibleSection
-        title="Why this recommendation"
-        icon={<IconStar className="size-4 text-amber-400" />}
-        defaultOpen
-      >
-        <div className="grid gap-4 md:grid-cols-2">
-          <EvidenceList title="Reasons to progress" items={report.strengths} />
-          <EvidenceList title="Concerns and gaps" items={report.weaknesses} />
-        </div>
-      </CollapsibleSection>
-
-      {/* Proposal & Portfolio — collapsible */}
-      <CollapsibleSection
-        title="Proposal and portfolio review"
-        icon={<IconNotes className="size-4 text-violet-400" />}
-        defaultOpen={false}
-      >
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Proposal specificity */}
-          <div className="space-y-3">
-            <p className="text-xs font-semibold text-muted-foreground">
-              How tailored is the proposal?{" "}
-              <span className="font-mono text-foreground">
-                {report.scoring.proposalSpecificity}/15
-              </span>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <IconNotes className="size-4 text-violet-700 dark:text-violet-400" />
+              Proposal
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 pt-0">
+            <p className="font-mono text-sm font-semibold">
+              {report.scoring.proposalSpecificity}/15
             </p>
             <p className="text-xs leading-5 text-muted-foreground">
               {report.proposalSpecificityFindings.summary}
             </p>
-            <SignalList
-              title="Job-specific details"
-              values={report.proposalSpecificityFindings.specificSignals}
-              positive
-            />
-            <SignalList
-              title="Generic or reusable wording"
-              values={report.proposalSpecificityFindings.templateSignals}
-              positive={false}
-            />
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Portfolio */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold text-muted-foreground">
-                How relevant is the portfolio?{" "}
-                <span className="font-mono text-foreground">
-                  {report.scoring.portfolioRelevance}/15
-                </span>
-              </p>
-              <PortfolioStatusBadge status={report.portfolioEvidence.status} />
-            </div>
-            {report.portfolioEvidence.inspectedUrl && (
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <IconExternalLink className="size-4 text-primary" />
+              Portfolio — manual review
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 pt-0">
+            {report.portfolioEvidence.inspectedUrl ? (
               <a
                 href={report.portfolioEvidence.inspectedUrl}
                 rel="noopener noreferrer"
                 target="_blank"
-                className="inline-flex items-center gap-1 text-xs text-primary underline underline-offset-4 hover:text-primary/80"
+                className="inline-flex max-w-full items-center gap-1 text-xs text-primary underline underline-offset-4"
               >
-                <span className="max-w-[220px] truncate">
+                <span className="truncate">
                   {report.portfolioEvidence.inspectedUrl}
                 </span>
                 <IconExternalLink className="size-3 shrink-0" />
               </a>
+            ) : (
+              <p className="text-xs text-muted-foreground">Not provided.</p>
             )}
             <p className="text-xs leading-5 text-muted-foreground">
-              {report.portfolioEvidence.summary}
+              Not analyzed or scored. Review it manually if useful.
             </p>
-            {report.portfolioEvidence.findings.length > 0 && (
-              <EvidenceItemList items={report.portfolioEvidence.findings} />
-            )}
-          </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {report.reviewPoints.length > 0 && (
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <IconUserCheck className="size-4 text-primary" />
+              Verify before progressing
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
+              {report.reviewPoints.slice(0, 3).map((item) => (
+                <li key={item.claim}>{item.claim}</li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
+      <CollapsibleSection
+        title="Supporting evidence details"
+        icon={<IconNotes className="size-4 text-muted-foreground" />}
+        defaultOpen={false}
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <EvidenceList
+            title="Strengths"
+            items={report.strengths.slice(0, 3)}
+          />
+          <EvidenceList title="Gaps" items={report.weaknesses.slice(0, 3)} />
         </div>
       </CollapsibleSection>
-
-      {/* Review points — collapsible, only when present */}
-      {report.reviewPoints.length > 0 && (
-        <CollapsibleSection
-          title={`What to verify (${report.reviewPoints.length})`}
-          icon={<IconUserCheck className="size-4 text-primary" />}
-          defaultOpen
-        >
-          <EvidenceItemList items={report.reviewPoints} />
-        </CollapsibleSection>
-      )}
 
       {/* Outreach draft — collapsible */}
       <CollapsibleSection
         title="Candidate message draft"
-        icon={<IconMessageCircle className="size-4 text-sky-400" />}
+        icon={
+          <IconMessageCircle className="size-4 text-sky-700 dark:text-sky-400" />
+        }
         defaultOpen={false}
       >
         <p className="mb-3 text-xs text-muted-foreground">
@@ -387,7 +386,9 @@ function SkillPills({
           <p
             className={cn(
               "text-xs italic",
-              emptyGood ? "text-emerald-400" : "text-muted-foreground"
+              emptyGood
+                ? "text-emerald-700 dark:text-emerald-400"
+                : "text-muted-foreground"
             )}
           >
             {emptyText}
@@ -519,71 +520,6 @@ function ScoreBar({
         />
       </div>
     </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// SignalList
-// ---------------------------------------------------------------------------
-
-function SignalList({
-  title,
-  values,
-  positive,
-}: {
-  title: string
-  values: string[]
-  positive: boolean
-}) {
-  if (!values.length) return null
-  return (
-    <div className="space-y-1.5">
-      <p className="text-xs font-semibold text-muted-foreground">{title}</p>
-      <ul className="space-y-1">
-        {values.map((v) => (
-          <li key={v} className="flex items-start gap-2 text-xs">
-            {positive ? (
-              <IconShieldCheck className="mt-0.5 size-3.5 shrink-0 text-emerald-400" />
-            ) : (
-              <IconAlertTriangle className="mt-0.5 size-3.5 shrink-0 text-amber-400" />
-            )}
-            <span className="text-muted-foreground">{v}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// PortfolioStatusBadge
-// ---------------------------------------------------------------------------
-
-function PortfolioStatusBadge({
-  status,
-}: {
-  status: "inspected" | "not_provided" | "unavailable" | "unsafe"
-}) {
-  const styles = {
-    inspected: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-    not_provided:
-      "border-muted-foreground/20 bg-muted/30 text-muted-foreground",
-    unavailable: "border-muted-foreground/20 bg-muted/30 text-muted-foreground",
-    unsafe: "border-destructive/30 bg-destructive/10 text-destructive",
-  }
-  const labels = {
-    inspected: "Inspected",
-    not_provided: "Evidence not provided",
-    unavailable: "Source unavailable",
-    unsafe: "Source blocked for safety",
-  }
-  return (
-    <Badge
-      variant="outline"
-      className={cn("border text-[10px] font-medium", styles[status])}
-    >
-      {labels[status]}
-    </Badge>
   )
 }
 

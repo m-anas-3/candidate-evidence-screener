@@ -20,10 +20,16 @@ export default async function AuthLayout({
   return (
     <main className="min-h-svh bg-background lg:grid lg:grid-cols-[1fr_minmax(28rem,0.72fr)]">
       {/* ── Left — branding + carousel ── */}
-      <section className="relative hidden overflow-hidden lg:flex lg:flex-col bg-[oklch(0.095_0.007_252)] p-12 xl:p-16">
+      <section className="relative hidden overflow-hidden bg-[oklch(0.095_0.007_252)] p-12 lg:flex lg:flex-col xl:p-16">
         {/* Background glows */}
-        <div aria-hidden className="pointer-events-none absolute -top-40 -left-40 size-[600px] rounded-full bg-primary/10 blur-[120px]" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-20 -right-20 size-[400px] rounded-full bg-primary/8 blur-[100px]" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-40 -left-40 size-[600px] rounded-full bg-primary/10 blur-[120px]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-20 -bottom-20 size-[400px] rounded-full bg-primary/8 blur-[100px]"
+        />
 
         {/* Grid lines */}
         <div
@@ -37,7 +43,7 @@ export default async function AuthLayout({
         />
 
         {/* Logo */}
-        <div className="relative flex items-center gap-3 shrink-0">
+        <div className="relative flex shrink-0 items-center gap-3">
           <span className="flex size-9 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/25">
             <IconShieldCheck className="size-4.5 text-primary" />
           </span>
@@ -45,7 +51,7 @@ export default async function AuthLayout({
             <span className="block text-sm font-semibold tracking-tight text-white">
               Evidence Screener
             </span>
-            <span className="block text-[10px] font-medium uppercase tracking-[0.12em] text-primary">
+            <span className="block text-[10px] font-medium tracking-[0.12em] text-primary uppercase">
               Recruiter Platform
             </span>
           </div>
@@ -57,7 +63,7 @@ export default async function AuthLayout({
         </div>
 
         {/* Footer */}
-        <p className="relative shrink-0 text-xs text-white/25 tracking-wide">
+        <p className="relative shrink-0 text-xs tracking-wide text-white/75">
           Private resumes · Evidence-backed reports · Human review required
         </p>
       </section>
@@ -69,7 +75,9 @@ export default async function AuthLayout({
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
             <IconShieldCheck className="size-4 text-primary" />
           </span>
-          <span className="text-sm font-semibold tracking-tight">Evidence Screener</span>
+          <span className="text-sm font-semibold tracking-tight">
+            Evidence Screener
+          </span>
         </div>
         <div className="w-full max-w-md">{children}</div>
       </section>

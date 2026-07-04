@@ -189,11 +189,13 @@ export default async function JobDetailsPage({
                 <span className="text-muted-foreground">candidates</span>
               </span>
               <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/15 bg-emerald-500/10 px-3 py-1.5">
-                <IconCircleCheck className="size-3.5 text-emerald-400" />
-                <span className="font-semibold text-emerald-400">
+                <IconCircleCheck className="size-3.5 text-emerald-700 dark:text-emerald-400" />
+                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
                   {reportsReadyCount}
                 </span>
-                <span className="text-emerald-400/80">ready</span>
+                <span className="text-emerald-700 dark:text-emerald-400">
+                  ready
+                </span>
               </span>
             </div>
           </div>
@@ -259,10 +261,10 @@ export default async function JobDetailsPage({
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <IconCircleCheck className="size-4 text-emerald-400" />{" "}
+                  <IconCircleCheck className="size-4 text-emerald-700 dark:text-emerald-400" />{" "}
                   Reports Ready
                 </span>
-                <span className="font-semibold text-emerald-400">
+                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
                   {reportsReadyCount}
                 </span>
               </div>
@@ -444,7 +446,7 @@ export default async function JobDetailsPage({
               <h3 className="text-sm font-semibold text-foreground">
                 No candidates yet
               </h3>
-              <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground/80">
+              <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
                 Add candidates to this role. Upload a resume or paste candidate
                 details, and the app will help you review fit against this job.
               </p>
@@ -493,12 +495,12 @@ function RecommendationBadge({
     strong_fit: {
       label: "Strong documented match",
       className:
-        "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/15",
+        "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-400",
     },
     possible_fit: {
       label: "Potential documented match",
       className:
-        "border-amber-500/20 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15",
+        "border-amber-500/20 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-400",
     },
     weak_fit: {
       label: "Limited documented match",

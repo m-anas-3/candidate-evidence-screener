@@ -192,7 +192,7 @@ export default async function NewCandidatePage({
                   2
                 </span>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Provide a public portfolio URL and upload their PDF resume.
+                  Optionally provide a portfolio URL and upload their PDF resume.
                 </p>
               </div>
               <div className="flex gap-2.5">

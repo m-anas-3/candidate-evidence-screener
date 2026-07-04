@@ -50,7 +50,8 @@ export default async function NewJobPage() {
           Create a new role
         </h1>
         <p className="text-sm text-muted-foreground">
-          Define the requirements and must-have skills to guide the candidate evidence screening.
+          Define the requirements and must-have skills to guide the candidate
+          evidence screening.
         </p>
       </div>
 
@@ -61,9 +62,12 @@ export default async function NewJobPage() {
               <IconBriefcase className="size-4.5" />
             </span>
             <div>
-              <CardTitle className="text-base font-semibold">Role Criteria</CardTitle>
+              <CardTitle className="text-base font-semibold">
+                Role Criteria
+              </CardTitle>
               <CardDescription className="text-xs">
-                Anchors portfolio inspection and resume analysis with hard evidence requirements.
+                Anchors resume and proposal analysis with clear evidence
+                requirements.
               </CardDescription>
             </div>
           </div>

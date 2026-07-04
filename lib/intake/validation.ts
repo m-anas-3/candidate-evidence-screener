@@ -40,19 +40,23 @@ export const candidateInputSchema = z.object({
   candidateId: z.uuid("Candidate ID is invalid."),
   jobId: z.uuid("Job ID is invalid."),
   name: requiredText("Candidate name", 200),
-  portfolioUrl: z
-    .string()
-    .trim()
-    .url("Enter a valid portfolio URL.")
-    .max(2048, "Portfolio URL is too long.")
-    .refine((value) => {
-      try {
-        const protocol = new URL(value).protocol
-        return protocol === "http:" || protocol === "https:"
-      } catch {
-        return false
-      }
-    }, "Portfolio URL must use HTTP or HTTPS."),
+  portfolioUrl: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") return value
+      const trimmed = value.trim()
+      return trimmed === "" ? null : trimmed
+    },
+    z
+      .url("Enter a valid portfolio URL.")
+      .max(2048, "Portfolio URL is too long.")
+      .refine(
+        (value) => ["http:", "https:"].includes(new URL(value).protocol),
+        {
+          message: "Portfolio URL must use HTTP or HTTPS.",
+        }
+      )
+      .nullable()
+  ),
   proposalText: requiredText("Proposal", 20_000),
   resumePath: z
     .string()

@@ -39,7 +39,13 @@ export const portfolioEvidenceSchema = z
   .object({
     score: z.number().int().min(0).max(15),
     inspectedUrl: z.url().max(2_048).nullable(),
-    status: z.enum(["inspected", "not_provided", "unavailable", "unsafe"]),
+    status: z.enum([
+      "manual_review",
+      "inspected",
+      "not_provided",
+      "unavailable",
+      "unsafe",
+    ]),
     findings: boundedEvidenceList,
     summary: z.string().trim().min(1).max(2_000),
   })
@@ -58,12 +64,12 @@ const screeningReportInputSchema = z
       .optional(),
     scoring: z
       .object({
-        jobRequirementsAndSkills: z.number().int().min(0).max(50),
-        relevantExperience: z.number().int().min(0).max(20),
-        // proposalSpecificity and portfolioRelevance must still match their
-        // nested objects so the evidence and sub-scores stay consistent.
+        jobRequirementsAndSkills: z.number().int().min(0).max(55),
+        relevantExperience: z.number().int().min(0).max(30),
         proposalSpecificity: z.number().int().min(0).max(15),
-        portfolioRelevance: z.number().int().min(0).max(15),
+        // Accepted only so reports created under the former 50/20/15/15
+        // rubric remain readable. New reports omit this field.
+        portfolioRelevance: z.number().int().min(0).max(15).optional(),
       })
       .strict(),
     summary: z.string().trim().min(1).max(3_000),
@@ -72,34 +78,43 @@ const screeningReportInputSchema = z
     matchedSkills: boundedEvidenceList,
     missingSkills: boundedEvidenceList,
     proposalSpecificityFindings: proposalSpecificitySchema,
-    portfolioEvidence: portfolioEvidenceSchema,
+    portfolioEvidence: portfolioEvidenceSchema.optional(),
     reviewPoints: boundedEvidenceList,
     outreachMessage: z.string().trim().min(1).max(5_000),
   })
   .transform((report) => {
-    // Auto-correct sub-score mismatches: when scoring.proposalSpecificity and
-    // proposalSpecificityFindings.score disagree, trust the nested findings
-    // object because it carries the evidence. Same for portfolioRelevance.
-    // This avoids hard failures on minor LLM inconsistencies.
     const proposalScore = report.proposalSpecificityFindings.score
-    const portfolioScore = report.portfolioEvidence.score
-
+    const portfolioEvidence = report.portfolioEvidence ?? {
+      score: 0,
+      inspectedUrl: null,
+      status: "manual_review" as const,
+      findings: [],
+      summary:
+        "Portfolio review is left to the recruiter and does not affect the score.",
+    }
+    const legacyPortfolioScore = report.scoring.portfolioRelevance
     const scoring =
-      report.scoring.proposalSpecificity !== proposalScore ||
-      report.scoring.portfolioRelevance !== portfolioScore
+      legacyPortfolioScore === undefined
         ? {
-            ...report.scoring,
+            jobRequirementsAndSkills: report.scoring.jobRequirementsAndSkills,
+            relevantExperience: report.scoring.relevantExperience,
             proposalSpecificity: proposalScore,
-            portfolioRelevance: portfolioScore,
           }
-        : report.scoring
+        : {
+            jobRequirementsAndSkills: report.scoring.jobRequirementsAndSkills,
+            relevantExperience: report.scoring.relevantExperience,
+            proposalSpecificity: proposalScore,
+            portfolioRelevance: legacyPortfolioScore,
+          }
 
     // Derive score from sub-scores — the LLM never has to do the arithmetic.
     let computedScore =
       scoring.jobRequirementsAndSkills +
       scoring.relevantExperience +
       scoring.proposalSpecificity +
-      scoring.portfolioRelevance
+      ("portfolioRelevance" in scoring
+        ? (scoring.portfolioRelevance ?? 0)
+        : 0)
 
     // Cap at 79 when any must-have skill is missing.
     if (report.missingSkills.length > 0 && computedScore > 79) {
@@ -116,6 +131,7 @@ const screeningReportInputSchema = z
 
     return {
       ...report,
+      portfolioEvidence,
       scoring,
       score: computedScore,
       recommendation: computedRecommendation,

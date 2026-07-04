@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Candidate Evidence Screener",
   },
   description:
-    "Evidence-backed screening for freelance candidate resumes, proposals, and portfolios.",
+    "Evidence-backed screening for freelance candidate resumes and proposals.",
 }
 
 export default function RootLayout({
