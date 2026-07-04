@@ -8,6 +8,11 @@ import {
   getCandidateAnalysisAgentConfiguration,
 } from "@/lib/agent/harness"
 import { RECRUITER_PROMPT_VERSION } from "@/lib/agent/prompt"
+import {
+  consumeAiRateLimit,
+  formatRetryAfter,
+  getAnalysisContextLimitError,
+} from "@/lib/security/ai-guardrails"
 import { createClient } from "@/lib/supabase/server"
 
 export const runtime = "nodejs"
@@ -58,10 +63,17 @@ export async function POST(
       `
       id,
       job_id,
+      proposal_text,
       resume_text,
       analysis_status,
       updated_at,
-      jobs!inner (recruiter_id)
+      jobs!inner (
+        recruiter_id,
+        title,
+        description,
+        requirements,
+        must_have_skills
+      )
     `
     )
     .eq("id", candidateId)
@@ -83,6 +95,12 @@ export async function POST(
 
   if (!candidate.resume_text) {
     return errorResponse("Extract the candidate resume before analysis.", 409)
+  }
+
+  const jobValue = candidate.jobs
+  const job = Array.isArray(jobValue) ? jobValue[0] : jobValue
+  if (!job) {
+    return errorResponse("Candidate job context could not be loaded.", 500)
   }
 
   if (candidate.analysis_status === "completed") {
@@ -136,6 +154,18 @@ export async function POST(
     }
   }
 
+  const contextLimitError = getAnalysisContextLimitError({
+    description: job.description,
+    mustHaveSkills: job.must_have_skills,
+    proposalText: candidate.proposal_text,
+    requirements: job.requirements,
+    resumeText: candidate.resume_text,
+    title: job.title,
+  })
+  if (contextLimitError) {
+    return errorResponse(contextLimitError, 413)
+  }
+
   let agentConfiguration
   try {
     agentConfiguration = getCandidateAnalysisAgentConfiguration()
@@ -145,6 +175,24 @@ export async function POST(
       "Candidate analysis is not configured.",
       503,
       requestReference
+    )
+  }
+
+  const rateLimit = await consumeAiRateLimit(supabase, "candidate_analysis")
+  if (!rateLimit.allowed) {
+    if ("unavailable" in rateLimit) {
+      return errorResponse(
+        "Candidate analysis is temporarily unavailable. Try again shortly.",
+        503,
+        requestReference
+      )
+    }
+
+    return errorResponse(
+      `Too many analysis requests. Try again in ${formatRetryAfter(rateLimit.retryAfterSeconds)}.`,
+      429,
+      undefined,
+      { "Retry-After": String(rateLimit.retryAfterSeconds) }
     )
   }
 
@@ -260,9 +308,7 @@ export async function POST(
           ? error.cause.message
           : undefined,
       validationCode:
-        error != null &&
-        typeof error === "object" &&
-        "code" in error
+        error != null && typeof error === "object" && "code" in error
           ? (error as { code: unknown }).code
           : undefined,
       zodIssues:
@@ -272,7 +318,10 @@ export async function POST(
         Array.isArray((error as { issues: unknown }).issues)
           ? (error as { issues: unknown[] }).issues
           : undefined,
-      stack: error instanceof Error ? error.stack?.split("\n").slice(0, 6).join("\n") : undefined,
+      stack:
+        error instanceof Error
+          ? error.stack?.split("\n").slice(0, 6).join("\n")
+          : undefined,
     })
     logAnalysisFailure(
       requestReference,
@@ -407,11 +456,16 @@ function logAnalysisFailure(
   })
 }
 
-function errorResponse(error: string, status: number, reference?: string) {
+function errorResponse(
+  error: string,
+  status: number,
+  reference?: string,
+  headers?: HeadersInit
+) {
   return Response.json(
     { error, ok: false, reference } satisfies ErrorResponse,
     {
-      headers: { "Cache-Control": "no-store" },
+      headers: { "Cache-Control": "no-store", ...headers },
       status,
     }
   )

@@ -8,7 +8,9 @@ import {
   PDFParse,
 } from "pdf-parse"
 
-export const MAX_RESUME_TEXT_CHARACTERS = 200_000
+import { MAX_ANALYSIS_RESUME_CHARACTERS } from "@/lib/security/ai-guardrails"
+
+export const MAX_RESUME_TEXT_CHARACTERS = MAX_ANALYSIS_RESUME_CHARACTERS
 export const MIN_RESUME_TEXT_CHARACTERS = 40
 
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46, 0x2d] as const
@@ -67,7 +69,7 @@ export async function extractResumeText(bytes: Uint8Array): Promise<string> {
 
     if (text.length > MAX_RESUME_TEXT_CHARACTERS) {
       throw new ResumeExtractionError(
-        "The resume contains too much text to process safely.",
+        `The resume contains too much text. Upload a shorter resume with no more than ${MAX_RESUME_TEXT_CHARACTERS.toLocaleString()} characters.`,
         "text_too_large"
       )
     }

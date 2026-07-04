@@ -85,15 +85,15 @@ scope, scoring rules, security requirements, and exclusions.
 
 ## Commands
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Start the development server |
-| `pnpm build` | Create a production build |
-| `pnpm start` | Serve a production build |
-| `pnpm test` | Run the Vitest suite |
-| `pnpm lint` | Run ESLint |
-| `pnpm typecheck` | Run strict TypeScript checks |
-| `pnpm format` | Format TypeScript and TSX files |
+| Command          | Purpose                         |
+| ---------------- | ------------------------------- |
+| `pnpm dev`       | Start the development server    |
+| `pnpm build`     | Create a production build       |
+| `pnpm start`     | Serve a production build        |
+| `pnpm test`      | Run the Vitest suite            |
+| `pnpm lint`      | Run ESLint                      |
+| `pnpm typecheck` | Run strict TypeScript checks    |
+| `pnpm format`    | Format TypeScript and TSX files |
 
 Before submitting changes, run:
 
@@ -123,3 +123,9 @@ docs/product-spec.md Product behavior, scoring, security, and scope
 - Preserve Row Level Security and server-side ownership checks.
 - Never expose service-role or OpenAI keys to browser code.
 - Do not send PDF bytes to OpenAI; only extracted text is analyzed.
+- AI routes reject oversized input before contacting the model. Chat messages
+  are limited to 2,000 characters; analysis is limited to 60,000 resume
+  characters and 80,000 combined context characters.
+- Persistent per-recruiter limits allow 20 chat requests per 5 minutes and 15
+  candidate analyses per hour. Apply all Supabase migrations before running
+  the application so these limits fail safely rather than being bypassed.

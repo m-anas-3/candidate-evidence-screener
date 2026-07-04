@@ -1,4 +1,5 @@
 const RESUME_SNIPPET_CHARS = 6_000
+const REPORT_FIELD_CHARS = 2_000
 
 type JobContext = {
   title: string
@@ -86,8 +87,11 @@ export function buildCandidateChatSystemPrompt(
 }
 
 function slim(value: unknown): string {
-  if (!Array.isArray(value)) return JSON.stringify(value)
-  return (value as { claim?: string }[])
-    .map((item) => item?.claim ?? JSON.stringify(item))
-    .join(" | ")
+  const text = Array.isArray(value)
+    ? (value as { claim?: string }[])
+        .map((item) => item?.claim ?? JSON.stringify(item))
+        .join(" | ")
+    : JSON.stringify(value)
+
+  return text.slice(0, REPORT_FIELD_CHARS)
 }

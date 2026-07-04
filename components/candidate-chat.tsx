@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
+import { MAX_CHAT_MESSAGE_CHARACTERS } from "@/lib/security/ai-guardrails"
 import { cn } from "@/lib/utils"
 
 // ---------------------------------------------------------------------------
@@ -219,6 +220,7 @@ export function CandidateChat({
             aria-label="Ask a question about this candidate"
             className="min-h-[60px] flex-1 resize-none rounded-xl border-border/50 bg-muted/20 text-sm focus:border-primary/40 focus:bg-background"
             disabled={streaming}
+            maxLength={MAX_CHAT_MESSAGE_CHARACTERS}
             onKeyDown={handleKeyDown}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about experience, skills, proposal quality…"
@@ -240,16 +242,22 @@ export function CandidateChat({
             )}
           </Button>
         </div>
-        <p className="text-[10px] text-muted-foreground">
-          <kbd className="rounded border border-border/40 px-1 font-mono text-[10px]">
-            Enter
-          </kbd>{" "}
-          to send ·{" "}
-          <kbd className="rounded border border-border/40 px-1 font-mono text-[10px]">
-            Shift+Enter
-          </kbd>{" "}
-          for new line
-        </p>
+        <div className="flex items-center justify-between gap-3 text-[10px] text-muted-foreground">
+          <p>
+            <kbd className="rounded border border-border/40 px-1 font-mono text-[10px]">
+              Enter
+            </kbd>{" "}
+            to send ·{" "}
+            <kbd className="rounded border border-border/40 px-1 font-mono text-[10px]">
+              Shift+Enter
+            </kbd>{" "}
+            for new line
+          </p>
+          <span aria-live="polite" className="tabular-nums">
+            {input.length.toLocaleString()}/
+            {MAX_CHAT_MESSAGE_CHARACTERS.toLocaleString()}
+          </span>
+        </div>
       </div>
     </div>
   )

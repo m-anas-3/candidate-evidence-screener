@@ -54,4 +54,26 @@ describe("candidate chat safety prompt", () => {
   ])("contains the required rule: %s", (rule) => {
     expect(prompt).toContain(rule)
   })
+
+  it("bounds large report fields before adding them to the prompt", () => {
+    const largeClaims = Array.from({ length: 20 }, (_, index) => ({
+      claim: `${index}-${"x".repeat(1_000)}`,
+    }))
+    const boundedPrompt = buildCandidateChatSystemPrompt(
+      { name: "Candidate", proposal_text: "Evidence", resume_text: "Evidence" },
+      null,
+      {
+        summary: "Summary",
+        score: 80,
+        recommendation: "strong_fit",
+        matched_skills: largeClaims,
+        missing_skills: largeClaims,
+        strengths: largeClaims,
+        weaknesses: largeClaims,
+        review_points: largeClaims,
+      }
+    )
+
+    expect(boundedPrompt.length).toBeLessThan(15_000)
+  })
 })

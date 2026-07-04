@@ -3,13 +3,15 @@ import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import { buildCandidateChatSystemPrompt } from "@/lib/agent/chat-prompt"
 import { readOpenAIContentDeltas } from "@/lib/agent/openai-sse"
+import {
+  boundChatHistory,
+  chatMessageSchema,
+  consumeAiRateLimit,
+  formatRetryAfter,
+} from "@/lib/security/ai-guardrails"
 
 export const runtime = "nodejs"
 export const maxDuration = 30 // Chat needs far less than the 60s we had before
-
-const bodySchema = z.object({
-  message: z.string().trim().min(1).max(2_000),
-})
 
 const candidateIdSchema = z.uuid()
 
@@ -52,12 +54,25 @@ export async function POST(
   const candidateId = candidateIdResult.data
 
   // --- Validate body ---
-  let body: z.infer<typeof bodySchema>
+  let rawBody: unknown
   try {
-    body = bodySchema.parse(await request.json())
+    rawBody = await request.json()
   } catch {
     return Response.json({ error: "Message is required." }, { status: 400 })
   }
+  const bodyResult = chatMessageSchema.safeParse(rawBody)
+  if (!bodyResult.success) {
+    const status = bodyResult.error.issues.some(
+      (issue) => issue.code === "too_big"
+    )
+      ? 413
+      : 400
+    return Response.json(
+      { error: bodyResult.error.issues[0]?.message ?? "Message is invalid." },
+      { headers: { "Cache-Control": "no-store" }, status }
+    )
+  }
+  const body = bodyResult.data
 
   // --- Model config ---
   // Chat uses a cheap fast model — no tool-use or structured output needed.
@@ -112,8 +127,35 @@ export async function POST(
     return Response.json({ error: "Candidate not found." }, { status: 404 })
   }
 
-  // history comes back newest-first from the DESC order, so reverse it
-  const orderedHistory = (history ?? []).slice().reverse()
+  const rateLimit = await consumeAiRateLimit(supabase, "candidate_chat")
+  if (!rateLimit.allowed) {
+    if ("unavailable" in rateLimit) {
+      return Response.json(
+        {
+          error:
+            "Candidate chat is temporarily unavailable. Try again shortly.",
+        },
+        { headers: { "Cache-Control": "no-store" }, status: 503 }
+      )
+    }
+
+    return Response.json(
+      {
+        error: `Too many chat requests. Try again in ${formatRetryAfter(rateLimit.retryAfterSeconds)}.`,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+          "Retry-After": String(rateLimit.retryAfterSeconds),
+        },
+        status: 429,
+      }
+    )
+  }
+
+  // History is newest-first. Keep recent context within a hard character
+  // budget, then restore chronological order for the model.
+  const orderedHistory = boundChatHistory(history ?? [])
 
   // --- Persist user message ---
   const { error: insertError } = await supabase

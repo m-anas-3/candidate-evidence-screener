@@ -1,11 +1,12 @@
 # Supabase schema and storage
 
-The migration in `migrations/` creates the complete MVP persistence boundary:
+The migrations in `migrations/` create the complete MVP persistence boundary:
 
 - recruiter-owned `jobs`;
 - `candidates` owned through their job;
 - one `screening_reports` row per candidate;
 - candidate-scoped `chat_messages`;
+- private, database-backed AI rate-limit events;
 - a private, PDF-only `resumes` bucket with a 2 MB object limit.
 
 ## Ownership and RLS
@@ -23,6 +24,10 @@ Storage policies compare the first folder with `auth.uid()` for every read, uplo
 Generate the candidate UUID before upload so the same value can be used in the second folder and the candidate insert. The database rejects a `resume_path` whose second folder does not match `candidates.id`.
 
 Deleting a relational row does not delete its Storage object. Any future candidate/job deletion workflow must delete resume objects through the Storage API before deleting database rows.
+
+AI rate-limit events live in the unexposed `private` schema. Authenticated
+clients can only consume a fixed limit through the security-definer RPC; they
+cannot read or write the event table or raise their configured limits.
 
 ## Apply locally
 

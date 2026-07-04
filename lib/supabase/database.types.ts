@@ -212,7 +212,15 @@ export type Database = {
       }
     }
     Views: { [_ in never]: never }
-    Functions: { [_ in never]: never }
+    Functions: {
+      consume_ai_rate_limit: {
+        Args: { requested_kind: string }
+        Returns: {
+          allowed: boolean
+          retry_after_seconds: number
+        }[]
+      }
+    }
     Enums: {
       candidate_analysis_status:
         | "pending"

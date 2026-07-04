@@ -54,6 +54,8 @@ Accept PDF files only, with a 2 MB maximum. Validate declared type, PDF magic by
 
 Structured agent output must pass a strict Zod schema before persistence. Invalid or partial output must fail safely. Prevent concurrent duplicate analysis, persist recoverable status transitions, bound chat history, and do not expose server secrets or model internals. The agent must not fetch or score portfolio content.
 
+AI-backed routes must reject oversized input before contacting the model and enforce persistent per-recruiter rate limits across server instances. Chat messages are limited to 2,000 characters. Candidate analysis is limited to 60,000 extracted resume characters and 80,000 combined job, proposal, and resume characters. Allow at most 20 chat requests per 5 minutes and 15 candidate-analysis requests per hour; return an actionable `429` response with a retry interval when a limit is reached.
+
 Authenticated account data persists until a future explicit deletion feature or administrator action. Automatic retention cleanup and account administration are not part of this MVP. Never use a service-role key in ordinary product requests or expose it to client code.
 
 ## User Experience and Completion
