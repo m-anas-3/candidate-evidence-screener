@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { CandidatesTable } from "@/components/candidates-table"
 import { PageHeader } from "@/components/page-header"
+import { RouteToast } from "@/components/route-toast"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = { title: "Candidates" }
@@ -18,7 +19,12 @@ interface RawCandidate {
     | null
 }
 
-export default async function CandidatesPage() {
+export default async function CandidatesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ notice?: string }>
+}) {
+  const { notice } = await searchParams
   const supabase = await createClient()
 
   const [{ data: candidates, error }, { data: jobs, error: jobsError }] =
@@ -83,6 +89,16 @@ export default async function CandidatesPage() {
       aria-labelledby="candidates-heading"
       className="mx-auto w-full max-w-6xl space-y-8"
     >
+      {notice === "candidate-deleted" && (
+        <RouteToast id="candidate-deleted" message="Candidate deleted." />
+      )}
+      {notice === "candidate-unavailable" && (
+        <RouteToast
+          id="candidate-unavailable"
+          message="That candidate is no longer available."
+          variant="error"
+        />
+      )}
       <PageHeader
         eyebrow="Recruiting Workspace"
         title="Candidates"

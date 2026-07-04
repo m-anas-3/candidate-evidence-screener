@@ -8,10 +8,9 @@ import { jobInputSchema } from "@/lib/intake/validation"
 import type { IntakeActionState } from "@/lib/intake/types"
 import { createClient } from "@/lib/supabase/server"
 
-export async function createJob(
-  _previousState: IntakeActionState,
-  formData: FormData
-): Promise<IntakeActionState> {
+type JobInsertResult = { jobId: string } | { state: IntakeActionState }
+
+async function insertOwnedJob(formData: FormData): Promise<JobInsertResult> {
   const parsed = jobInputSchema.safeParse({
     description: formData.get("description"),
     mustHaveSkills: formData.get("mustHaveSkills"),
@@ -21,9 +20,12 @@ export async function createJob(
 
   if (!parsed.success) {
     return {
-      fieldErrors: z.flattenError(parsed.error).fieldErrors,
-      message: "Check the highlighted fields.",
-      status: "error",
+      state: {
+        eventId: crypto.randomUUID(),
+        fieldErrors: z.flattenError(parsed.error).fieldErrors,
+        message: "Check the highlighted fields.",
+        status: "error",
+      },
     }
   }
 
@@ -33,8 +35,11 @@ export async function createJob(
 
   if (authError || !recruiterId) {
     return {
-      message: "Your session expired. Sign in and try again.",
-      status: "error",
+      state: {
+        eventId: crypto.randomUUID(),
+        message: "Your session expired. Sign in and try again.",
+        status: "error",
+      },
     }
   }
 
@@ -53,13 +58,26 @@ export async function createJob(
   if (error) {
     console.error("Job creation failed", { code: error.code })
     return {
-      message: "The job could not be created. Try again.",
-      status: "error",
+      state: {
+        eventId: crypto.randomUUID(),
+        message: "The job could not be created. Try again.",
+        status: "error",
+      },
     }
   }
 
+  return { jobId: data.id }
+}
+
+export async function createJob(
+  _previousState: IntakeActionState,
+  formData: FormData
+): Promise<IntakeActionState> {
+  const result = await insertOwnedJob(formData)
+  if ("state" in result) return result.state
+
   revalidatePath("/dashboard/jobs")
-  redirect(`/dashboard/jobs/${data.id}`)
+  redirect(`/dashboard/jobs/${result.jobId}?notice=job-created`)
 }
 
 /**
@@ -69,67 +87,32 @@ export async function createJob(
  */
 export async function createJobForDialog(
   _previousState: IntakeActionState,
-  formData: FormData,
+  formData: FormData
 ): Promise<IntakeActionState> {
-  const parsed = jobInputSchema.safeParse({
-    description: formData.get("description"),
-    mustHaveSkills: formData.get("mustHaveSkills"),
-    requirements: formData.get("requirements"),
-    title: formData.get("title"),
-  })
-
-  if (!parsed.success) {
-    return {
-      fieldErrors: z.flattenError(parsed.error).fieldErrors,
-      message: "Check the highlighted fields.",
-      status: "error",
-    }
-  }
-
-  const supabase = await createClient()
-  const { data: authData, error: authError } = await supabase.auth.getClaims()
-  const recruiterId = authData?.claims?.sub
-
-  if (authError || !recruiterId) {
-    return {
-      message: "Your session expired. Sign in and try again.",
-      status: "error",
-    }
-  }
-
-  const { data, error } = await supabase
-    .from("jobs")
-    .insert({
-      description: parsed.data.description,
-      must_have_skills: parsed.data.mustHaveSkills,
-      recruiter_id: recruiterId,
-      requirements: parsed.data.requirements,
-      title: parsed.data.title,
-    })
-    .select("id")
-    .single()
-
-  if (error) {
-    console.error("Job creation failed", { code: error.code })
-    return {
-      message: "The job could not be created. Try again.",
-      status: "error",
-    }
-  }
+  const result = await insertOwnedJob(formData)
+  if ("state" in result) return result.state
 
   revalidatePath("/dashboard/jobs")
-  return { status: "success", jobId: data.id }
+  return {
+    eventId: crypto.randomUUID(),
+    status: "success",
+    jobId: result.jobId,
+  }
 }
 
 export async function deleteJob(
-  jobId: string
+  jobId: string,
+  redirectTo?: string
 ): Promise<{ ok: boolean; message?: string }> {
   const supabase = await createClient()
   const { data: authData, error: authError } = await supabase.auth.getClaims()
   const recruiterId = authData?.claims?.sub
 
   if (authError || !recruiterId) {
-    return { ok: false, message: "Your session expired. Sign in and try again." }
+    return {
+      ok: false,
+      message: "Your session expired. Sign in and try again.",
+    }
   }
 
   const { data: job, error: jobError } = await supabase
@@ -140,7 +123,10 @@ export async function deleteJob(
     .maybeSingle()
 
   if (jobError || !job) {
-    return { ok: false, message: "The role is unavailable or was already deleted." }
+    return {
+      ok: false,
+      message: "The role is unavailable or was already deleted.",
+    }
   }
 
   const { data: deletedJob, error: deleteError } = await supabase
@@ -170,5 +156,8 @@ export async function deleteJob(
   revalidatePath("/dashboard")
   revalidatePath("/dashboard/jobs")
   revalidatePath("/dashboard/candidates")
+  if (redirectTo === "/dashboard/jobs") {
+    redirect("/dashboard/jobs?notice=role-deleted")
+  }
   return { ok: true }
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { redirect } from "next/navigation"
 import {
   IconArrowLeft,
   IconBriefcase,
@@ -79,8 +79,19 @@ export default async function CandidateDetailsPage({
       .limit(50),
   ])
 
-  if (candidateError || !candidate || candidate.job_id !== jobId) notFound()
-  if (jobError || !job) notFound()
+  if (
+    candidateError ||
+    !candidate ||
+    candidate.job_id !== jobId ||
+    jobError ||
+    !job
+  ) {
+    redirect(
+      from === "/dashboard/candidates"
+        ? "/dashboard/candidates?notice=candidate-unavailable"
+        : "/dashboard/jobs?notice=role-unavailable"
+    )
+  }
 
   const cameFromCandidates = from === "/dashboard/candidates"
   const backHref = cameFromCandidates

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -28,17 +28,15 @@ export function CandidateForm({
 }) {
   const router = useRouter()
   const [errors, setErrors] = useState<FormErrors>({})
-  const [message, setMessage] = useState<string>()
   const [pending, setPending] = useState(false)
 
-  useEffect(() => {
-    if (message) toast.error(message)
-  }, [message])
+  function showError(message: string) {
+    toast.error(message, { id: "candidate-form-error" })
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErrors({})
-    setMessage(undefined)
 
     const form = event.currentTarget
     const formData = new FormData(form)
@@ -70,7 +68,7 @@ export function CandidateForm({
 
     if (!parsed.success) {
       setErrors(parsed.error.flatten().fieldErrors)
-      setMessage("Check the highlighted fields.")
+      showError("Check the highlighted fields.")
       return
     }
 
@@ -88,7 +86,7 @@ export function CandidateForm({
 
       if (uploadError) {
         console.error("Resume upload failed", { code: uploadError.name })
-        setMessage("The resume could not be uploaded. Try again.")
+        showError("The resume could not be uploaded. Try again.")
         return
       }
 
@@ -97,7 +95,7 @@ export function CandidateForm({
       if (!result.ok) {
         await removeUploadedResume(resumePath)
         setErrors(result.fieldErrors ?? {})
-        setMessage(result.message ?? "The candidate could not be created.")
+        showError(result.message ?? "The candidate could not be created.")
         return
       }
 
@@ -109,7 +107,7 @@ export function CandidateForm({
     } catch {
       // A transport failure can occur after the database insert commits. Keep
       // the private object rather than risk leaving a candidate without a file.
-      setMessage("The candidate could not be created. Try again.")
+      showError("The candidate could not be created. Try again.")
     } finally {
       setPending(false)
     }

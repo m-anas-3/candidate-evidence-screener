@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { redirect } from "next/navigation"
 import { IconArrowLeft, IconSparkles } from "@tabler/icons-react"
 
 import { CandidateChat } from "@/components/candidate-chat"
@@ -61,7 +61,11 @@ export default async function CandidateChatPage({
   ])
 
   if (candidateError || !candidate || jobError || !job) {
-    notFound()
+    redirect(
+      from === "/dashboard/candidates"
+        ? "/dashboard/candidates?notice=candidate-unavailable"
+        : "/dashboard/jobs?notice=role-unavailable"
+    )
   }
 
   const reportResult = screeningReportSchema.safeParse(

@@ -1,4 +1,5 @@
 export type AuthActionState = {
+  eventId?: string
   fieldErrors?: {
     confirmPassword?: string[]
     email?: string[]

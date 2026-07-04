@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -60,18 +60,16 @@ function CandidateSheetForm({
   onCancel: () => void
 }) {
   const [errors, setErrors] = useState<FormErrors>({})
-  const [message, setMessage] = useState<string>()
   const [pending, setPending] = useState(false)
   const [fileName, setFileName] = useState<string>()
 
-  useEffect(() => {
-    if (message) toast.error(message)
-  }, [message])
+  function showError(message: string) {
+    toast.error(message, { id: "candidate-sheet-error" })
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setErrors({})
-    setMessage(undefined)
 
     const form = event.currentTarget
     const formData = new FormData(form)
@@ -100,7 +98,7 @@ function CandidateSheetForm({
     const parsed = candidateInputSchema.safeParse(input)
     if (!parsed.success) {
       setErrors(parsed.error.flatten().fieldErrors)
-      setMessage("Check the highlighted fields.")
+      showError("Check the highlighted fields.")
       return
     }
 
@@ -117,7 +115,7 @@ function CandidateSheetForm({
         })
 
       if (uploadError) {
-        setMessage("The resume could not be uploaded. Try again.")
+        showError("The resume could not be uploaded. Try again.")
         return
       }
 
@@ -126,13 +124,13 @@ function CandidateSheetForm({
       if (!result.ok) {
         await supabase.storage.from("resumes").remove([resumePath])
         setErrors(result.fieldErrors ?? {})
-        setMessage(result.message ?? "The candidate could not be created.")
+        showError(result.message ?? "The candidate could not be created.")
         return
       }
 
       onSuccess(candidateId)
     } catch {
-      setMessage("The candidate could not be created. Try again.")
+      showError("The candidate could not be created. Try again.")
     } finally {
       setPending(false)
     }

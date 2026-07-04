@@ -46,7 +46,9 @@ export function DeleteRecordButton({
   function handleDelete() {
     startTransition(async () => {
       const result =
-        recordType === "role" ? await deleteJob(id) : await deleteCandidate(id)
+        recordType === "role"
+          ? await deleteJob(id, redirectTo)
+          : await deleteCandidate(id, redirectTo)
 
       if (!result.ok) {
         toast.error(result.message ?? `The ${label} could not be deleted.`)

@@ -44,6 +44,7 @@ function fieldsFrom(formData: FormData) {
 
 function invalidCredentials(): AuthActionState {
   return {
+    eventId: crypto.randomUUID(),
     message: "The email or password is incorrect.",
     status: "error",
   }
@@ -57,6 +58,7 @@ export async function signIn(
 
   if (!parsed.success) {
     return {
+      eventId: crypto.randomUUID(),
       fieldErrors: z.flattenError(parsed.error).fieldErrors,
       message: "Check the highlighted fields.",
       status: "error",
@@ -69,6 +71,7 @@ export async function signIn(
   if (error) {
     if (error.code === "email_not_confirmed") {
       return {
+        eventId: crypto.randomUUID(),
         message:
           "Email confirmation is still enabled in Supabase. Disable Confirm email for this MVP.",
         status: "error",
@@ -90,6 +93,7 @@ export async function signUp(
 
   if (!parsed.success) {
     return {
+      eventId: crypto.randomUUID(),
       fieldErrors: z.flattenError(parsed.error).fieldErrors,
       message: "Check the highlighted fields.",
       status: "error",
@@ -104,6 +108,7 @@ export async function signUp(
 
   if (error) {
     return {
+      eventId: crypto.randomUUID(),
       message: "The account could not be created. Try again.",
       status: "error",
     }
@@ -111,6 +116,7 @@ export async function signUp(
 
   if (!data.session) {
     return {
+      eventId: crypto.randomUUID(),
       message:
         "Immediate sign-up is not enabled. Disable Confirm email in Supabase Auth settings.",
       status: "error",

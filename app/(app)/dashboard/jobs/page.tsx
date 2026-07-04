@@ -9,12 +9,10 @@ import {
 
 import { CreateJobDialog } from "@/components/create-job-dialog"
 import { DeleteRecordButton } from "@/components/delete-record-button"
+import { RouteToast } from "@/components/route-toast"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Table,
   TableBody,
@@ -27,12 +25,18 @@ import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = { title: "Open Roles" }
 
-export default async function JobsPage() {
+export default async function JobsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ notice?: string }>
+}) {
+  const { notice } = await searchParams
   const supabase = await createClient()
 
   const { data: jobs, error } = await supabase
     .from("jobs")
-    .select(`
+    .select(
+      `
       id,
       title,
       must_have_skills,
@@ -42,17 +46,28 @@ export default async function JobsPage() {
         analysis_status,
         screening_reports ( status )
       )
-    `)
+    `
+    )
     .order("created_at", { ascending: false })
 
   if (error) throw new Error("Jobs could not be loaded.")
 
   return (
     <section className="mx-auto w-full max-w-6xl space-y-6">
+      {notice === "role-deleted" && (
+        <RouteToast id="role-deleted" message="Role deleted." />
+      )}
+      {notice === "role-unavailable" && (
+        <RouteToast
+          id="role-unavailable"
+          message="That role is no longer available."
+          variant="error"
+        />
+      )}
       {/* ── Header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary flex items-center gap-2">
+          <p className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
             <span className="inline-block h-px w-4 rounded-full bg-primary/50" />
             Recruiting Workspace
           </p>
@@ -74,9 +89,15 @@ export default async function JobsPage() {
           <Table>
             <TableHeader className="border-b border-border/40 bg-muted/20">
               <TableRow>
-                <TableHead className="w-[40%] pl-5 text-xs font-semibold">Role</TableHead>
-                <TableHead className="text-xs font-semibold">Must-have Skills</TableHead>
-                <TableHead className="text-xs font-semibold">Candidates</TableHead>
+                <TableHead className="w-[40%] pl-5 text-xs font-semibold">
+                  Role
+                </TableHead>
+                <TableHead className="text-xs font-semibold">
+                  Must-have Skills
+                </TableHead>
+                <TableHead className="text-xs font-semibold">
+                  Candidates
+                </TableHead>
                 <TableHead className="text-xs font-semibold">Reports</TableHead>
                 <TableHead className="text-xs font-semibold">Created</TableHead>
                 <TableHead className="w-[8%] pr-5 text-right text-xs font-semibold" />
@@ -95,10 +116,10 @@ export default async function JobsPage() {
                 return (
                   <TableRow
                     key={job.id}
-                    className="group cursor-pointer hover:bg-muted/15 transition-colors"
+                    className="group cursor-pointer transition-colors hover:bg-muted/15"
                   >
                     {/* Role name */}
-                    <TableCell className="pl-5 py-4">
+                    <TableCell className="py-4 pl-5">
                       <Link
                         href={`/dashboard/jobs/${job.id}`}
                         className="flex items-center gap-3"
@@ -106,7 +127,7 @@ export default async function JobsPage() {
                         <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/8 text-primary ring-1 ring-primary/10 transition-colors group-hover:bg-primary/15">
                           <IconBriefcase className="size-3.5" />
                         </span>
-                        <span className="font-semibold text-[13px] text-foreground group-hover:text-primary transition-colors">
+                        <span className="text-[13px] font-semibold text-foreground transition-colors group-hover:text-primary">
                           {job.title}
                         </span>
                       </Link>
@@ -120,19 +141,24 @@ export default async function JobsPage() {
                             <Badge
                               key={skill}
                               variant="secondary"
-                              className="text-[10px] px-2 py-0 font-normal"
+                              className="px-2 py-0 text-[10px] font-normal"
                             >
                               {skill}
                             </Badge>
                           ))}
                           {job.must_have_skills.length > 3 && (
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                            <Badge
+                              variant="outline"
+                              className="px-1.5 py-0 text-[10px]"
+                            >
                               +{job.must_have_skills.length - 3}
                             </Badge>
                           )}
                         </div>
                       ) : (
-                        <span className="text-xs text-muted-foreground italic">None</span>
+                        <span className="text-xs text-muted-foreground italic">
+                          None
+                        </span>
                       )}
                     </TableCell>
 
@@ -140,7 +166,9 @@ export default async function JobsPage() {
                     <TableCell className="py-4">
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <IconUsers className="size-3.5" />
-                        <span className="font-medium text-foreground">{candidateCount}</span>
+                        <span className="font-medium text-foreground">
+                          {candidateCount}
+                        </span>
                       </div>
                     </TableCell>
 
@@ -148,9 +176,13 @@ export default async function JobsPage() {
                     <TableCell className="py-4">
                       <div className="flex items-center gap-1.5 text-xs">
                         <IconCircleCheck className="size-3.5 text-emerald-400" />
-                        <span className="font-medium text-emerald-400">{reportCount}</span>
+                        <span className="font-medium text-emerald-400">
+                          {reportCount}
+                        </span>
                         {candidateCount > 0 && (
-                          <span className="text-muted-foreground">/ {candidateCount}</span>
+                          <span className="text-muted-foreground">
+                            / {candidateCount}
+                          </span>
                         )}
                       </div>
                     </TableCell>
@@ -171,11 +203,9 @@ export default async function JobsPage() {
                           asChild
                           size="sm"
                           variant="outline"
-                          className="border-border/50 text-xs hover:border-primary/25 hover:bg-primary/5 hover:text-primary transition-all"
+                          className="border-border/50 text-xs transition-all hover:border-primary/25 hover:bg-primary/5 hover:text-primary"
                         >
-                          <Link href={`/dashboard/jobs/${job.id}`}>
-                            Open
-                          </Link>
+                          <Link href={`/dashboard/jobs/${job.id}`}>Open</Link>
                         </Button>
                         <DeleteRecordButton
                           id={job.id}
@@ -197,8 +227,9 @@ export default async function JobsPage() {
               <IconBriefcase className="size-6 text-muted-foreground" />
             </span>
             <h2 className="text-base font-semibold">No roles yet</h2>
-            <p className="mt-2 max-w-sm text-sm text-muted-foreground/80 leading-relaxed">
-              Define a role with requirements and must-have skills. Candidates added to it will be evaluated against those criteria.
+            <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground/80">
+              Define a role with requirements and must-have skills. Candidates
+              added to it will be evaluated against those criteria.
             </p>
             <div className="mt-6">
               <CreateJobDialog

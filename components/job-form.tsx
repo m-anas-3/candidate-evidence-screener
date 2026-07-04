@@ -23,8 +23,10 @@ export function JobForm() {
   })
 
   useEffect(() => {
-    if (state.status === "error" && state.message) toast.error(state.message)
-  }, [state])
+    if (state.status === "error" && state.message) {
+      toast.error(state.message, { id: "job-form-error" })
+    }
+  }, [state.eventId, state.message, state.status])
 
   return (
     <form action={formAction} className="space-y-4" noValidate>

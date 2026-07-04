@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { redirect } from "next/navigation"
 import {
   IconArrowLeft,
   IconBriefcase,
@@ -15,6 +15,7 @@ import { AddCandidateSheet } from "@/components/add-candidate-sheet"
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
 import { ClickableTableRow } from "@/components/clickable-table-row"
 import { DeleteRecordButton } from "@/components/delete-record-button"
+import { RouteToast } from "@/components/route-toast"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -41,10 +42,13 @@ export const metadata: Metadata = { title: "Role details" }
 
 export default async function JobDetailsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ jobId: string }>
+  searchParams: Promise<{ notice?: string }>
 }) {
   const { jobId } = await params
+  const { notice } = await searchParams
   const supabase = await createClient()
 
   const [{ data: authData }, { data: job, error: jobError }] =
@@ -66,7 +70,7 @@ export default async function JobDetailsPage({
   }
 
   if (!job || !userId) {
-    notFound()
+    redirect("/dashboard/jobs?notice=role-unavailable")
   }
 
   // Load candidates for this job and join their screening reports
@@ -99,6 +103,12 @@ export default async function JobDetailsPage({
 
   return (
     <section className="mx-auto w-full max-w-6xl space-y-6">
+      {notice === "job-created" && (
+        <RouteToast id="job-created" message="Role created" />
+      )}
+      {notice === "candidate-deleted" && (
+        <RouteToast id="candidate-deleted" message="Candidate deleted." />
+      )}
       {/* Navigation Breadcrumbs */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <Breadcrumb>

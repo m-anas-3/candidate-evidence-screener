@@ -31,9 +31,13 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
 
   useEffect(() => {
     if (!state.message) return
-    if (state.status === "success") toast.success(state.message)
-    if (state.status === "error") toast.error(state.message)
-  }, [state])
+    if (state.status === "success") {
+      toast.success(state.message, { id: "auth-status" })
+    }
+    if (state.status === "error") {
+      toast.error(state.message, { id: "auth-status" })
+    }
+  }, [state.eventId, state.message, state.status])
 
   return (
     <form action={formAction} className="space-y-4" noValidate>

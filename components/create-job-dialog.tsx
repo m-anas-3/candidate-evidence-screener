@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useActionState } from "react"
+import { useActionState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { IconBriefcase, IconPlus, IconSparkles } from "@tabler/icons-react"
@@ -35,14 +35,13 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
     requirements: "",
     title: "",
   })
-
   useEffect(() => {
     if (state.status === "success" && state.jobId) {
       onSuccess(state.jobId)
     } else if (state.status === "error" && state.message) {
-      toast.error(state.message)
+      toast.error(state.message, { id: "job-dialog-error" })
     }
-  }, [state, onSuccess])
+  }, [state.eventId, state.jobId, state.message, state.status, onSuccess])
 
   return (
     <form action={formAction} className="space-y-5" noValidate>
@@ -201,12 +200,15 @@ export function CreateJobDialog({ trigger }: CreateJobDialogProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
-  function handleSuccess(jobId: string) {
-    setOpen(false)
-    toast.success("Role created")
-    router.push(`/dashboard/jobs/${jobId}`)
-    router.refresh()
-  }
+  const handleSuccess = useCallback(
+    (jobId: string) => {
+      setOpen(false)
+      toast.success("Role created", { id: "job-created" })
+      router.push(`/dashboard/jobs/${jobId}`)
+      router.refresh()
+    },
+    [router]
+  )
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

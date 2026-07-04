@@ -1,4 +1,5 @@
 export type IntakeActionState = {
+  eventId?: string
   fieldErrors?: Record<string, string[] | undefined>
   message?: string
   status?: "error" | "success"
