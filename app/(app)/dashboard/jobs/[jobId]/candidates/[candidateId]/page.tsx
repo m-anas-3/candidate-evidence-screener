@@ -28,7 +28,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { screeningReportSchema } from "@/lib/agent/report-schema"
 import { createClient } from "@/lib/supabase/server"
@@ -98,9 +104,27 @@ export default async function CandidateDetailsPage({
   }))
 
   const recColors = {
-    strong_fit: { label: "Strong Fit", ring: "border-emerald-500/50", bg: "bg-emerald-500/8", text: "text-emerald-400", score: "text-emerald-400" },
-    possible_fit: { label: "Possible Fit", ring: "border-amber-500/50", bg: "bg-amber-500/8", text: "text-amber-400", score: "text-amber-400" },
-    weak_fit: { label: "Weak Fit", ring: "border-destructive/50", bg: "bg-destructive/8", text: "text-destructive", score: "text-destructive" },
+    strong_fit: {
+      label: "Strong documented match",
+      ring: "border-emerald-500/50",
+      bg: "bg-emerald-500/8",
+      text: "text-emerald-400",
+      score: "text-emerald-400",
+    },
+    possible_fit: {
+      label: "Potential documented match",
+      ring: "border-amber-500/50",
+      bg: "bg-amber-500/8",
+      text: "text-amber-400",
+      score: "text-amber-400",
+    },
+    weak_fit: {
+      label: "Limited documented match",
+      ring: "border-destructive/50",
+      bg: "bg-destructive/8",
+      text: "text-destructive",
+      score: "text-destructive",
+    },
   }
   const rec = report?.recommendation ? recColors[report.recommendation] : null
 
@@ -116,14 +140,20 @@ export default async function CandidateDetailsPage({
               <IconNotes className="size-4" />
             </span>
             <div>
-              <CardTitle className="text-sm font-semibold">Proposal Statement</CardTitle>
-              <CardDescription className="text-xs">Submitted application text.</CardDescription>
+              <CardTitle className="text-sm font-semibold">
+                Proposal Statement
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Submitted application text.
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-4">
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground/90">
-            {candidate.proposal_text || <span className="italic">No proposal text.</span>}
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground/90">
+            {candidate.proposal_text || (
+              <span className="italic">No proposal text.</span>
+            )}
           </p>
         </CardContent>
       </Card>
@@ -137,14 +167,20 @@ export default async function CandidateDetailsPage({
                 <IconFileText className="size-4" />
               </span>
               <div>
-                <CardTitle className="text-sm font-semibold">Extracted Resume</CardTitle>
-                <CardDescription className="text-xs">Indexed text used for evidence analysis.</CardDescription>
+                <CardTitle className="text-sm font-semibold">
+                  Extracted Resume
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Indexed text used for evidence analysis.
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="pt-4">
             <ScrollArea className="h-80 rounded-lg border bg-muted/10 p-4 font-mono text-xs text-muted-foreground">
-              <p className="whitespace-pre-wrap leading-relaxed">{candidate.resume_text}</p>
+              <p className="leading-relaxed whitespace-pre-wrap">
+                {candidate.resume_text}
+              </p>
             </ScrollArea>
           </CardContent>
         </Card>
@@ -157,7 +193,10 @@ export default async function CandidateDetailsPage({
               Extract resume text before running the AI analysis.
             </p>
             <div className="mt-4">
-              <ResumeExtractionControl candidateId={candidate.id} status={candidate.analysis_status} />
+              <ResumeExtractionControl
+                candidateId={candidate.id}
+                status={candidate.analysis_status}
+              />
             </div>
           </CardContent>
         </Card>
@@ -171,8 +210,12 @@ export default async function CandidateDetailsPage({
               <IconLink className="size-4" />
             </span>
             <div>
-              <CardTitle className="text-sm font-semibold">Portfolio URL</CardTitle>
-              <CardDescription className="text-xs">Scraped for evidence during analysis.</CardDescription>
+              <CardTitle className="text-sm font-semibold">
+                Portfolio URL
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Scraped for evidence during analysis.
+              </CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -182,13 +225,15 @@ export default async function CandidateDetailsPage({
               href={candidate.portfolio_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80 break-all"
+              className="inline-flex items-center gap-1.5 text-sm font-medium break-all text-primary underline underline-offset-4 hover:text-primary/80"
             >
               {candidate.portfolio_url}
               <IconExternalLink className="size-3.5 shrink-0" />
             </a>
           ) : (
-            <p className="text-sm italic text-muted-foreground">No portfolio URL provided.</p>
+            <p className="text-sm text-muted-foreground italic">
+              No portfolio URL provided.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -200,9 +245,12 @@ export default async function CandidateDetailsPage({
   ) : reportUnavailable ? (
     <Card className="border-destructive/30 bg-destructive/5">
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-        <p className="text-sm font-semibold text-destructive">Report unavailable</p>
+        <p className="text-sm font-semibold text-destructive">
+          Report unavailable
+        </p>
         <p className="mt-1 max-w-xs text-xs text-muted-foreground">
-          The stored report could not be validated. Unvalidated analysis is never displayed.
+          The stored report could not be validated. Unvalidated analysis is
+          never displayed.
         </p>
       </CardContent>
     </Card>
@@ -220,12 +268,18 @@ export default async function CandidateDetailsPage({
         </p>
         {candidate.resume_text && (
           <div className="mt-5">
-            <CandidateAnalysisControl candidateId={candidate.id} status={candidate.analysis_status} />
+            <CandidateAnalysisControl
+              candidateId={candidate.id}
+              status={candidate.analysis_status}
+            />
           </div>
         )}
         {!candidate.resume_text && (
           <div className="mt-5">
-            <ResumeExtractionControl candidateId={candidate.id} status={candidate.analysis_status} />
+            <ResumeExtractionControl
+              candidateId={candidate.id}
+              status={candidate.analysis_status}
+            />
           </div>
         )}
       </CardContent>
@@ -264,7 +318,12 @@ export default async function CandidateDetailsPage({
           </BreadcrumbList>
         </Breadcrumb>
         <div className="flex items-center gap-2">
-          <Button asChild size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
+          <Button
+            asChild
+            size="sm"
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground"
+          >
             <Link href={backHref}>
               <IconArrowLeft className="mr-1.5 size-3.5" />
               {backLabel}
@@ -281,7 +340,9 @@ export default async function CandidateDetailsPage({
       </div>
 
       {/* ── Candidate identity card ─────────────────────────────────────────── */}
-      <div className={`mb-6 overflow-hidden rounded-2xl border-2 ${rec?.ring ?? "border-border/40"} ${rec?.bg ?? "bg-card/50"}`}>
+      <div
+        className={`mb-6 overflow-hidden rounded-2xl border-2 ${rec?.ring ?? "border-border/40"} ${rec?.bg ?? "bg-card/50"}`}
+      >
         <div className="flex flex-col gap-5 p-6 md:flex-row md:items-start md:justify-between">
           {/* Left — identity */}
           <div className="flex items-start gap-4">
@@ -300,11 +361,21 @@ export default async function CandidateDetailsPage({
               <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <IconBriefcase className="size-3.5" />
-                  <Link href={`/dashboard/jobs/${job.id}`} className="hover:text-primary transition-colors font-medium">
+                  <Link
+                    href={`/dashboard/jobs/${job.id}`}
+                    className="font-medium transition-colors hover:text-primary"
+                  >
                     {job.title}
                   </Link>
                 </span>
-                <span>Added {new Date(candidate.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                <span>
+                  Added{" "}
+                  {new Date(candidate.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
               {candidate.analysis_error && (
                 <p className="mt-1 rounded-lg border border-destructive/20 bg-destructive/8 px-2.5 py-1 text-[11px] text-destructive">
@@ -318,18 +389,27 @@ export default async function CandidateDetailsPage({
           {rec && report && (
             <div className="flex shrink-0 items-center gap-4 self-start rounded-xl bg-background/50 px-5 py-3.5 ring-1 ring-border/30 backdrop-blur-sm">
               <div className="text-center">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Fit Score</p>
-                <p className={`mt-0.5 font-mono text-4xl font-black leading-none ${rec.score}`}>
+                <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                  Fit Score
+                </p>
+                <p
+                  className={`mt-0.5 font-mono text-4xl leading-none font-black ${rec.score}`}
+                >
                   {report.score}
                 </p>
                 <p className="text-[10px] text-muted-foreground">/ 100</p>
               </div>
               <div className="h-10 w-px bg-border/40" />
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Verdict</p>
-                <p className={`mt-0.5 text-sm font-bold ${rec.text}`}>{rec.label}</p>
+                <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                  Verdict
+                </p>
+                <p className={`mt-0.5 text-sm font-bold ${rec.text}`}>
+                  {rec.label}
+                </p>
                 <p className="mt-0.5 max-w-[140px] text-[10px] leading-4 text-muted-foreground">
-                  {report.summary.slice(0, 80)}{report.summary.length > 80 ? "…" : ""}
+                  {report.summary.slice(0, 80)}
+                  {report.summary.length > 80 ? "…" : ""}
                 </p>
               </div>
             </div>
@@ -337,13 +417,16 @@ export default async function CandidateDetailsPage({
         </div>
 
         {/* Action bar at the bottom of the identity card */}
-        {(candidate.resume_text && !hasReport) && (
+        {candidate.resume_text && !hasReport && (
           <div className="border-t border-border/30 bg-background/30 px-6 py-3">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs text-muted-foreground">
                 Resume extracted. Ready for AI fit analysis.
               </p>
-              <CandidateAnalysisControl candidateId={candidate.id} status={candidate.analysis_status} />
+              <CandidateAnalysisControl
+                candidateId={candidate.id}
+                status={candidate.analysis_status}
+              />
             </div>
           </div>
         )}

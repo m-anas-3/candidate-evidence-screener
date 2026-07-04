@@ -25,12 +25,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import {
   Table,
@@ -77,7 +72,8 @@ export default async function JobDetailsPage({
   // Load candidates for this job and join their screening reports
   const { data: candidates, error: candidateError } = await supabase
     .from("candidates")
-    .select(`
+    .select(
+      `
       id,
       name,
       analysis_status,
@@ -86,7 +82,8 @@ export default async function JobDetailsPage({
         score,
         recommendation
       )
-    `)
+    `
+    )
     .eq("job_id", job.id)
     .order("created_at", { ascending: false })
 
@@ -123,9 +120,14 @@ export default async function JobDetailsPage({
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <Button asChild size="sm" variant="ghost" className="text-muted-foreground self-start md:self-auto">
+        <Button
+          asChild
+          size="sm"
+          variant="ghost"
+          className="self-start text-muted-foreground md:self-auto"
+        >
           <Link href="/dashboard/jobs">
-            <IconArrowLeft className="size-4 mr-1.5" />
+            <IconArrowLeft className="mr-1.5 size-4" />
             Back to roles
           </Link>
         </Button>
@@ -141,32 +143,46 @@ export default async function JobDetailsPage({
                 <IconBriefcase className="size-5" />
               </span>
               <div>
-                <p className="text-2xs font-semibold uppercase tracking-wider text-primary">
+                <p className="text-2xs font-semibold tracking-wider text-primary uppercase">
                   Role Criteria
                 </p>
-                <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
+                <h1 className="text-xl font-bold tracking-tight text-foreground md:text-2xl">
                   {job.title}
                 </h1>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground pt-1">
-              <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-2xs font-medium">
+            <div className="flex items-center gap-3 pt-1 text-xs text-muted-foreground">
+              <Badge
+                variant="outline"
+                className="text-2xs border-primary/20 bg-primary/5 font-medium text-primary"
+              >
                 Active Screening
               </Badge>
-              <span>Created {new Date(job.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+              <span>
+                Created{" "}
+                {new Date(job.created_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-3 self-start">
             {/* Stats pills */}
             <div className="flex items-center gap-2 text-xs">
-              <span className="flex items-center gap-1.5 bg-muted/30 px-3 py-1.5 rounded-full border border-border/40">
+              <span className="flex items-center gap-1.5 rounded-full border border-border/40 bg-muted/30 px-3 py-1.5">
                 <IconUsers className="size-3.5 text-muted-foreground" />
-                <span className="font-semibold text-foreground">{candidates.length}</span>
+                <span className="font-semibold text-foreground">
+                  {candidates.length}
+                </span>
                 <span className="text-muted-foreground">candidates</span>
               </span>
-              <span className="flex items-center gap-1.5 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/15">
+              <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/15 bg-emerald-500/10 px-3 py-1.5">
                 <IconCircleCheck className="size-3.5 text-emerald-400" />
-                <span className="font-semibold text-emerald-400">{reportsReadyCount}</span>
+                <span className="font-semibold text-emerald-400">
+                  {reportsReadyCount}
+                </span>
                 <span className="text-emerald-400/80">ready</span>
               </span>
             </div>
@@ -179,31 +195,36 @@ export default async function JobDetailsPage({
         {/* Left Side: Role Criteria details */}
         <Card className="border-border/40 shadow-sm">
           <CardHeader className="border-b pb-4">
-            <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            <CardTitle className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
               Job Criteria Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-5 space-y-5">
+          <CardContent className="space-y-5 pt-5">
             <DetailSection title="Description" value={job.description} />
             <Separator className="bg-border/30" />
             <DetailSection title="Requirements" value={job.requirements} />
             <Separator className="bg-border/30" />
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                 Must-have skills
               </h3>
               {job.must_have_skills.length ? (
                 <ul className="flex flex-wrap gap-1.5 pt-1">
                   {job.must_have_skills.map((skill) => (
                     <li key={skill}>
-                      <Badge variant="secondary" className="font-normal text-xs px-2.5 py-0.5">
+                      <Badge
+                        variant="secondary"
+                        className="px-2.5 py-0.5 text-xs font-normal"
+                      >
                         {skill}
                       </Badge>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-xs text-muted-foreground italic">None specified.</p>
+                <p className="text-xs text-muted-foreground italic">
+                  None specified.
+                </p>
               )}
             </div>
           </CardContent>
@@ -212,28 +233,39 @@ export default async function JobDetailsPage({
         {/* Right Side Info panel */}
         <div className="space-y-4 lg:sticky lg:top-20">
           <Card className="border-border/40 shadow-sm">
-            <CardHeader className="pb-3 border-b">
-              <CardTitle className="text-sm font-semibold">Quick Summary</CardTitle>
+            <CardHeader className="border-b pb-3">
+              <CardTitle className="text-sm font-semibold">
+                Quick Summary
+              </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 space-y-3">
+            <CardContent className="space-y-3 pt-4">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
                   <IconUsers className="size-4" /> Candidates
                 </span>
-                <span className="font-semibold text-foreground">{candidates.length}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <IconCircleCheck className="size-4 text-emerald-400" /> Reports Ready
+                <span className="font-semibold text-foreground">
+                  {candidates.length}
                 </span>
-                <span className="font-semibold text-emerald-400">{reportsReadyCount}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground flex items-center gap-1.5">
-                  <IconFileText className="size-4 text-muted-foreground" /> Created
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <IconCircleCheck className="size-4 text-emerald-400" />{" "}
+                  Reports Ready
+                </span>
+                <span className="font-semibold text-emerald-400">
+                  {reportsReadyCount}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <IconFileText className="size-4 text-muted-foreground" />{" "}
+                  Created
                 </span>
                 <span className="text-foreground">
-                  {new Date(job.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  {new Date(job.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </span>
               </div>
               <Separator className="bg-border/30" />
@@ -241,8 +273,11 @@ export default async function JobDetailsPage({
                 job={job}
                 userId={userId}
                 trigger={
-                  <Button className="w-full bg-primary hover:bg-primary/85 font-semibold" size="sm">
-                    <IconPlus className="size-3.5 mr-1.5" />
+                  <Button
+                    className="w-full bg-primary font-semibold hover:bg-primary/85"
+                    size="sm"
+                  >
+                    <IconPlus className="mr-1.5 size-3.5" />
                     Add candidate
                   </Button>
                 }
@@ -267,27 +302,36 @@ export default async function JobDetailsPage({
             <h2 className="text-lg font-semibold tracking-tight text-foreground">
               Candidates for this role
             </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               Review and manage applicants matching this role criteria.
             </p>
           </div>
-          <AddCandidateSheet
-            job={job}
-            userId={userId}
-          />
+          <AddCandidateSheet job={job} userId={userId} />
         </div>
 
         {candidates.length > 0 ? (
-          <Card className="border-border/40 shadow-sm overflow-hidden">
+          <Card className="overflow-hidden border-border/40 shadow-sm">
             <Table>
-              <TableHeader className="bg-muted/30 border-b border-border/40">
+              <TableHeader className="border-b border-border/40 bg-muted/30">
                 <TableRow>
-                  <TableHead className="w-[35%] pl-6 font-semibold text-xs">Candidate Name</TableHead>
-                  <TableHead className="font-semibold text-xs">Screening Status</TableHead>
-                  <TableHead className="font-semibold text-xs">Evidence Score</TableHead>
-                  <TableHead className="font-semibold text-xs">Recommendation</TableHead>
-                  <TableHead className="font-semibold text-xs">Date Added</TableHead>
-                  <TableHead className="w-[12%] text-right pr-6 font-semibold text-xs">Action</TableHead>
+                  <TableHead className="w-[35%] pl-6 text-xs font-semibold">
+                    Candidate Name
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold">
+                    Screening Status
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold">
+                    Evidence Score
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold">
+                    Recommendation
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold">
+                    Date Added
+                  </TableHead>
+                  <TableHead className="w-[12%] pr-6 text-right text-xs font-semibold">
+                    Action
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -308,18 +352,20 @@ export default async function JobDetailsPage({
                           <span className="flex size-7 items-center justify-center rounded-full bg-primary/8 text-primary ring-1 ring-primary/10">
                             <IconUser className="size-3.5" />
                           </span>
-                          <span className="text-foreground text-sm font-semibold group-hover:text-primary transition-colors">
+                          <span className="text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
                             {candidate.name}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <AnalysisStatusBadge status={candidate.analysis_status} />
+                        <AnalysisStatusBadge
+                          status={candidate.analysis_status}
+                        />
                       </TableCell>
                       <TableCell className="text-sm font-semibold text-foreground/95">
                         {hasReport && report.score !== null ? (
                           <div className="flex items-center gap-2">
-                            <div className="h-1.5 w-16 rounded-full bg-muted/40 overflow-hidden">
+                            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted/40">
                               <div
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{
@@ -335,25 +381,34 @@ export default async function JobDetailsPage({
                                 }}
                               />
                             </div>
-                            <span className="font-mono text-xs">{report.score}</span>
+                            <span className="font-mono text-xs">
+                              {report.score}
+                            </span>
                           </div>
                         ) : (
-                          <span className="text-muted-foreground text-xs">—</span>
+                          <span className="text-xs text-muted-foreground">
+                            —
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>
                         {hasReport && report.recommendation ? (
                           <RecommendationBadge rec={report.recommendation} />
                         ) : (
-                          <span className="text-muted-foreground text-xs">—</span>
+                          <span className="text-xs text-muted-foreground">
+                            —
+                          </span>
                         )}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {new Date(candidate.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {new Date(candidate.created_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}
                       </TableCell>
                       <TableCell className="pr-6">
                         <div className="flex items-center justify-end">
@@ -371,22 +426,28 @@ export default async function JobDetailsPage({
             </Table>
           </Card>
         ) : (
-          <Card className="border-dashed border-2 border-border/40">
+          <Card className="border-2 border-dashed border-border/40">
             <CardContent className="flex min-h-56 flex-col items-center justify-center py-10 text-center">
               <span className="mb-3 flex size-12 items-center justify-center rounded-xl bg-muted/50 text-muted-foreground ring-1 ring-border/30">
                 <IconUser className="size-5" />
               </span>
-              <h3 className="text-sm font-semibold text-foreground">No candidates yet</h3>
-              <p className="mt-1 max-w-sm text-xs text-muted-foreground/80 leading-relaxed">
-                Add candidates to this role. Upload a resume or paste candidate details, and the app will help you review fit against this job.
+              <h3 className="text-sm font-semibold text-foreground">
+                No candidates yet
+              </h3>
+              <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground/80">
+                Add candidates to this role. Upload a resume or paste candidate
+                details, and the app will help you review fit against this job.
               </p>
               <div className="mt-4">
                 <AddCandidateSheet
                   job={job}
                   userId={userId}
                   trigger={
-                    <Button className="bg-primary hover:bg-primary/85 font-semibold" size="sm">
-                      <IconPlus className="size-4 mr-1.5" />
+                    <Button
+                      className="bg-primary font-semibold hover:bg-primary/85"
+                      size="sm"
+                    >
+                      <IconPlus className="mr-1.5 size-4" />
                       Add candidate
                     </Button>
                   }
@@ -403,7 +464,7 @@ export default async function JobDetailsPage({
 function DetailSection({ title, value }: { title: string; value: string }) {
   return (
     <div className="space-y-1.5">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
         {title}
       </h3>
       <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground/90">
@@ -420,21 +481,27 @@ function RecommendationBadge({
 }) {
   const config = {
     strong_fit: {
-      label: "Strong Fit",
-      className: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/15",
+      label: "Strong documented match",
+      className:
+        "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/15",
     },
     possible_fit: {
-      label: "Possible Fit",
-      className: "border-amber-500/20 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15",
+      label: "Potential documented match",
+      className:
+        "border-amber-500/20 bg-amber-500/10 text-amber-400 hover:bg-amber-500/15",
     },
     weak_fit: {
-      label: "Weak Fit",
-      className: "border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/15",
+      label: "Limited documented match",
+      className:
+        "border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/15",
     },
   }
   const item = config[rec]
   return (
-    <Badge variant="outline" className={`text-2xs font-normal ${item.className}`}>
+    <Badge
+      variant="outline"
+      className={`text-2xs font-normal ${item.className}`}
+    >
       {item.label}
     </Badge>
   )

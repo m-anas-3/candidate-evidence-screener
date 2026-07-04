@@ -6,7 +6,11 @@ import { z } from "zod"
 import { assessProposalSpecificity } from "./proposal-specificity"
 import { inspectPublicPortfolio, PortfolioInspectionError } from "./portfolio"
 import { screeningReportSchema } from "./report-schema"
-import { validateReportMustHaveCoverage } from "./report-validation"
+import {
+  bindToolResultsToReport,
+  type PortfolioToolResult,
+} from "./report-binding"
+import type { ProposalSpecificity } from "./report-schema"
 import type { Database, Json } from "@/lib/supabase/database.types"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
@@ -131,6 +135,8 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
     proposalAssessed: false,
     reportSaved: false,
   }
+  let proposalResult: ProposalSpecificity | undefined
+  let portfolioResult: PortfolioToolResult | undefined
 
   const loadCandidateContext = tool(
     async ({ candidateId }) => {
@@ -182,6 +188,7 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
         job.title,
         job.must_have_skills
       )
+      proposalResult = result
       workflow.proposalAssessed = true
       return result
     },
@@ -204,10 +211,20 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
       }
       // Reuses the cached DB fetch — no second round-trip.
       const { candidate } = await loadOwnedCandidate(dependencies)
+      if (!candidate.portfolio_url) {
+        portfolioResult = { finalUrl: null, status: "not_provided" }
+        workflow.portfolioInspected = true
+        return {
+          ...portfolioResult,
+          text: "not provided",
+          title: null,
+        }
+      }
       try {
         const result = await inspectPublicPortfolio(
           candidate.portfolio_url ?? ""
         )
+        portfolioResult = { finalUrl: result.finalUrl, status: "inspected" }
         workflow.portfolioInspected = true
         return {
           ...result,
@@ -219,6 +236,7 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
         if (error instanceof PortfolioInspectionError) {
           // An unavailable or unsafe portfolio is still a completed inspection
           // step and must be represented as missing evidence in the report.
+          portfolioResult = { finalUrl: null, status: error.code }
           workflow.portfolioInspected = true
           return {
             finalUrl: null,
@@ -252,8 +270,13 @@ export function createRecruiterTools(dependencies: AgentToolDependencies) {
       if (candidate.analysis_status !== "processing") {
         throw new Error("The candidate is not in an active analysis run.")
       }
-      const validatedReport = validateReportMustHaveCoverage(
+      if (!proposalResult || !portfolioResult) {
+        throw new Error("Required tool results are unavailable for this run.")
+      }
+      const validatedReport = bindToolResultsToReport(
         screeningReportSchema.parse(report),
+        proposalResult,
+        portfolioResult,
         job.must_have_skills
       )
       const now = new Date().toISOString()

@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import type { EvidenceItem, ScreeningReport } from "@/lib/agent/report-schema"
+import { getRecruiterBrief } from "@/lib/agent/report-presentation"
 
 // ---------------------------------------------------------------------------
 // Colour maps
@@ -46,19 +47,19 @@ const recConfig: Record<
   { label: string; color: string; ring: string; bar: string }
 > = {
   strong_fit: {
-    label: "Strong Fit",
+    label: "Strong documented match",
     color: "text-emerald-400",
     ring: "border-emerald-500/40",
     bar: "bg-emerald-500",
   },
   possible_fit: {
-    label: "Possible Fit",
+    label: "Potential documented match",
     color: "text-amber-400",
     ring: "border-amber-500/40",
     bar: "bg-amber-500",
   },
   weak_fit: {
-    label: "Weak Fit",
+    label: "Limited documented match",
     color: "text-destructive",
     ring: "border-destructive/40",
     bar: "bg-destructive",
@@ -71,6 +72,7 @@ const recConfig: Record<
 
 export function ScreeningReportView({ report }: { report: ScreeningReport }) {
   const rec = recConfig[report.recommendation]
+  const brief = getRecruiterBrief(report)
 
   return (
     <div className="space-y-4">
@@ -85,6 +87,35 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
           key claims before deciding whether to proceed.
         </p>
       </div>
+
+      <Card className="border-primary/30 bg-primary/[0.04]">
+        <CardHeader className="pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="text-base">Recruiter brief</CardTitle>
+            <Badge variant="outline" className="border-primary/30 text-primary">
+              {brief.nextStep}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-4 pt-0 md:grid-cols-3">
+          <BriefItem
+            label="Top supporting reasons"
+            value={
+              brief.supportingReasons.length
+                ? brief.supportingReasons.map((item) => item.claim).join("; ")
+                : "No supported reason was recorded."
+            }
+          />
+          <BriefItem
+            label="Most important gap"
+            value={brief.mostImportantGap}
+          />
+          <BriefItem
+            label="First verification action"
+            value={brief.firstVerificationAction}
+          />
+        </CardContent>
+      </Card>
 
       {/* Score hero */}
       <Card className={cn("border-2", rec.ring)}>
@@ -531,19 +562,38 @@ function SignalList({
 function PortfolioStatusBadge({
   status,
 }: {
-  status: "inspected" | "unavailable" | "unsafe"
+  status: "inspected" | "not_provided" | "unavailable" | "unsafe"
 }) {
   const styles = {
     inspected: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+    not_provided:
+      "border-muted-foreground/20 bg-muted/30 text-muted-foreground",
     unavailable: "border-muted-foreground/20 bg-muted/30 text-muted-foreground",
     unsafe: "border-destructive/30 bg-destructive/10 text-destructive",
+  }
+  const labels = {
+    inspected: "Inspected",
+    not_provided: "Evidence not provided",
+    unavailable: "Source unavailable",
+    unsafe: "Source blocked for safety",
   }
   return (
     <Badge
       variant="outline"
       className={cn("border text-[10px] font-medium", styles[status])}
     >
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+      {labels[status]}
     </Badge>
+  )
+}
+
+function BriefItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+        {label}
+      </p>
+      <p className="mt-1 text-sm leading-5 text-foreground">{value}</p>
+    </div>
   )
 }

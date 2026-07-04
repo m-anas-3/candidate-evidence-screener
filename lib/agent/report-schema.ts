@@ -39,7 +39,7 @@ export const portfolioEvidenceSchema = z
   .object({
     score: z.number().int().min(0).max(15),
     inspectedUrl: z.url().max(2_048).nullable(),
-    status: z.enum(["inspected", "unavailable", "unsafe"]),
+    status: z.enum(["inspected", "not_provided", "unavailable", "unsafe"]),
     findings: boundedEvidenceList,
     summary: z.string().trim().min(1).max(2_000),
   })
@@ -93,7 +93,7 @@ const screeningReportInputSchema = z
             portfolioRelevance: portfolioScore,
           }
         : report.scoring
-  
+
     // Derive score from sub-scores — the LLM never has to do the arithmetic.
     let computedScore =
       scoring.jobRequirementsAndSkills +

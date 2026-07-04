@@ -3,12 +3,7 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import {
-  IconSearch,
-  IconUser,
-  IconUserScan,
-  IconX,
-} from "@tabler/icons-react"
+import { IconSearch, IconUser, IconUserScan, IconX } from "@tabler/icons-react"
 
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
 import { DeleteRecordButton } from "@/components/delete-record-button"
@@ -44,7 +39,10 @@ interface CandidateItem {
   analysis_status: string
   created_at: string
   jobs: { title: string } | null
-  screening_reports: { score: number | null; recommendation: string | null } | null
+  screening_reports: {
+    score: number | null
+    recommendation: string | null
+  } | null
 }
 
 function getScoreColor(score: number) {
@@ -71,7 +69,8 @@ export function CandidatesTable({
     return candidates.filter((c) => {
       const matchName = c.name.toLowerCase().includes(search.toLowerCase())
       const matchJob = jobFilter === "all" || c.job_id === jobFilter
-      const matchStatus = statusFilter === "all" || c.analysis_status === statusFilter
+      const matchStatus =
+        statusFilter === "all" || c.analysis_status === statusFilter
       return matchName && matchJob && matchStatus
     })
   }, [candidates, search, jobFilter, statusFilter])
@@ -79,9 +78,13 @@ export function CandidatesTable({
   // Reset to page 1 whenever filters change
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage = Math.min(page, totalPages)
-  const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+  const pageItems = filtered.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE
+  )
 
-  const hasFilters = search !== "" || jobFilter !== "all" || statusFilter !== "all"
+  const hasFilters =
+    search !== "" || jobFilter !== "all" || statusFilter !== "all"
 
   function clearFilters() {
     setSearch("")
@@ -97,10 +100,15 @@ export function CandidatesTable({
 
   // Build page numbers to display
   function pageNumbers(): (number | "ellipsis")[] {
-    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1)
+    if (totalPages <= 7)
+      return Array.from({ length: totalPages }, (_, i) => i + 1)
     const pages: (number | "ellipsis")[] = [1]
     if (safePage > 3) pages.push("ellipsis")
-    for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) {
+    for (
+      let i = Math.max(2, safePage - 1);
+      i <= Math.min(totalPages - 1, safePage + 1);
+      i++
+    ) {
       pages.push(i)
     }
     if (safePage < totalPages - 2) pages.push("ellipsis")
@@ -114,18 +122,20 @@ export function CandidatesTable({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         {/* Search */}
         <div className="relative max-w-xs flex-1">
-          <IconSearch className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+          <IconSearch className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search by name…"
             value={search}
-            onChange={(e) => handleFilterChange(() => setSearch(e.target.value))}
-            className="h-9 pl-8 pr-8 text-sm border-border/50"
+            onChange={(e) =>
+              handleFilterChange(() => setSearch(e.target.value))
+            }
+            className="h-9 border-border/50 pr-8 pl-8 text-sm"
           />
           {search && (
             <button
               type="button"
               onClick={() => handleFilterChange(() => setSearch(""))}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute top-1/2 right-2.5 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
             >
               <IconX className="size-3.5" />
             </button>
@@ -136,20 +146,26 @@ export function CandidatesTable({
           {/* Role filter */}
           <select
             value={jobFilter}
-            onChange={(e) => handleFilterChange(() => setJobFilter(e.target.value))}
-            className="h-9 rounded-lg border border-border/50 bg-background px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 hover:border-primary/20 transition-colors"
+            onChange={(e) =>
+              handleFilterChange(() => setJobFilter(e.target.value))
+            }
+            className="h-9 rounded-lg border border-border/50 bg-background px-3 text-xs text-foreground transition-colors hover:border-primary/20 focus:ring-1 focus:ring-primary/30 focus:outline-none"
           >
             <option value="all">All Roles</option>
             {jobs.map((j) => (
-              <option key={j.id} value={j.id}>{j.title}</option>
+              <option key={j.id} value={j.id}>
+                {j.title}
+              </option>
             ))}
           </select>
 
           {/* Status filter */}
           <select
             value={statusFilter}
-            onChange={(e) => handleFilterChange(() => setStatusFilter(e.target.value))}
-            className="h-9 rounded-lg border border-border/50 bg-background px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 hover:border-primary/20 transition-colors"
+            onChange={(e) =>
+              handleFilterChange(() => setStatusFilter(e.target.value))
+            }
+            className="h-9 rounded-lg border border-border/50 bg-background px-3 text-xs text-foreground transition-colors hover:border-primary/20 focus:ring-1 focus:ring-primary/30 focus:outline-none"
           >
             <option value="all">All Statuses</option>
             <option value="pending">Pending</option>
@@ -176,9 +192,13 @@ export function CandidatesTable({
         {/* Results count */}
         {hasFilters && (
           <p className="ml-auto text-xs text-muted-foreground">
-            <span className="font-semibold text-foreground">{filtered.length}</span>
-            {" "}of{" "}
-            <span className="font-semibold text-foreground">{candidates.length}</span>
+            <span className="font-semibold text-foreground">
+              {filtered.length}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-foreground">
+              {candidates.length}
+            </span>
           </p>
         )}
       </div>
@@ -190,11 +210,19 @@ export function CandidatesTable({
             <Table>
               <TableHeader className="border-b border-border/40 bg-muted/20">
                 <TableRow>
-                  <TableHead className="w-[26%] pl-5 text-xs font-semibold">Candidate</TableHead>
-                  <TableHead className="w-[22%] text-xs font-semibold">Role</TableHead>
-                  <TableHead className="text-xs font-semibold">Status</TableHead>
+                  <TableHead className="w-[26%] pl-5 text-xs font-semibold">
+                    Candidate
+                  </TableHead>
+                  <TableHead className="w-[22%] text-xs font-semibold">
+                    Role
+                  </TableHead>
+                  <TableHead className="text-xs font-semibold">
+                    Status
+                  </TableHead>
                   <TableHead className="text-xs font-semibold">Score</TableHead>
-                  <TableHead className="text-xs font-semibold">Recommendation</TableHead>
+                  <TableHead className="text-xs font-semibold">
+                    Recommendation
+                  </TableHead>
                   <TableHead className="text-xs font-semibold">Added</TableHead>
                   <TableHead className="w-[9%] pr-5 text-right text-xs font-semibold" />
                 </TableRow>
@@ -209,11 +237,13 @@ export function CandidatesTable({
                       role="link"
                       tabIndex={0}
                       aria-label={`Review ${c.name}`}
-                      className="group cursor-pointer transition-colors hover:bg-muted/10 focus-visible:bg-muted/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                      className="group cursor-pointer transition-colors hover:bg-muted/10 focus-visible:bg-muted/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
                       onClick={(event) => {
                         if (
                           event.target instanceof Element &&
-                          event.target.closest("a, button, input, select, textarea")
+                          event.target.closest(
+                            "a, button, input, select, textarea"
+                          )
                         ) {
                           return
                         }
@@ -230,12 +260,12 @@ export function CandidatesTable({
                       }}
                     >
                       {/* Name */}
-                      <TableCell className="pl-5 py-3.5">
+                      <TableCell className="py-3.5 pl-5">
                         <div className="flex items-center gap-2.5">
                           <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary ring-1 ring-primary/10">
                             <IconUser className="size-3.5" />
                           </span>
-                          <span className="max-w-[160px] truncate text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">
+                          <span className="max-w-[160px] truncate text-[13px] font-semibold text-foreground transition-colors group-hover:text-primary">
                             {c.name}
                           </span>
                         </div>
@@ -251,14 +281,18 @@ export function CandidatesTable({
                             {c.jobs.title}
                           </Link>
                         ) : (
-                          <span className="text-xs italic text-muted-foreground">—</span>
+                          <span className="text-xs text-muted-foreground italic">
+                            —
+                          </span>
                         )}
                       </TableCell>
 
                       {/* Status */}
                       <TableCell className="py-3.5">
                         <AnalysisStatusBadge
-                          status={c.analysis_status as Database["public"]["Enums"]["candidate_analysis_status"]}
+                          status={
+                            c.analysis_status as Database["public"]["Enums"]["candidate_analysis_status"]
+                          }
                         />
                       </TableCell>
 
@@ -280,7 +314,9 @@ export function CandidatesTable({
                             </span>
                           </div>
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <span className="text-xs text-muted-foreground">
+                            —
+                          </span>
                         )}
                       </TableCell>
 
@@ -289,7 +325,9 @@ export function CandidatesTable({
                         {report?.recommendation ? (
                           <RecBadge rec={report.recommendation} />
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <span className="text-xs text-muted-foreground">
+                            —
+                          </span>
                         )}
                       </TableCell>
 
@@ -324,7 +362,10 @@ export function CandidatesTable({
             <div className="flex items-center justify-between px-1">
               <p className="text-xs text-muted-foreground">
                 Page {safePage} of {totalPages} ·{" "}
-                <span className="font-medium text-foreground">{filtered.length}</span> candidates
+                <span className="font-medium text-foreground">
+                  {filtered.length}
+                </span>{" "}
+                candidates
               </p>
               <Pagination className="w-auto">
                 <PaginationContent>
@@ -354,7 +395,9 @@ export function CandidatesTable({
 
                   <PaginationItem>
                     <PaginationNext
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      onClick={() =>
+                        setPage((p) => Math.min(totalPages, p + 1))
+                      }
                       disabled={safePage === totalPages}
                     />
                   </PaginationItem>
@@ -372,13 +415,18 @@ export function CandidatesTable({
             <h3 className="text-sm font-semibold">
               {hasFilters ? "No matching candidates" : "No candidates yet"}
             </h3>
-            <p className="mt-1 max-w-xs text-xs text-muted-foreground/80 leading-relaxed">
+            <p className="mt-1 max-w-xs text-xs leading-relaxed text-muted-foreground/80">
               {hasFilters
                 ? "Try adjusting your search or filters."
                 : "Add candidates to a role to see them here."}
             </p>
             {hasFilters && (
-              <Button variant="outline" size="sm" onClick={clearFilters} className="mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearFilters}
+                className="mt-4"
+              >
                 Reset filters
               </Button>
             )}
@@ -391,11 +439,23 @@ export function CandidatesTable({
 
 function RecBadge({ rec }: { rec: string }) {
   const map: Record<string, { label: string; cls: string }> = {
-    strong_fit:   { label: "Strong Fit",   cls: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400" },
-    possible_fit: { label: "Possible Fit", cls: "border-amber-500/20 bg-amber-500/10 text-amber-400" },
-    weak_fit:     { label: "Weak Fit",     cls: "border-destructive/20 bg-destructive/10 text-destructive" },
+    strong_fit: {
+      label: "Strong documented match",
+      cls: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+    },
+    possible_fit: {
+      label: "Potential documented match",
+      cls: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+    },
+    weak_fit: {
+      label: "Limited documented match",
+      cls: "border-destructive/20 bg-destructive/10 text-destructive",
+    },
   }
-  const item = map[rec] ?? { label: rec, cls: "border-border bg-muted text-muted-foreground" }
+  const item = map[rec] ?? {
+    label: rec,
+    cls: "border-border bg-muted text-muted-foreground",
+  }
   return (
     <Badge variant="outline" className={`text-[10px] font-normal ${item.cls}`}>
       {item.label}
