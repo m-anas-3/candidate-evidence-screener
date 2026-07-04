@@ -16,6 +16,7 @@ import {
   ScoreDistributionChart,
 } from "@/components/dashboard-charts"
 import { CreateJobDialog } from "@/components/create-job-dialog"
+import { CreateSyntheticSampleButton } from "@/components/create-synthetic-sample-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -36,7 +37,8 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: authData } = await supabase.auth.getClaims()
-  const email = typeof authData?.claims?.email === "string" ? authData.claims.email : ""
+  const email =
+    typeof authData?.claims?.email === "string" ? authData.claims.email : ""
   const firstName = email.split("@")[0] ?? "there"
 
   const [
@@ -64,7 +66,10 @@ export default async function DashboardPage() {
       .order("created_at", { ascending: false })
       .limit(6),
     supabase.from("candidates").select("analysis_status"),
-    supabase.from("screening_reports").select("score").eq("status", "completed"),
+    supabase
+      .from("screening_reports")
+      .select("score")
+      .eq("status", "completed"),
   ])
 
   const totalJobs = jobsRes.count ?? 0
@@ -84,13 +89,31 @@ export default async function DashboardPage() {
       else acc.pending++
       return acc
     },
-    { completed: 0, ready: 0, pending: 0, failed: 0 },
+    { completed: 0, ready: 0, pending: 0, failed: 0 }
   )
 
   const pipelineData = [
-    { label: "Pending", completed: 0, ready: 0, pending: statusCounts.pending, failed: 0 },
-    { label: "Ready", completed: 0, ready: statusCounts.ready, pending: statusCounts.pending, failed: 0 },
-    { label: "Analyzed", completed: statusCounts.completed, ready: statusCounts.ready, pending: statusCounts.pending, failed: statusCounts.failed },
+    {
+      label: "Pending",
+      completed: 0,
+      ready: 0,
+      pending: statusCounts.pending,
+      failed: 0,
+    },
+    {
+      label: "Ready",
+      completed: 0,
+      ready: statusCounts.ready,
+      pending: statusCounts.pending,
+      failed: 0,
+    },
+    {
+      label: "Analyzed",
+      completed: statusCounts.completed,
+      ready: statusCounts.ready,
+      pending: statusCounts.pending,
+      failed: statusCounts.failed,
+    },
   ]
 
   const scoreBuckets = [
@@ -111,16 +134,15 @@ export default async function DashboardPage() {
 
   const hasChartData = allCandidates.length > 0
   const hasScoreData = allReports.length > 0
-  const completionRate = totalCandidates > 0
-    ? Math.round((reportsReady / totalCandidates) * 100)
-    : 0
+  const completionRate =
+    totalCandidates > 0 ? Math.round((reportsReady / totalCandidates) * 100) : 0
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-7">
       {/* ── Greeting ──────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
             Overview
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
@@ -131,7 +153,13 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button asChild variant="outline" size="sm" className="border-border/50">
+          <CreateSyntheticSampleButton />
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="border-border/50"
+          >
             <Link href="/dashboard/candidates">
               <IconUsers className="mr-1.5 size-3.5" />
               All candidates
@@ -186,12 +214,16 @@ export default async function DashboardPage() {
                     <IconTrendingUp className="size-3.5" />
                   </span>
                   <div>
-                    <CardTitle className="text-sm font-semibold">Candidate Pipeline</CardTitle>
-                    <CardDescription className="text-xs">Stages across all roles</CardDescription>
+                    <CardTitle className="text-sm font-semibold">
+                      Candidate Pipeline
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Stages across all roles
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pb-3 pt-4">
+              <CardContent className="pt-4 pb-3">
                 <CandidatePipelineChart data={pipelineData} />
               </CardContent>
             </Card>
@@ -204,12 +236,16 @@ export default async function DashboardPage() {
                     <IconChartBar className="size-3.5" />
                   </span>
                   <div>
-                    <CardTitle className="text-sm font-semibold">Score Distribution</CardTitle>
-                    <CardDescription className="text-xs">Fit scores across analyzed candidates</CardDescription>
+                    <CardTitle className="text-sm font-semibold">
+                      Score Distribution
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Fit scores across analyzed candidates
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pb-3 pt-4">
+              <CardContent className="pt-4 pb-3">
                 <ScoreDistributionChart data={scoreBuckets} />
               </CardContent>
             </Card>
@@ -224,26 +260,32 @@ export default async function DashboardPage() {
           <CardHeader className="border-b pb-3">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-semibold">Recent Roles</CardTitle>
-                <CardDescription className="text-xs">Your latest job criteria</CardDescription>
+                <CardTitle className="text-sm font-semibold">
+                  Recent Roles
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Your latest job criteria
+                </CardDescription>
               </div>
-              <Badge variant="secondary" className="text-[10px]">{totalJobs} total</Badge>
+              <Badge variant="secondary" className="text-[10px]">
+                {totalJobs} total
+              </Badge>
             </div>
           </CardHeader>
           <CardContent className="p-0">
             {recentJobs.length > 0 ? (
               <>
-                {recentJobs.map((job, i) => (
+                {recentJobs.map((job) => (
                   <Link
                     key={job.id}
                     href={`/dashboard/jobs/${job.id}`}
-                    className="group flex items-center gap-3 border-b border-border/30 px-5 py-3.5 last:border-0 hover:bg-muted/15 transition-colors"
+                    className="group flex items-center gap-3 border-b border-border/30 px-5 py-3.5 transition-colors last:border-0 hover:bg-muted/15"
                   >
-                    <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted/60 text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
                       <IconBriefcase className="size-3.5" />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-medium text-foreground group-hover:text-primary transition-colors">
+                      <p className="truncate text-[13px] font-medium text-foreground transition-colors group-hover:text-primary">
                         {job.title}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
@@ -266,12 +308,14 @@ export default async function DashboardPage() {
                   Create your first role to start screening candidates.
                 </p>
                 <div className="mt-4">
-                  <CreateJobDialog trigger={
-                    <Button size="sm">
-                      <IconPlus className="mr-1.5 size-3.5" />
-                      Create role
-                    </Button>
-                  } />
+                  <CreateJobDialog
+                    trigger={
+                      <Button size="sm">
+                        <IconPlus className="mr-1.5 size-3.5" />
+                        Create role
+                      </Button>
+                    }
+                  />
                 </div>
               </div>
             )}
@@ -279,16 +323,34 @@ export default async function DashboardPage() {
         </Card>
 
         {/* How it works */}
-        <Card className="border-border/40 h-fit">
+        <Card className="h-fit border-border/40">
           <CardHeader className="border-b pb-3">
-            <CardTitle className="text-sm font-semibold">How it works</CardTitle>
+            <CardTitle className="text-sm font-semibold">
+              How it works
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {[
-              { n: 1, title: "Create a Role", desc: "Define requirements and must-have skills." },
-              { n: 2, title: "Add Candidates", desc: "Upload resume, proposal, and portfolio URL." },
-              { n: 3, title: "Extract Resume", desc: "Parse PDF text for evidence analysis." },
-              { n: 4, title: "Run Analysis", desc: "Get a 100-point evidence-backed report." },
+              {
+                n: 1,
+                title: "Create a Role",
+                desc: "Define requirements and must-have skills.",
+              },
+              {
+                n: 2,
+                title: "Add Candidates",
+                desc: "Upload resume, proposal, and portfolio URL.",
+              },
+              {
+                n: 3,
+                title: "Extract Resume",
+                desc: "Parse PDF text for evidence analysis.",
+              },
+              {
+                n: 4,
+                title: "Run Analysis",
+                desc: "Get a 100-point evidence-backed report.",
+              },
             ].map((step, i, arr) => (
               <div key={step.n}>
                 <div className="flex items-start gap-3 px-5 py-3.5">
@@ -296,8 +358,12 @@ export default async function DashboardPage() {
                     {step.n}
                   </span>
                   <div>
-                    <p className="text-[13px] font-semibold text-foreground">{step.title}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{step.desc}</p>
+                    <p className="text-[13px] font-semibold text-foreground">
+                      {step.title}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {step.desc}
+                    </p>
                   </div>
                 </div>
                 {i < arr.length - 1 && <Separator className="bg-border/30" />}
@@ -311,7 +377,12 @@ export default async function DashboardPage() {
 }
 
 function StatCard({
-  icon, accent, label, value, sub, valueClass,
+  icon,
+  accent,
+  label,
+  value,
+  sub,
+  valueClass,
 }: {
   icon: React.ReactNode
   accent: string
@@ -325,10 +396,18 @@ function StatCard({
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/4 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       <CardContent className="relative p-5">
         <div className="flex items-start justify-between">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-          <span className={`flex size-8 items-center justify-center rounded-lg ${accent}`}>{icon}</span>
+          <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            {label}
+          </p>
+          <span
+            className={`flex size-8 items-center justify-center rounded-lg ${accent}`}
+          >
+            {icon}
+          </span>
         </div>
-        <p className={`mt-3 font-mono text-3xl font-bold tracking-tight ${valueClass ?? "text-foreground"}`}>
+        <p
+          className={`mt-3 font-mono text-3xl font-bold tracking-tight ${valueClass ?? "text-foreground"}`}
+        >
           {value}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">{sub}</p>

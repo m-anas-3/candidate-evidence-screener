@@ -2,7 +2,7 @@
 
 ## Status
 
-This is the implementation contract for the current locked MVP and supersedes the earlier anonymous-session plan. Supabase persistence, authentication, job/candidate intake, and resume extraction are implemented. Agent analysis, reports, chat, synthetic evaluation data, deployment verification, and automated tests remain planned.
+This is the implementation contract for the current locked MVP and supersedes the earlier anonymous-session plan. Supabase persistence, authentication, job/candidate intake, resume extraction, agent analysis, reports, grounded chat, a synthetic evaluator path, and focused automated tests are implemented locally. Live cross-user acceptance and deployment verification remain pending.
 
 ## Product and Core Flow
 
@@ -33,7 +33,7 @@ An unsupported criterion scores zero rather than being inferred. If any explicit
 
 - **Application:** Next.js 16 App Router, with frontend and server code deployed together on Vercel.
 - **Agent runtime:** the JavaScript `deepagents` package and `createDeepAgent()` run server-side in a protected Next.js Node.js Route Handler on Vercel. There is no Python or separate agent service.
-- **Model:** OpenAI `gpt-5.5`, configured as `OPENAI_MODEL=gpt-5.5` with medium reasoning as the initial setting. Confirm access and installed-adapter support during agent implementation.
+- **Model:** OpenAI `gpt-5.5`, configured as `OPENAI_ANALYSIS_MODEL=gpt-5.5` with medium reasoning as the initial setting. Confirm access and installed-adapter support during agent implementation.
 - **Authentication:** basic Supabase email/password sign-up, sign-in, and sign-out. For the one-week MVP, Supabase email confirmation is disabled so sign-up returns a session immediately. This does not verify ownership of the submitted email address. Product routes still require an authenticated account, and public self-service sign-up does not make the product invite-only.
 - **Persistence:** Supabase PostgreSQL stores jobs, candidates, reports, and chat messages, and private Supabase Storage stores resumes.
 - **Uploads:** the authenticated browser uploads PDFs directly to private Storage, so upload bytes do not pass through a Vercel Route Handler. The protected extraction handler later downloads the private object by its stored path; PDF bytes are never sent to OpenAI.

@@ -29,6 +29,12 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
     createJobForDialog,
     initialState
   )
+  const [values, setValues] = useState({
+    description: "",
+    mustHaveSkills: "",
+    requirements: "",
+    title: "",
+  })
 
   useEffect(() => {
     if (state.status === "success" && state.jobId) {
@@ -54,6 +60,10 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
           required
           className="h-10"
           aria-invalid={Boolean(state.fieldErrors?.title)}
+          value={values.title}
+          onChange={(event) =>
+            setValues((current) => ({ ...current, title: event.target.value }))
+          }
         />
         {state.fieldErrors?.title && (
           <ul className="space-y-0.5 text-xs text-destructive">
@@ -80,6 +90,13 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
           required
           className="min-h-[100px] resize-y"
           aria-invalid={Boolean(state.fieldErrors?.description)}
+          value={values.description}
+          onChange={(event) =>
+            setValues((current) => ({
+              ...current,
+              description: event.target.value,
+            }))
+          }
         />
         {state.fieldErrors?.description && (
           <ul className="space-y-0.5 text-xs text-destructive">
@@ -104,6 +121,13 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
           required
           className="min-h-[90px] resize-y"
           aria-invalid={Boolean(state.fieldErrors?.requirements)}
+          value={values.requirements}
+          onChange={(event) =>
+            setValues((current) => ({
+              ...current,
+              requirements: event.target.value,
+            }))
+          }
         />
         {state.fieldErrors?.requirements && (
           <ul className="space-y-0.5 text-xs text-destructive">
@@ -129,6 +153,13 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
           disabled={pending}
           maxLength={20000}
           className="min-h-[72px] resize-y"
+          value={values.mustHaveSkills}
+          onChange={(event) =>
+            setValues((current) => ({
+              ...current,
+              mustHaveSkills: event.target.value,
+            }))
+          }
         />
         {state.fieldErrors?.mustHaveSkills && (
           <ul className="space-y-0.5 text-xs text-destructive">
@@ -138,16 +169,6 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
           </ul>
         )}
       </div>
-
-      {/* Global error */}
-      {state.status === "error" && state.message && (
-        <div
-          className="rounded-lg border border-destructive/20 bg-destructive/8 px-3 py-2.5 text-xs text-destructive"
-          role="alert"
-        >
-          {state.message}
-        </div>
-      )}
 
       <div className="flex gap-3 pt-1">
         <Button

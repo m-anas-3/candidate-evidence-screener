@@ -315,16 +315,6 @@ function CandidateSheetForm({
         )}
       </div>
 
-      {/* Global error */}
-      {message && (
-        <div
-          className="rounded-lg border border-destructive/20 bg-destructive/8 px-3 py-2.5 text-xs text-destructive"
-          role="alert"
-        >
-          {message}
-        </div>
-      )}
-
       <div className="flex gap-2.5 pt-2 pb-6">
         <Button
           type="button"

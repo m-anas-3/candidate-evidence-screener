@@ -8,36 +8,36 @@ No milestone may add a pipeline, interview-question generation, or another expli
 
 ## Dependency and Infrastructure Status
 
-| Area | Current status | Planned addition or setup |
-| --- | --- | --- |
-| Web application | Installed: Next.js 16.2.6, React 19.2.4, TypeScript 5 | Keep App Router and deploy frontend/server together to Vercel |
-| UI | Installed: Tailwind CSS 4, shadcn/Radix-related packages, Tabler icons | Add only primitives needed by the workflow |
-| Supabase SDK | **Installed foundation** | `@supabase/supabase-js` 2.110.0 and `@supabase/ssr` 0.12.0; schema-dependent use follows |
-| Validation | **Installed and integrated** | `zod` 4.4.3 with shared intake validation and the strict screening-report schema |
-| Resume parsing | **Installed and integrated** | `pdf-parse` 2.4.5 in a protected Node Route Handler; deployed runtime verification remains |
-| Agent/model | **Installed and integrated** | `deepagents` 1.10.5 with pinned LangChain/OpenAI packages; live model integration follows in Milestone 7 |
-| Automated tests | **Not installed/configured** | Vitest in Milestone 11; add browser testing only if later acceptance needs it |
-| Supabase project | **Schema applied remotely** | MVP tables, RLS, and private `resumes` bucket are migrated; auth-flow and cross-user tests remain |
-| OpenAI | **Not configured** | Server-only `OPENAI_API_KEY`; `OPENAI_MODEL=gpt-5.4-mini` with medium reasoning initially |
-| Vercel | **Not configured or verified** | Start on Hobby with Fluid Compute; Node Route Handler and 300-second analysis `maxDuration` |
+| Area             | Current status                                                         | Planned addition or setup                                                                                                           |
+| ---------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Web application  | Installed: Next.js 16.2.6, React 19.2.4, TypeScript 5                  | Keep App Router and deploy frontend/server together to Vercel                                                                       |
+| UI               | Installed: Tailwind CSS 4, shadcn/Radix-related packages, Tabler icons | Add only primitives needed by the workflow                                                                                          |
+| Supabase SDK     | **Installed foundation**                                               | `@supabase/supabase-js` 2.110.0 and `@supabase/ssr` 0.12.0; schema-dependent use follows                                            |
+| Validation       | **Installed and integrated**                                           | `zod` 4.4.3 with shared intake validation and the strict screening-report schema                                                    |
+| Resume parsing   | **Installed and integrated**                                           | `pdf-parse` 2.4.5 in a protected Node Route Handler; deployed runtime verification remains                                          |
+| Agent/model      | **Installed and integrated**                                           | `deepagents` 1.10.5 with pinned LangChain/OpenAI packages; live model integration follows in Milestone 7                            |
+| Automated tests  | **Installed and configured**                                           | Vitest covers report authority, scoring, prompt safety, proposal signals, and SSRF address rules; live ownership acceptance remains |
+| Supabase project | **Schema applied remotely**                                            | MVP tables, RLS, and private `resumes` bucket are migrated; auth-flow and cross-user tests remain                                   |
+| OpenAI           | **Not configured**                                                     | Server-only `OPENAI_API_KEY`; `OPENAI_ANALYSIS_MODEL=gpt-5.5` with medium reasoning initially                                       |
+| Vercel           | **Not configured or verified**                                         | Start on Hobby with Fluid Compute; Node Route Handler and 300-second analysis `maxDuration`                                         |
 
 Dependencies are added only in the milestone that first uses them. Package changes use pnpm and include `pnpm-lock.yaml`.
 
 ## Challenge and Locked-Requirement Mapping
 
-| Requirement | Planned implementation | Milestones | Verification evidence |
-| --- | --- | --- | --- |
-| Screen freelance candidates using job, resume, proposal, and one portfolio URL | Persist all four evidence sources and present one candidate report | 2, 4, 5, 8 | End-to-end manual and synthetic candidate acceptance tests |
-| Use the JavaScript Deep Agent, not a plain completion | Server-only `createDeepAgent()` harness with constrained, typed tools | 6, 7 | Build/type checks plus an integration run showing tool use and a saved validated report |
-| Provide custom tools | Authorized context load, proposal-specificity assessment, safe portfolio inspection, and report persistence | 6 | Unit tests for schemas/tool guards and tool-level failure cases |
-| Run on the required application architecture | Next.js Node Route Handlers on Vercel; no Edge Function, Python, or separate agent service | 5–7, 9, 10 | Runtime declarations, production build, and deployed smoke test |
-| Use Supabase for auth, data, and private files | Email/password Auth, RLS-protected PostgreSQL tables, direct private Storage upload | 1–5 | Auth flow, fresh-project migration, RLS/ownership tests, upload and refresh test |
-| Produce evidence-backed advisory output | Strict report schema, source labels, `not found`, human-review language, no protected-trait inference | 6–8 | Schema fixtures and report acceptance review |
-| Analyze proposal specificity responsibly | Report observable specificity/template signals without AI-authorship claims | 6, 8 | Unit fixtures and wording review |
-| Support grounded follow-up questions | Protected, bounded, persisted candidate chat using read-only tools | 9 | Refresh persistence and unsupported-question tests |
-| Be immediately evaluable | Basic authentication followed by a synthetic sample workflow without real personal data | 3, 10 | Newly signed-in user reaches a meaningful report workflow in under one minute after authentication |
-| Meet security and reliability expectations | RLS, server ownership checks, SSRF controls, safe errors, duplicate-run prevention, and focused tests | 2, 4–7, 9, 11 | Security test matrix and final quality gate |
-| Preserve locked exclusions | No pipeline, interview questions, multiple URLs, email sending, or other excluded services | All | Scope review in every milestone and final acceptance review |
+| Requirement                                                                    | Planned implementation                                                                                      | Milestones    | Verification evidence                                                                              |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| Screen freelance candidates using job, resume, proposal, and one portfolio URL | Persist all four evidence sources and present one candidate report                                          | 2, 4, 5, 8    | End-to-end manual and synthetic candidate acceptance tests                                         |
+| Use the JavaScript Deep Agent, not a plain completion                          | Server-only `createDeepAgent()` harness with constrained, typed tools                                       | 6, 7          | Build/type checks plus an integration run showing tool use and a saved validated report            |
+| Provide custom tools                                                           | Authorized context load, proposal-specificity assessment, safe portfolio inspection, and report persistence | 6             | Unit tests for schemas/tool guards and tool-level failure cases                                    |
+| Run on the required application architecture                                   | Next.js Node Route Handlers on Vercel; no Edge Function, Python, or separate agent service                  | 5–7, 9, 10    | Runtime declarations, production build, and deployed smoke test                                    |
+| Use Supabase for auth, data, and private files                                 | Email/password Auth, RLS-protected PostgreSQL tables, direct private Storage upload                         | 1–5           | Auth flow, fresh-project migration, RLS/ownership tests, upload and refresh test                   |
+| Produce evidence-backed advisory output                                        | Strict report schema, source labels, `not found`, human-review language, no protected-trait inference       | 6–8           | Schema fixtures and report acceptance review                                                       |
+| Analyze proposal specificity responsibly                                       | Report observable specificity/template signals without AI-authorship claims                                 | 6, 8          | Unit fixtures and wording review                                                                   |
+| Support grounded follow-up questions                                           | Protected, bounded, persisted candidate chat using read-only tools                                          | 9             | Refresh persistence and unsupported-question tests                                                 |
+| Be immediately evaluable                                                       | Basic authentication followed by a synthetic sample workflow without real personal data                     | 3, 10         | Newly signed-in user reaches a meaningful report workflow in under one minute after authentication |
+| Meet security and reliability expectations                                     | RLS, server ownership checks, SSRF controls, safe errors, duplicate-run prevention, and focused tests       | 2, 4–7, 9, 11 | Security test matrix and final quality gate                                                        |
+| Preserve locked exclusions                                                     | No pipeline, interview questions, multiple URLs, email sending, or other excluded services                  | All           | Scope review in every milestone and final acceptance review                                        |
 
 ## Ordered Milestones
 
@@ -93,11 +93,11 @@ Add a server-only extractor and protected Node Route Handler. Revalidate candida
 
 ### 6. Deep Agent, Prompt, Report Schema, and Tools
 
-**Status:** implemented. The server-only `createDeepAgent()` harness uses the locked model default and medium reasoning, a versioned recruiter prompt, strict evidence/report validation, four ownership-bound product tools, and an in-memory backend with non-product tools hidden. Portfolio inspection pins validated public DNS results per request, revalidates redirects, and caps redirects, time, bytes, ports, and content types. Live model integration remains part of Milestone 7.
+**Status:** implemented. The server-only `createDeepAgent()` harness uses the locked model default and medium reasoning, a versioned recruiter prompt, strict evidence/report validation, four ownership-bound product tools, and an in-memory backend with non-product tools hidden. Tool-derived proposal and portfolio results are authoritative at persistence. Portfolio inspection pins validated public DNS results per request, revalidates redirects, and caps redirects, time, bytes, ports, and content types. Live model integration remains part of Milestone 7.
 
 **Depends on:** Milestones 1–2 and 5; Deep Agents/LangChain/OpenAI packages and model configuration.
 
-Create a server-only `createDeepAgent()` harness using `gpt-5.4-mini` with medium reasoning initially, a versioned recruiter prompt, strict report schema, and the four locked custom tools. Encode the locked 50/20/15/15 scoring weights, recommendation bands, zero-for-unsupported rule, and 79-point cap when a must-have lacks evidence. Enforce ownership in context loading and saving. Portfolio inspection must allow only public HTTP(S), revalidate every redirect, block private/reserved destinations, and cap time, bytes, and accepted content types. Treat fetched text as hostile evidence, not instructions.
+Create a server-only `createDeepAgent()` harness using `gpt-5.5` with medium reasoning initially, a versioned recruiter prompt, strict report schema, and the four locked custom tools. Encode the locked 50/20/15/15 scoring weights, recommendation bands, zero-for-unsupported rule, and 79-point cap when a must-have lacks evidence. Enforce ownership in context loading and saving. Portfolio inspection must allow only public HTTP(S), revalidate every redirect, block private/reserved destinations, and cap time, bytes, and accepted content types. Treat fetched text as hostile evidence, not instructions.
 
 **Gate:** tool schemas and report schema compile; invalid reports cannot persist; unsafe URLs and redirects fail; claims require source evidence or `not found`; the agent has no shell, arbitrary filesystem, or unrestricted mutation tools.
 
@@ -123,6 +123,8 @@ Add analysis controls and the persisted report view. Display every locked report
 
 ### 9. Grounded Follow-Up Chat
 
+**Status:** implemented locally. The protected candidate-scoped route authenticates ownership through RLS and an explicit job-owner filter, bounds recent history and source context, treats all evidence and prior messages as untrusted, persists both sides of the conversation, and cannot mutate reports. Live cross-user and model acceptance remain pending configured credentials.
+
 **Depends on:** a completed report from Milestone 8.
 
 Add a protected Node Route Handler and focused chat panel. Load authorized bounded context and recent history, invoke the agent in read-only follow-up mode, and persist user/assistant messages. Unsupported answers distinguish inference from evidence and use `not found` when needed.
@@ -131,6 +133,8 @@ Add a protected Node Route Handler and focused chat panel. Load authorized bound
 
 ### 10. Synthetic Evaluator Path and Deployment Polish
 
+**Status:** implemented locally. An authenticated one-click action creates a fictional job and candidate with synthetic proposal and resume evidence already ready for analysis, plus a same-application public portfolio fixture. Manual intake remains available. Deployed portfolio inspection, end-to-end timing, and Vercel Fluid Compute verification remain pending deployment.
+
 **Depends on:** Milestones 3–9.
 
 Add a one-click synthetic job/candidate/proposal, locally hosted portfolio fixture, extracted text, and report-ready path for the signed-in user. Keep manual upload available. Add concise privacy/advisory copy and finish responsive, contrast, keyboard, loading, empty, and failure behavior. Configure the Vercel Hobby environment with Fluid Compute and verify Node runtime constraints.
@@ -138,6 +142,8 @@ Add a one-click synthetic job/candidate/proposal, locally hosted portfolio fixtu
 **Gate:** a newly signed-in user reaches a meaningful report workflow in under one minute after authentication without additional credentials or real personal data; the manual path still works; deployed smoke tests pass.
 
 ### 11. Automated Tests and Final Security Review
+
+**Status:** partially complete. Vitest is configured with focused no-network coverage for authoritative tool-result binding, unavailable and unsafe portfolios, must-have repair and caps, recommendation boundaries, proposal signals, SSRF address classification, contradictory report data, and chat prompt safety. Lint and typecheck pass locally. Live authentication/RLS cross-owner tests, analysis transition integration tests, a production build, and deployed smoke/security checks remain.
 
 **Depends on:** all behavior milestones.
 
@@ -149,20 +155,20 @@ Review RLS, defense-in-depth ownership, SSRF, secret/log exposure, duplicate ana
 
 ## Key Risks and Mitigations
 
-| Risk | Impact | Mitigation and gate |
-| --- | --- | --- |
-| Agent duration exceeds Vercel limits | Analysis times out after partial work | Use Hobby Fluid Compute with a 300-second route limit, shorter internal timeouts, recoverable statuses, and deployed duration tests |
-| Portfolio fetching enables SSRF or prompt injection | Internal network exposure or manipulated output | Resolve and block private/reserved IPs, revalidate redirects, cap fetches, accept narrow content types, and delimit fetched text as untrusted evidence |
-| RLS or path-policy mistake exposes candidate data | Cross-user data or resume disclosure | Owner-derived policies, private bucket paths, server ownership checks, and negative integration tests |
-| PDF parser/runtime incompatibility | Resume extraction fails in production | Verify the installed parser API, force Node runtime, use representative fixtures, and release resources on all paths |
-| Model output is malformed or unsupported | Misleading or partially stored report | Strict Zod validation, evidence requirements, no partial persistence, safe failure status, and malformed-output fixtures |
-| Duplicate analysis causes conflicting reports or cost | Inconsistent state and unnecessary API spend | Atomic processing transition/idempotency strategy and concurrent-request tests before UI release |
-| Public unverified sign-up is abused or mistaken for invite-only access | Unexpected accounts, impersonated email addresses, or resource consumption | Label email verification as deferred, apply Supabase rate limits/CAPTCHA if exposed publicly, protect every product route with RLS, and monitor usage |
-| Model or package APIs change | Build/runtime drift | Pin through the lockfile, inspect installed-version docs at each integration milestone, and run all quality gates |
+| Risk                                                                   | Impact                                                                     | Mitigation and gate                                                                                                                                    |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Agent duration exceeds Vercel limits                                   | Analysis times out after partial work                                      | Use Hobby Fluid Compute with a 300-second route limit, shorter internal timeouts, recoverable statuses, and deployed duration tests                    |
+| Portfolio fetching enables SSRF or prompt injection                    | Internal network exposure or manipulated output                            | Resolve and block private/reserved IPs, revalidate redirects, cap fetches, accept narrow content types, and delimit fetched text as untrusted evidence |
+| RLS or path-policy mistake exposes candidate data                      | Cross-user data or resume disclosure                                       | Owner-derived policies, private bucket paths, server ownership checks, and negative integration tests                                                  |
+| PDF parser/runtime incompatibility                                     | Resume extraction fails in production                                      | Verify the installed parser API, force Node runtime, use representative fixtures, and release resources on all paths                                   |
+| Model output is malformed or unsupported                               | Misleading or partially stored report                                      | Strict Zod validation, evidence requirements, no partial persistence, safe failure status, and malformed-output fixtures                               |
+| Duplicate analysis causes conflicting reports or cost                  | Inconsistent state and unnecessary API spend                               | Atomic processing transition/idempotency strategy and concurrent-request tests before UI release                                                       |
+| Public unverified sign-up is abused or mistaken for invite-only access | Unexpected accounts, impersonated email addresses, or resource consumption | Label email verification as deferred, apply Supabase rate limits/CAPTCHA if exposed publicly, protect every product route with RLS, and monitor usage  |
+| Model or package APIs change                                           | Build/runtime drift                                                        | Pin through the lockfile, inspect installed-version docs at each integration milestone, and run all quality gates                                      |
 
 ## Locked Implementation Defaults
 
-- **Model:** `gpt-5.4-mini` with medium reasoning initially; benchmark representative candidates before changing model or effort.
+- **Model:** `gpt-5.5` with medium reasoning initially; benchmark representative candidates before changing model or effort.
 - **Scoring:** 50 points for job requirements/skills, 20 for relevant experience evidence, 15 for proposal specificity, and 15 for portfolio relevance. Strong Fit is 80–100, Possible Fit is 60–79, and Weak Fit is 0–59. Unsupported criteria score zero, and a missing must-have caps the score at 79.
 - **Vercel:** begin on Hobby with Fluid Compute and use a 300-second maximum for the analysis Node Route Handler, with shorter internal timeouts.
 - **Tests:** Vitest is the unit/integration runner. Browser automation remains deferred unless an acceptance gap requires Playwright.

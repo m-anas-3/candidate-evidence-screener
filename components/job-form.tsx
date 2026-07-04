@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
 
@@ -15,6 +15,12 @@ const initialState: IntakeActionState = {}
 
 export function JobForm() {
   const [state, formAction, pending] = useActionState(createJob, initialState)
+  const [values, setValues] = useState({
+    description: "",
+    mustHaveSkills: "",
+    requirements: "",
+    title: "",
+  })
 
   useEffect(() => {
     if (state.status === "error" && state.message) toast.error(state.message)
@@ -35,6 +41,10 @@ export function JobForm() {
           name="title"
           placeholder="Senior full-stack engineer"
           required
+          value={values.title}
+          onChange={(event) =>
+            setValues((current) => ({ ...current, title: event.target.value }))
+          }
         />
       </FormField>
 
@@ -55,6 +65,13 @@ export function JobForm() {
           name="description"
           placeholder="Describe the project, team, and expected outcomes."
           required
+          value={values.description}
+          onChange={(event) =>
+            setValues((current) => ({
+              ...current,
+              description: event.target.value,
+            }))
+          }
         />
       </FormField>
 
@@ -75,6 +92,13 @@ export function JobForm() {
           name="requirements"
           placeholder="List the experience and evidence a strong candidate should have."
           required
+          value={values.requirements}
+          onChange={(event) =>
+            setValues((current) => ({
+              ...current,
+              requirements: event.target.value,
+            }))
+          }
         />
       </FormField>
 
@@ -96,17 +120,15 @@ export function JobForm() {
           id="mustHaveSkills"
           name="mustHaveSkills"
           placeholder="Next.js, TypeScript, PostgreSQL"
+          value={values.mustHaveSkills}
+          onChange={(event) =>
+            setValues((current) => ({
+              ...current,
+              mustHaveSkills: event.target.value,
+            }))
+          }
         />
       </FormField>
-
-      {state.message ? (
-        <p
-          className="rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive"
-          role="alert"
-        >
-          {state.message}
-        </p>
-      ) : null}
 
       <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-2">
         <Button

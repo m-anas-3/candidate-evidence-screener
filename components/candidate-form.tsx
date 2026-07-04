@@ -197,15 +197,6 @@ export function CandidateForm({
         />
       </FormField>
 
-      {message ? (
-        <p
-          className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          role="alert"
-        >
-          {message}
-        </p>
-      ) : null}
-
       <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end sm:gap-2">
         <Button
           asChild

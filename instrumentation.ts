@@ -28,8 +28,18 @@ export async function register() {
     // shape matches what Node's net/http/https internals expect.
     dns.lookup = (
       hostname: string,
-      options: { all?: boolean; hints?: number; family?: number } | ((err: NodeJS.ErrnoException | null, address: string, family: number) => void),
-      callback?: (err: NodeJS.ErrnoException | null, address: string | { address: string; family: number }[], family?: number) => void
+      options:
+        | { all?: boolean; hints?: number; family?: number }
+        | ((
+            err: NodeJS.ErrnoException | null,
+            address: string,
+            family: number
+          ) => void),
+      callback?: (
+        err: NodeJS.ErrnoException | null,
+        address: string | { address: string; family: number }[],
+        family?: number
+      ) => void
     ) => {
       if (typeof options === "function") {
         callback = options as never
@@ -42,7 +52,12 @@ export async function register() {
         if (!err && addresses && addresses.length > 0) {
           if (wantsAll) {
             // http/https calls lookup with { all: true } and expects an array
-            ;(callback as (err: null, addresses: { address: string; family: number }[]) => void)(
+            ;(
+              callback as (
+                err: null,
+                addresses: { address: string; family: number }[]
+              ) => void
+            )(
               null,
               addresses.map((addr) => ({ address: addr, family: 4 }))
             )
@@ -55,7 +70,7 @@ export async function register() {
           }
         } else {
           // resolve4 failed — fall back to original system resolver
-          ;(origLookup as Function)(hostname, options, callback)
+          Reflect.apply(origLookup, dns, [hostname, options, callback])
         }
       })
     }

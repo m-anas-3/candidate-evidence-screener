@@ -15,7 +15,7 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 
 const agentEnvironmentSchema = z.object({
   OPENAI_API_KEY: z.string().trim().min(1),
-  OPENAI_MODEL: z.string().trim().min(1).default("gpt-5.4-mini"),
+  OPENAI_ANALYSIS_MODEL: z.string().trim().min(1).default("gpt-5.4"),
 })
 
 const NON_PRODUCT_TOOLS = [
@@ -94,7 +94,7 @@ export class AgentConfigurationError extends Error {
 export function getCandidateAnalysisAgentConfiguration(): CandidateAnalysisAgentConfiguration {
   const result = agentEnvironmentSchema.safeParse({
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    OPENAI_MODEL: process.env.OPENAI_MODEL || undefined,
+    OPENAI_ANALYSIS_MODEL: process.env.OPENAI_ANALYSIS_MODEL || undefined,
   })
 
   if (!result.success) {
@@ -110,7 +110,7 @@ export function getCandidateAnalysisAgentConfiguration(): CandidateAnalysisAgent
 
   return new CandidateAnalysisAgentConfiguration(
     result.data.OPENAI_API_KEY,
-    result.data.OPENAI_MODEL
+    result.data.OPENAI_ANALYSIS_MODEL
   )
 }
 

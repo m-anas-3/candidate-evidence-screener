@@ -45,7 +45,6 @@ export function CandidateChat({
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
   const [input, setInput] = useState("")
   const [streaming, setStreaming] = useState(false)
-  const [error, setError] = useState<string>()
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -56,9 +55,6 @@ export function CandidateChat({
   async function send() {
     const trimmed = input.trim()
     if (!trimmed || streaming) return
-
-    setInput("")
-    setError(undefined)
 
     const userMessage: ChatMessage = {
       id: crypto.randomUUID(),
@@ -126,7 +122,6 @@ export function CandidateChat({
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Something went wrong. Try again."
-      setError(message)
       toast.error("Could not answer that question", { description: message })
       setMessages((prev) => prev.filter((m) => m.id !== assistantId))
     } finally {
@@ -220,12 +215,6 @@ export function CandidateChat({
           <div ref={bottomRef} />
         </div>
       </ScrollArea>
-
-      {error && (
-        <p className="shrink-0 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs text-destructive">
-          {error}
-        </p>
-      )}
 
       {/* Input */}
       <div className="shrink-0 space-y-2">

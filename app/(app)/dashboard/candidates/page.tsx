@@ -11,8 +11,11 @@ interface RawCandidate {
   name: string
   analysis_status: string
   created_at: string
-  jobs: any
-  screening_reports: any
+  jobs: { title: string } | { title: string }[] | null
+  screening_reports:
+    | { recommendation: string | null; score: number | null }
+    | { recommendation: string | null; score: number | null }[]
+    | null
 }
 
 export default async function CandidatesPage() {
@@ -22,7 +25,8 @@ export default async function CandidatesPage() {
     await Promise.all([
       supabase
         .from("candidates")
-        .select(`
+        .select(
+          `
           id,
           job_id,
           name,
@@ -35,7 +39,8 @@ export default async function CandidatesPage() {
             score,
             recommendation
           )
-        `)
+        `
+        )
         .order("created_at", { ascending: false }),
       supabase.from("jobs").select("id, title"),
     ])
@@ -45,7 +50,9 @@ export default async function CandidatesPage() {
   }
 
   // Format and safely cast joined relation arrays or objects
-  const formattedCandidates = ((candidates as unknown as RawCandidate[]) ?? []).map((candidate) => {
+  const formattedCandidates = (
+    (candidates as unknown as RawCandidate[]) ?? []
+  ).map((candidate) => {
     const reportVal = candidate.screening_reports
     const reportObj = Array.isArray(reportVal) ? reportVal[0] : reportVal
 
@@ -63,7 +70,9 @@ export default async function CandidatesPage() {
         ? {
             score: typeof reportObj.score === "number" ? reportObj.score : null,
             recommendation:
-              typeof reportObj.recommendation === "string" ? reportObj.recommendation : null,
+              typeof reportObj.recommendation === "string"
+                ? reportObj.recommendation
+                : null,
           }
         : null,
     }

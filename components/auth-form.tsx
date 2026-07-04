@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useActionState, useEffect } from "react"
+import { useActionState, useEffect, useState } from "react"
 import { IconLoader2 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -22,6 +22,11 @@ type AuthFormProps = {
 
 export function AuthForm({ action, mode, notice }: AuthFormProps) {
   const [state, formAction, pending] = useActionState(action, initialState)
+  const [values, setValues] = useState({
+    confirmPassword: "",
+    email: "",
+    password: "",
+  })
   const isSignUp = mode === "sign-up"
 
   useEffect(() => {
@@ -51,6 +56,10 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
         disabled={pending}
         errors={state.fieldErrors?.email}
         errorId="email-error"
+        value={values.email}
+        onChange={(value) =>
+          setValues((current) => ({ ...current, email: value }))
+        }
       />
 
       {/* Password */}
@@ -64,6 +73,10 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
           disabled={pending}
           errors={state.fieldErrors?.password}
           errorId="password-error"
+          value={values.password}
+          onChange={(value) =>
+            setValues((current) => ({ ...current, password: value }))
+          }
         />
         {isSignUp && (
           <p className="pl-0.5 text-[11px] text-muted-foreground">
@@ -83,22 +96,11 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
           disabled={pending}
           errors={state.fieldErrors?.confirmPassword}
           errorId="confirm-password-error"
+          value={values.confirmPassword}
+          onChange={(value) =>
+            setValues((current) => ({ ...current, confirmPassword: value }))
+          }
         />
-      )}
-
-      {/* Global message */}
-      {state.message && (
-        <p
-          role={state.status === "success" ? "status" : "alert"}
-          className={cn(
-            "rounded-lg border px-3.5 py-2.5 text-[13px]",
-            state.status === "success"
-              ? "border-emerald-500/25 bg-emerald-500/8 text-emerald-400"
-              : "border-destructive/25 bg-destructive/8 text-destructive"
-          )}
-        >
-          {state.message}
-        </p>
       )}
 
       <Button
@@ -143,6 +145,8 @@ function Field({
   disabled,
   errors,
   errorId,
+  value,
+  onChange,
 }: {
   id: string
   label: string
@@ -152,6 +156,8 @@ function Field({
   disabled: boolean
   errors?: string[]
   errorId: string
+  value: string
+  onChange: (value: string) => void
 }) {
   const hasError = Boolean(errors?.length)
   return (
@@ -170,6 +176,8 @@ function Field({
         placeholder={placeholder}
         disabled={disabled}
         required
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
         aria-describedby={hasError ? errorId : undefined}
         aria-invalid={hasError}
         className={cn(
