@@ -12,7 +12,7 @@ import {
 } from "@tabler/icons-react"
 
 import {
-  CandidatePipelineChart,
+  AnalysisProgressChart,
   ScoreDistributionChart,
 } from "@/components/dashboard-charts"
 import { CreateJobDialog } from "@/components/create-job-dialog"
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
     { completed: 0, ready: 0, pending: 0, failed: 0 }
   )
 
-  const pipelineData = [
+  const analysisProgressData = [
     {
       label: "Pending",
       completed: 0,
@@ -217,16 +217,16 @@ export default async function DashboardPage() {
                   </span>
                   <div>
                     <CardTitle className="text-sm font-semibold">
-                      Candidate Pipeline
+                      Analysis progress
                     </CardTitle>
                     <CardDescription className="text-xs">
-                      Stages across all roles
+                      Current screening states across all roles
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-4 pb-3">
-                <CandidatePipelineChart data={pipelineData} />
+                <AnalysisProgressChart data={analysisProgressData} />
               </CardContent>
             </Card>
           )}

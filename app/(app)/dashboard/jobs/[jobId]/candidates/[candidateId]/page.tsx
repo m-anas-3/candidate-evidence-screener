@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { screeningReportSchema } from "@/lib/agent/report-schema"
+import { validateReportMustHaveCoverage } from "@/lib/agent/report-validation"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = { title: "Candidate Evaluation" }
@@ -65,7 +66,11 @@ export default async function CandidateDetailsPage({
       )
       .eq("id", candidateId)
       .maybeSingle(),
-    supabase.from("jobs").select("id, title").eq("id", jobId).maybeSingle(),
+    supabase
+      .from("jobs")
+      .select("id, title, must_have_skills")
+      .eq("id", jobId)
+      .maybeSingle(),
     supabase
       .from("screening_reports")
       .select("*")
@@ -102,7 +107,12 @@ export default async function CandidateDetailsPage({
   const reportResult = screeningReportSchema.safeParse(
     reportRaw?.status === "completed" ? reportRaw.raw_structured_output : null
   )
-  const report = reportResult.success ? reportResult.data : null
+  const report = reportResult.success
+    ? validateReportMustHaveCoverage(
+        reportResult.data,
+        job.must_have_skills ?? []
+      )
+    : null
   const hasReport = report !== null
   const reportUnavailable =
     Boolean(reportError) ||

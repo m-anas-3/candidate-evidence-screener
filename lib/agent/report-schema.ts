@@ -224,16 +224,11 @@ const screeningReportInputSchema = screeningReportObjectSchema.transform(
           }
 
     // Derive score from sub-scores — the LLM never has to do the arithmetic.
-    let computedScore =
+    const computedScore =
       scoring.jobRequirementsAndSkills +
       scoring.relevantExperience +
       scoring.proposalSpecificity +
       ("portfolioRelevance" in scoring ? (scoring.portfolioRelevance ?? 0) : 0)
-
-    // Cap at 79 when any must-have skill is missing.
-    if (report.missingSkills.length > 0 && computedScore > 79) {
-      computedScore = 79
-    }
 
     // Derive recommendation from the final score.
     const computedRecommendation =

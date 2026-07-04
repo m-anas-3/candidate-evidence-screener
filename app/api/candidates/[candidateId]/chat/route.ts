@@ -2,6 +2,7 @@ import { z } from "zod"
 
 import { createClient } from "@/lib/supabase/server"
 import { buildCandidateChatSystemPrompt } from "@/lib/agent/chat-prompt"
+import { readOpenAIContentDeltas } from "@/lib/agent/openai-sse"
 
 export const runtime = "nodejs"
 export const maxDuration = 30 // Chat needs far less than the 60s we had before
@@ -181,38 +182,12 @@ export async function POST(
 
   const stream = new ReadableStream({
     async start(controller) {
-      const reader = upstream.body!.getReader()
-      const decoder = new TextDecoder()
-
       try {
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-
-          for (const line of decoder
-            .decode(value, { stream: true })
-            .split("\n")) {
-            if (!line.startsWith("data: ")) continue
-            const payload = line.slice(6).trim()
-            if (payload === "[DONE]") continue
-
-            try {
-              const delta = (
-                JSON.parse(payload) as {
-                  choices: { delta: { content?: string } }[]
-                }
-              ).choices[0]?.delta?.content
-
-              if (typeof delta === "string" && delta) {
-                fullReply += delta
-                controller.enqueue(
-                  encoder.encode(`data: ${JSON.stringify({ delta })}\n\n`)
-                )
-              }
-            } catch {
-              // malformed SSE chunk — skip
-            }
-          }
+        for await (const delta of readOpenAIContentDeltas(upstream.body!)) {
+          fullReply += delta
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ delta })}\n\n`)
+          )
         }
       } finally {
         if (fullReply.trim()) {

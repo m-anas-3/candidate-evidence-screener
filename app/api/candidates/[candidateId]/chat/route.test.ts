@@ -1,6 +1,36 @@
 import { describe, expect, it } from "vitest"
 
 import { buildCandidateChatSystemPrompt } from "@/lib/agent/chat-prompt"
+import { readOpenAIContentDeltas } from "@/lib/agent/openai-sse"
+
+describe("OpenAI chat stream parsing", () => {
+  it("preserves SSE JSON lines fragmented across network chunks", async () => {
+    const fragments = [
+      'data: {"choices":[{"delta":{"con',
+      'tent":"Hel',
+      'lo"}}]}\n\ndata: {"choices":[',
+      '{"delta":{"content":" world"}}]}\n',
+      "\ndata: [DO",
+      "NE]\n\n",
+    ]
+    const encoder = new TextEncoder()
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const fragment of fragments) {
+          controller.enqueue(encoder.encode(fragment))
+        }
+        controller.close()
+      },
+    })
+
+    const deltas: string[] = []
+    for await (const delta of readOpenAIContentDeltas(body)) {
+      deltas.push(delta)
+    }
+
+    expect(deltas).toEqual(["Hello", " world"])
+  })
+})
 
 describe("candidate chat safety prompt", () => {
   const prompt = buildCandidateChatSystemPrompt(

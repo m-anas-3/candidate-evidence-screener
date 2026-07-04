@@ -17,8 +17,8 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-// ─── Candidate Pipeline Area Chart ───────────────────────────────────────────
-interface PipelineDataPoint {
+// ─── Analysis Progress Area Chart ────────────────────────────────────────────
+interface AnalysisProgressDataPoint {
   label: string
   completed: number
   ready: number
@@ -26,17 +26,21 @@ interface PipelineDataPoint {
   failed: number
 }
 
-const pipelineChartConfig = {
+const analysisProgressChartConfig = {
   completed: { label: "Analyzed", color: "oklch(0.72 0.18 192)" },
   ready: { label: "Ready", color: "oklch(0.78 0.12 155)" },
   pending: { label: "Pending", color: "oklch(0.82 0.14 60)" },
   failed: { label: "Failed", color: "oklch(0.70 0.20 22)" },
 } satisfies ChartConfig
 
-export function CandidatePipelineChart({ data }: { data: PipelineDataPoint[] }) {
+export function AnalysisProgressChart({
+  data,
+}: {
+  data: AnalysisProgressDataPoint[]
+}) {
   if (!data.length) return null
   return (
-    <ChartContainer config={pipelineChartConfig} className="h-48 w-full">
+    <ChartContainer config={analysisProgressChartConfig} className="h-48 w-full">
       <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
         <defs>
           <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">

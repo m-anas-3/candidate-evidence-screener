@@ -21,8 +21,8 @@ export class ReportContextValidationError extends Error {
  *   missingSkills → remove it from missingSkills (evidence wins).
  * - omitted_must_have: skill has no evidence and is absent from missingSkills
  *   → add a not_found entry to missingSkills so the cap logic can apply.
- * - must_have_score_cap: score > 79 with an unsupported skill → already
- *   handled by the schema transform; nothing to do here.
+ * - must_have_score_cap: score > 79 with an unsupported must-have → cap the
+ *   score here, where the job's declared must-haves are available.
  *
  * The score and recommendation fields are read-only on the incoming type so
  * we return a new object when either list changes.
@@ -33,6 +33,7 @@ export function validateReportMustHaveCoverage(
 ): ScreeningReport {
   const missingSkills = [...report.missingSkills]
   let changed = false
+  let hasUnsupportedMustHave = false
 
   for (const skill of mustHaveSkills) {
     const supported = report.matchedSkills.some(
@@ -44,6 +45,10 @@ export function validateReportMustHaveCoverage(
       mentionsSkill(item.claim, skill)
     )
     const markedMissing = missingIndex !== -1
+
+    if (!supported) {
+      hasUnsupportedMustHave = true
+    }
 
     if (supported && markedMissing) {
       // Contradictory: evidence exists but also marked missing — trust evidence.
@@ -63,9 +68,20 @@ export function validateReportMustHaveCoverage(
     }
   }
 
-  if (!changed) return report
+  const validatedReport = changed
+    ? screeningReportSchema.parse({ ...report, missingSkills })
+    : report
 
-  // Parse again after repairing coverage. This re-derives the total and
-  // recommendation, including the 79-point cap for a missing must-have.
-  return screeningReportSchema.parse({ ...report, missingSkills })
+  // Only this context-aware validation step knows which skills the recruiter
+  // explicitly declared as must-haves. Other missing skills remain useful in
+  // the report, but must not prevent a Strong Fit recommendation.
+  if (hasUnsupportedMustHave && validatedReport.score > 79) {
+    return {
+      ...validatedReport,
+      score: 79,
+      recommendation: "possible_fit",
+    }
+  }
+
+  return validatedReport
 }
