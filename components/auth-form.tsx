@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import { useActionState, useEffect, useState } from "react"
-import { IconLoader2 } from "@tabler/icons-react"
+import { IconEye, IconEyeOff, IconLoader2 } from "@tabler/icons-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import type { AuthActionState } from "@/lib/auth/types"
 import { cn } from "@/lib/utils"
 
@@ -164,6 +165,9 @@ function Field({
   onChange: (value: string) => void
 }) {
   const hasError = Boolean(errors?.length)
+  const isPassword = type === "password"
+  const [passwordVisible, setPasswordVisible] = useState(false)
+
   return (
     <div className="space-y-1.5">
       <label
@@ -172,28 +176,46 @@ function Field({
       >
         {label}
       </label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        autoComplete={autoComplete}
-        placeholder={placeholder}
-        disabled={disabled}
-        required
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-describedby={hasError ? errorId : undefined}
-        aria-invalid={hasError}
-        className={cn(
-          "h-10 w-full rounded-lg border bg-muted/30 px-3 text-[13px] text-foreground transition-all outline-none",
-          "placeholder:text-muted-foreground",
-          "focus:border-primary/60 focus:ring-2 focus:ring-primary/15",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          hasError
-            ? "border-destructive/50 focus:border-destructive focus:ring-destructive/15"
-            : "border-border"
+      <div className="relative">
+        <Input
+          id={id}
+          name={id}
+          type={isPassword && passwordVisible ? "text" : type}
+          autoComplete={autoComplete}
+          placeholder={placeholder}
+          disabled={disabled}
+          required
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          aria-describedby={hasError ? errorId : undefined}
+          aria-invalid={hasError}
+          className={cn(
+            "h-10 rounded-lg border-border bg-muted/30 px-3 text-[13px] transition-all",
+            "focus-visible:border-primary/60 focus-visible:ring-2 focus-visible:ring-primary/15",
+            isPassword && "pr-10",
+            hasError &&
+              "border-destructive/50 focus-visible:border-destructive focus-visible:ring-destructive/15"
+          )}
+        />
+        {isPassword && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={disabled}
+            aria-label={passwordVisible ? "Hide password" : "Show password"}
+            aria-pressed={passwordVisible}
+            className="absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground"
+            onClick={() => setPasswordVisible((visible) => !visible)}
+          >
+            {passwordVisible ? (
+              <IconEyeOff aria-hidden="true" className="size-4" />
+            ) : (
+              <IconEye aria-hidden="true" className="size-4" />
+            )}
+          </Button>
         )}
-      />
+      </div>
       {hasError && (
         <ul id={errorId} className="space-y-0.5">
           {errors!.map((e) => (
