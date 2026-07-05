@@ -15,6 +15,7 @@ import { AddCandidateSheet } from "@/components/add-candidate-sheet"
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
 import { ClickableTableRow } from "@/components/clickable-table-row"
 import { DeleteRecordButton } from "@/components/delete-record-button"
+import { LocalDate } from "@/components/local-date"
 import { RouteToast } from "@/components/route-toast"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -169,12 +170,7 @@ export default async function JobDetailsPage({
                 Active Screening
               </Badge>
               <span>
-                Created{" "}
-                {new Date(job.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+                Created <LocalDate value={job.created_at} />
               </span>
             </div>
           </div>
@@ -274,10 +270,7 @@ export default async function JobDetailsPage({
                   Created
                 </span>
                 <span className="text-foreground">
-                  {new Date(job.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  <LocalDate value={job.created_at} display="month-day" />
                 </span>
               </div>
               <Separator className="bg-border/30" />
@@ -413,14 +406,7 @@ export default async function JobDetailsPage({
                         )}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {new Date(candidate.created_at).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          }
-                        )}
+                        <LocalDate value={candidate.created_at} />
                       </TableCell>
                       <TableCell className="pr-6">
                         <div className="flex items-center justify-end">

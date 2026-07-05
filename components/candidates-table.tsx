@@ -7,6 +7,7 @@ import { IconSearch, IconUser, IconUserScan, IconX } from "@tabler/icons-react"
 
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
 import { DeleteRecordButton } from "@/components/delete-record-button"
+import { LocalDate } from "@/components/local-date"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -333,11 +334,7 @@ export function CandidatesTable({
 
                       {/* Date */}
                       <TableCell className="py-3.5 text-xs text-muted-foreground">
-                        {new Date(c.created_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        <LocalDate value={c.created_at} />
                       </TableCell>
 
                       {/* Delete action */}

@@ -23,11 +23,6 @@ type AuthFormProps = {
 
 export function AuthForm({ action, mode, notice }: AuthFormProps) {
   const [state, formAction, pending] = useActionState(action, initialState)
-  const [values, setValues] = useState({
-    confirmPassword: "",
-    email: "",
-    password: "",
-  })
   const isSignUp = mode === "sign-up"
 
   useEffect(() => {
@@ -61,10 +56,6 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
         disabled={pending}
         errors={state.fieldErrors?.email}
         errorId="email-error"
-        value={values.email}
-        onChange={(value) =>
-          setValues((current) => ({ ...current, email: value }))
-        }
       />
 
       {/* Password */}
@@ -78,10 +69,6 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
           disabled={pending}
           errors={state.fieldErrors?.password}
           errorId="password-error"
-          value={values.password}
-          onChange={(value) =>
-            setValues((current) => ({ ...current, password: value }))
-          }
         />
         {isSignUp && (
           <p className="pl-0.5 text-[11px] text-muted-foreground">
@@ -101,10 +88,6 @@ export function AuthForm({ action, mode, notice }: AuthFormProps) {
           disabled={pending}
           errors={state.fieldErrors?.confirmPassword}
           errorId="confirm-password-error"
-          value={values.confirmPassword}
-          onChange={(value) =>
-            setValues((current) => ({ ...current, confirmPassword: value }))
-          }
         />
       )}
 
@@ -150,8 +133,6 @@ function Field({
   disabled,
   errors,
   errorId,
-  value,
-  onChange,
 }: {
   id: string
   label: string
@@ -161,8 +142,6 @@ function Field({
   disabled: boolean
   errors?: string[]
   errorId: string
-  value: string
-  onChange: (value: string) => void
 }) {
   const hasError = Boolean(errors?.length)
   const isPassword = type === "password"
@@ -185,14 +164,13 @@ function Field({
           placeholder={placeholder}
           disabled={disabled}
           required
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
+          spellCheck={isPassword ? false : undefined}
           aria-describedby={hasError ? errorId : undefined}
           aria-invalid={hasError}
           className={cn(
             "h-10 rounded-lg border-border bg-muted/30 px-3 text-[13px] transition-all",
             "focus-visible:border-primary/60 focus-visible:ring-2 focus-visible:ring-primary/15",
-            isPassword && "pr-10",
+            isPassword && "pr-11",
             hasError &&
               "border-destructive/50 focus-visible:border-destructive focus-visible:ring-destructive/15"
           )}
@@ -203,10 +181,14 @@ function Field({
             variant="ghost"
             size="icon"
             disabled={disabled}
+            aria-controls={id}
             aria-label={passwordVisible ? "Hide password" : "Show password"}
             aria-pressed={passwordVisible}
-            className="absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground"
-            onClick={() => setPasswordVisible((visible) => !visible)}
+            className="absolute inset-y-0 right-0 z-10 h-10 w-10 rounded-lg text-muted-foreground hover:bg-transparent hover:text-foreground active:not-aria-[haspopup]:translate-y-0"
+            onClick={(event) => {
+              event.preventDefault()
+              setPasswordVisible((visible) => !visible)
+            }}
           >
             {passwordVisible ? (
               <IconEyeOff aria-hidden="true" className="size-4" />

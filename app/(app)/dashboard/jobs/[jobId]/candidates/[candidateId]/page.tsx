@@ -17,6 +17,7 @@ import { CandidateChat } from "@/components/candidate-chat"
 import type { ChatMessage } from "@/components/candidate-chat"
 import { CandidatePageTabs } from "@/components/candidate-page-tabs"
 import { DeleteRecordButton } from "@/components/delete-record-button"
+import { LocalDate } from "@/components/local-date"
 import { ResumeExtractionControl } from "@/components/resume-extraction-control"
 import { ScreeningReportView } from "@/components/screening-report-view"
 import { Button } from "@/components/ui/button"
@@ -390,12 +391,7 @@ export default async function CandidateDetailsPage({
                   </Link>
                 </span>
                 <span>
-                  Added{" "}
-                  {new Date(candidate.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  Added <LocalDate value={candidate.created_at} />
                 </span>
               </div>
               {candidate.analysis_error && (

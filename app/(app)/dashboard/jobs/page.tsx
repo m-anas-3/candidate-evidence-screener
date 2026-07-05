@@ -9,6 +9,7 @@ import {
 
 import { CreateJobDialog } from "@/components/create-job-dialog"
 import { DeleteRecordButton } from "@/components/delete-record-button"
+import { LocalDate } from "@/components/local-date"
 import { RouteToast } from "@/components/route-toast"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -189,11 +190,7 @@ export default async function JobsPage({
 
                     {/* Date */}
                     <TableCell className="py-4 text-xs text-muted-foreground">
-                      {new Date(job.created_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      <LocalDate value={job.created_at} />
                     </TableCell>
 
                     {/* Action */}
