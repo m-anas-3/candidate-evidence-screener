@@ -210,6 +210,90 @@
   }
 }
 
+@keyframes landing-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes trace-travel {
+  from {
+    transform: translateY(-32px);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(32px);
+    opacity: 0;
+  }
+}
+
+.landing-page {
+  scroll-behavior: smooth;
+}
+
+.landing-grid {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklch, var(--border), transparent 45%) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklch, var(--border), transparent 45%) 1px,
+      transparent 1px
+    );
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 92%);
+}
+
+.landing-reveal {
+  animation: landing-reveal 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing-reveal-delay {
+  animation-delay: 120ms;
+}
+
+.trace-line::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -1px;
+  width: 3px;
+  height: 32px;
+  border-radius: 999px;
+  background: oklch(0.76 0.15 190);
+  box-shadow: 0 0 14px oklch(0.76 0.15 190 / 55%);
+  animation: trace-travel 3.5s ease-in-out infinite;
+}
+
+.landing-menu > summary::-webkit-details-marker,
+.faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page {
+    scroll-behavior: auto;
+  }
+
+  .landing-reveal,
+  .trace-line::after,
+  .evidence-highlight {
+    animation: none !important;
+  }
+}
+
 /* Subtle noise texture on dark backgrounds for depth */
 .dark body::before {
   content: "";
