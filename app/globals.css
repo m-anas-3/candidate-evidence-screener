@@ -5,8 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
+  --font-heading: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,7 +52,6 @@
 }
 
 :root {
-  /* ── Light Mode ── */
   --background: oklch(0.985 0.001 240);
   --foreground: oklch(0.13 0.015 245);
 
@@ -95,8 +98,6 @@
 }
 
 .dark {
-  /* ── Dark Mode — Deep Neutral + Teal ── */
-
   /* True near-black with a hint of blue-gray — not warm, not cold, just deep */
   --background: oklch(0.115 0.008 250);
   --foreground: oklch(0.94 0.006 220);
@@ -210,32 +211,6 @@
   }
 }
 
-@keyframes landing-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes trace-travel {
-  from {
-    transform: translateY(-32px);
-    opacity: 0;
-  }
-  20%,
-  80% {
-    opacity: 1;
-  }
-  to {
-    transform: translateY(32px);
-    opacity: 0;
-  }
-}
-
 .landing-page {
   scroll-behavior: smooth;
 }
@@ -256,27 +231,6 @@
   mask-image: linear-gradient(to bottom, black, transparent 92%);
 }
 
-.landing-reveal {
-  animation: landing-reveal 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.landing-reveal-delay {
-  animation-delay: 120ms;
-}
-
-.trace-line::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: -1px;
-  width: 3px;
-  height: 32px;
-  border-radius: 999px;
-  background: oklch(0.76 0.15 190);
-  box-shadow: 0 0 14px oklch(0.76 0.15 190 / 55%);
-  animation: trace-travel 3.5s ease-in-out infinite;
-}
-
 .landing-menu > summary::-webkit-details-marker,
 .faq-item > summary::-webkit-details-marker {
   display: none;
@@ -285,12 +239,6 @@
 @media (prefers-reduced-motion: reduce) {
   .landing-page {
     scroll-behavior: auto;
-  }
-
-  .landing-reveal,
-  .trace-line::after,
-  .evidence-highlight {
-    animation: none !important;
   }
 }
 

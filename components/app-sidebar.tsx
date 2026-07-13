@@ -59,7 +59,6 @@ export function AppSidebar({ email }: { email?: string }) {
       variant="inset"
       className="border-r border-sidebar-border bg-sidebar"
     >
-      {/* ── Logo ── */}
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <Link
           href="/dashboard"
@@ -79,7 +78,6 @@ export function AppSidebar({ email }: { email?: string }) {
         </Link>
       </SidebarHeader>
 
-      {/* ── Nav ── */}
       <SidebarContent className="px-2 py-3">
         <SidebarGroup>
           <SidebarGroupContent>
@@ -125,7 +123,6 @@ export function AppSidebar({ email }: { email?: string }) {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* ── Footer ── */}
       {email && (
         <SidebarFooter className="border-t border-sidebar-border p-3">
           <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:justify-center">

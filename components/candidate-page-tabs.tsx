@@ -46,7 +46,6 @@ export function CandidatePageTabs({
 
   return (
     <div className="space-y-0">
-      {/* ── Tab navigation bar ───────────────────────────────────────── */}
       <div className="relative flex items-end gap-0 border-b border-border/50">
         {tabs.map((tab) => {
           const disabled = tab.requiresReport && !hasReport
@@ -94,7 +93,6 @@ export function CandidatePageTabs({
         })}
       </div>
 
-      {/* ── Panel content ───────────────────────────────────────────── */}
       <div className="pt-6">
         <div hidden={active !== "evidence"}>{evidencePanel}</div>
         <div hidden={active !== "report"}>{reportPanel}</div>

@@ -139,14 +139,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-7">
-      {/* ── Greeting ──────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
             Overview
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
-            Welcome back{firstName ? `, ${firstName}` : ""} 👋
+            Welcome back{firstName ? `, ${firstName}` : ""}
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             Here&apos;s your recruiting activity at a glance.
@@ -169,7 +168,6 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Stats row ─────────────────────────────────────────────────── */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={<IconBriefcase className="size-4" />}
@@ -203,7 +201,6 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* ── Charts ────────────────────────────────────────────────────── */}
       {(hasChartData || hasScoreData) && (
         <div
           className={`grid gap-4 ${hasChartData && hasScoreData ? "lg:grid-cols-2" : "grid-cols-1"}`}
@@ -255,7 +252,6 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* ── Bottom grid ───────────────────────────────────────────────── */}
       <div className="grid gap-5 lg:grid-cols-[1fr_18rem]">
         {/* Recent roles */}
         <Card className="border-border/40">

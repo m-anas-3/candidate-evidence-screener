@@ -1,9 +1,10 @@
 # Candidate Evidence Screener
 
-A recruiter-facing application for evaluating a freelance candidate against a
-specific role using documented resume and proposal evidence. The application
-produces a structured screening report, keeps portfolio review manual, and
-supports grounded follow-up questions.
+A recruiter-facing application that helps verify a freelancer's claims against
+a specific role. It extracts text from a private PDF resume, compares the
+resume and proposal with the role requirements, and produces a structured,
+evidence-backed report for human review. Recruiters can then ask follow-up
+questions grounded in the submitted material.
 
 All scores and recommendations are advisory. See the
 [product specification](docs/product-spec.md) for the authoritative product
@@ -19,7 +20,9 @@ scope, scoring rules, security requirements, and exclusions.
 - Evidence-backed candidate analysis with validated structured output
 - Manual portfolio review without portfolio scoring
 - Persisted screening reports and grounded recruiter chat
+- Persistent per-recruiter rate limits and bounded AI inputs
 - Synthetic sample data for evaluating the complete workflow
+- Public, data-free portfolio case study at `/case-study`
 
 ## Technology
 
@@ -56,13 +59,14 @@ scope, scoring rules, security requirements, and exclusions.
    NEXT_PUBLIC_SUPABASE_URL=
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
    OPENAI_API_KEY=
-   OPENAI_ANALYSIS_MODEL=
-   OPENAI_CHAT_MODEL=
+   OPENAI_ANALYSIS_MODEL=gpt-5.4
+   OPENAI_CHAT_MODEL=gpt-5.4-mini
    ```
 
-   The Supabase values and `OPENAI_API_KEY` are required. Model overrides are
-   optional; leaving them blank uses the application defaults. Never expose
-   server-side API keys through a `NEXT_PUBLIC_` variable.
+   The Supabase values and `OPENAI_API_KEY` are required. The application
+   defaults to `gpt-5.4` for analysis and `gpt-5.4-mini` for grounded chat;
+   either model can be overridden. Never expose server-side API keys through a
+   `NEXT_PUBLIC_` variable.
 
 4. Apply the Supabase migrations. For a local Supabase instance with Docker
    running:
@@ -98,11 +102,30 @@ scope, scoring rules, security requirements, and exclusions.
 Before submitting changes, run:
 
 ```bash
+pnpm exec prettier --check "**/*.{ts,tsx}"
 pnpm test
 pnpm lint
 pnpm typecheck
 pnpm build
 ```
+
+## Portfolio demo notes
+
+The public `/case-study` page explains the recruiting problem, product
+workflow, safeguards, and technical design using a synthetic report state. It
+does not require an account and contains no real candidate or client data.
+
+For a hands-on evaluation, create a workspace and use the synthetic sample from
+the dashboard. That path seeds fictional extracted resume text and exercises
+persisted job and candidate records, structured analysis, report presentation,
+and grounded chat without asking a reviewer to upload personal information. AI
+analysis still requires configured server-side OpenAI credentials.
+
+This portfolio build demonstrates Next.js 16 App Router boundaries, Supabase
+Auth and Row Level Security, private resume storage, server-side PDF extraction,
+strict Zod validation for structured AI output, persistent rate limits,
+grounded follow-up chat, and focused Vitest coverage. It remains a decision
+support tool: recommendations are advisory and recruiter review is required.
 
 ## Repository structure
 

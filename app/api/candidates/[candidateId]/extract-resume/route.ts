@@ -86,7 +86,7 @@ export async function POST(
     return errorResponse("The candidate resume path is invalid.", 409)
   }
 
-if (candidate.resume_text && candidate.analysis_status === "ready") {
+  if (candidate.resume_text && candidate.analysis_status === "ready") {
     return successResponse(candidate.resume_text.length)
   }
 

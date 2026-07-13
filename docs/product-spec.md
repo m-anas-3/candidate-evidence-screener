@@ -32,19 +32,19 @@ An unsupported criterion scores zero rather than being inferred. If any explicit
 
 - **Application:** Next.js 16 App Router, with frontend and server code deployed together on Vercel.
 - **Agent runtime:** the JavaScript `deepagents` package and `createDeepAgent()` run server-side in a protected Next.js Node.js Route Handler on Vercel. There is no Python or separate agent service.
-- **Model:** OpenAI `gpt-5.5`, configured as `OPENAI_ANALYSIS_MODEL=gpt-5.5` with medium reasoning as the initial setting. Confirm access and installed-adapter support during agent implementation.
+- **Models:** OpenAI `gpt-5.4` for analysis with medium reasoning and `gpt-5.4-mini` for grounded chat. These defaults can be overridden with `OPENAI_ANALYSIS_MODEL` and `OPENAI_CHAT_MODEL`.
 - **Authentication:** basic Supabase email/password sign-up, sign-in, and sign-out. For the one-week MVP, Supabase email confirmation is disabled so sign-up returns a session immediately. This does not verify ownership of the submitted email address. Product routes still require an authenticated account, and public self-service sign-up does not make the product invite-only.
 - **Persistence:** Supabase PostgreSQL stores jobs, candidates, reports, and chat messages, and private Supabase Storage stores resumes.
 - **Uploads:** the authenticated browser uploads PDFs directly to private Storage, so upload bytes do not pass through a Vercel Route Handler. The protected extraction handler later downloads the private object by its stored path; PDF bytes are never sent to OpenAI.
 - **Server boundaries:** Server Actions may handle ordinary form mutations. Protected Node Route Handlers handle resume extraction, agent analysis, and follow-up chat. Every entry point validates input, authenticates the session, and verifies resource ownership.
 
-The Deep Agent has only three product tools:
+The analysis Deep Agent has only three product tools:
 
 1. Load authorized job and candidate context.
 2. Assess observable proposal-specificity signals.
 3. Validate and save the screening report.
 
-Follow-up chat reuses the agent in a read-only mode and cannot overwrite the report.
+Follow-up chat uses a dedicated read-only, grounded model route and cannot overwrite the report.
 
 ## Data and Security Rules
 
@@ -70,6 +70,6 @@ The MVP excludes a pipeline board or candidate-stage workflow, interview-questio
 
 ## Current Repository Status
 
-Installed today: Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/Radix-related UI packages, Supabase browser/server clients, Zod, `pdf-parse` 2.4.5, ESLint, and Prettier. The linked project has the MVP schema, RLS policies, and private `resumes` bucket. Immediate email/password authentication, protected dashboard routes, job/candidate intake, direct private PDF upload, and protected resume text extraction are implemented.
+Installed today: Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/Radix-related UI packages, Supabase browser/server clients, Zod, `pdf-parse` 2.4.5, Deep Agents, LangChain, the OpenAI LangChain adapter, Vitest, ESLint, and Prettier. The linked project has the MVP schema, RLS policies, and private `resumes` bucket. Immediate email/password authentication, protected dashboard routes, job/candidate intake, direct private PDF upload, protected resume text extraction, agent analysis, grounded chat, and focused automated tests are implemented.
 
-Not installed yet: `deepagents`, LangChain packages, the OpenAI LangChain adapter, and Vitest. Not provisioned or verified yet: a live immediate sign-up/intake/extraction test, cross-user RLS acceptance tests, OpenAI credentials/model access, and a Vercel Hobby deployment with Fluid Compute. These are planned dependencies or verification work, not current capabilities.
+Not provisioned or verified yet: a live immediate sign-up/intake/extraction test, automated cross-user RLS acceptance tests, production OpenAI credentials and model access, and a Vercel deployment. These are deployment and acceptance-verification tasks, not missing local dependencies.

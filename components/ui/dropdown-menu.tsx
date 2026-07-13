@@ -14,7 +14,12 @@ function DropdownMenu({
 function DropdownMenuTrigger({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
-  return <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />
+  return (
+    <DropdownMenuPrimitive.Trigger
+      data-slot="dropdown-menu-trigger"
+      {...props}
+    />
+  )
 }
 
 function DropdownMenuContent({
@@ -45,7 +50,7 @@ function DropdownMenuItem({
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
       className={cn(
-        "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-muted focus:bg-muted disabled:pointer-events-none disabled:opacity-50",
+        "relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-xs transition-colors outline-none select-none hover:bg-muted focus:bg-muted disabled:pointer-events-none disabled:opacity-50",
         className
       )}
       {...props}

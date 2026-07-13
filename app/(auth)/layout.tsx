@@ -19,7 +19,6 @@ export default async function AuthLayout({
 
   return (
     <main className="min-h-svh bg-background lg:grid lg:grid-cols-[1fr_minmax(28rem,0.72fr)]">
-      {/* ── Left — branding + carousel ── */}
       <section className="relative hidden overflow-hidden bg-[oklch(0.095_0.007_252)] p-12 lg:flex lg:flex-col xl:p-16">
         {/* Background glows */}
         <div
@@ -68,7 +67,6 @@ export default async function AuthLayout({
         </p>
       </section>
 
-      {/* ── Right — form ── */}
       <section className="flex min-h-svh flex-col items-center justify-center bg-background p-6 sm:p-10 lg:min-h-0">
         {/* Mobile logo */}
         <div className="mb-8 flex items-center gap-2.5 lg:hidden">
