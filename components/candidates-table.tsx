@@ -119,7 +119,6 @@ export function CandidatesTable({
 
   return (
     <div className="space-y-4">
-      {/* ── Filters ─────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         {/* Search */}
         <div className="relative max-w-xs flex-1">
@@ -204,7 +203,6 @@ export function CandidatesTable({
         )}
       </div>
 
-      {/* ── Table ───────────────────────────────────────────────────── */}
       {pageItems.length > 0 ? (
         <>
           <Card className="overflow-hidden border-border/40">
@@ -354,7 +352,6 @@ export function CandidatesTable({
             </Table>
           </Card>
 
-          {/* ── Pagination ─────────────────────────────────────────── */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-1">
               <p className="text-xs text-muted-foreground">

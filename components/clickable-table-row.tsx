@@ -27,7 +27,7 @@ export function ClickableTableRow({
       tabIndex={0}
       aria-label={navigationLabel}
       className={cn(
-        "cursor-pointer transition-colors focus-visible:bg-muted/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+        "cursor-pointer transition-colors focus-visible:bg-muted/10 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset",
         className
       )}
       onClick={(event) => {

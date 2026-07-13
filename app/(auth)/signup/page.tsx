@@ -9,7 +9,7 @@ export default function SignUpPage() {
   return (
     <div className="space-y-7">
       <div className="space-y-1.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
+        <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
           Recruiter workspace
         </p>
         <h2 className="text-2xl font-semibold tracking-tight text-foreground">

@@ -65,7 +65,6 @@ export default async function JobsPage({
           variant="error"
         />
       )}
-      {/* ── Header ──────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
@@ -84,7 +83,6 @@ export default async function JobsPage({
         <CreateJobDialog />
       </div>
 
-      {/* ── Table / Empty state ─────────────────────────────────────── */}
       {jobs.length > 0 ? (
         <Card className="overflow-hidden border-border/40">
           <Table>

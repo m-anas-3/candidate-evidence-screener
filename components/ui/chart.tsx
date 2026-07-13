@@ -4,7 +4,6 @@ import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 import { cn } from "@/lib/utils"
 
-// ─── Theme ───────────────────────────────────────────────────────────────────
 export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode
@@ -24,7 +23,6 @@ function useChart() {
   return context
 }
 
-// ─── Container ───────────────────────────────────────────────────────────────
 const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
@@ -56,7 +54,6 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
-// ─── Style injector ──────────────────────────────────────────────────────────
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([, cfg]) => cfg.color)
   if (!colorConfig.length) return null
@@ -75,7 +72,6 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   )
 }
 
-// ─── Tooltip ─────────────────────────────────────────────────────────────────
 const ChartTooltip = RechartsPrimitive.Tooltip
 type TooltipPayloadItem = {
   color?: string
@@ -244,7 +240,6 @@ const ChartTooltipContent = React.forwardRef<
 )
 ChartTooltipContent.displayName = "ChartTooltipContent"
 
-// ─── Legend ──────────────────────────────────────────────────────────────────
 const ChartLegend = RechartsPrimitive.Legend
 type LegendPayloadItem = {
   color?: string
@@ -306,7 +301,6 @@ const ChartLegendContent = React.forwardRef<
 )
 ChartLegendContent.displayName = "ChartLegendContent"
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,

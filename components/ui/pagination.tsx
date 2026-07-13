@@ -1,5 +1,9 @@
 import * as React from "react"
-import { IconChevronLeft, IconChevronRight, IconDots } from "@tabler/icons-react"
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconDots,
+} from "@tabler/icons-react"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -54,7 +58,7 @@ function PaginationLink({
           variant: isActive ? "outline" : "ghost",
           size,
         }),
-        isActive && "border-primary/30 bg-primary/8 text-primary font-semibold",
+        isActive && "border-primary/30 bg-primary/8 font-semibold text-primary",
         "h-8 w-8 cursor-pointer rounded-lg text-xs",
         className
       )}
@@ -73,7 +77,7 @@ function PaginationPrevious({
       data-slot="pagination-previous"
       className={cn(
         buttonVariants({ variant: "ghost", size: "sm" }),
-        "h-8 gap-1.5 px-3 text-xs cursor-pointer rounded-lg text-muted-foreground hover:text-foreground",
+        "h-8 cursor-pointer gap-1.5 rounded-lg px-3 text-xs text-muted-foreground hover:text-foreground",
         className
       )}
       {...props}
@@ -94,7 +98,7 @@ function PaginationNext({
       data-slot="pagination-next"
       className={cn(
         buttonVariants({ variant: "ghost", size: "sm" }),
-        "h-8 gap-1.5 px-3 text-xs cursor-pointer rounded-lg text-muted-foreground hover:text-foreground",
+        "h-8 cursor-pointer gap-1.5 rounded-lg px-3 text-xs text-muted-foreground hover:text-foreground",
         className
       )}
       {...props}
@@ -113,7 +117,10 @@ function PaginationEllipsis({
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn("flex h-8 w-8 items-center justify-center text-muted-foreground", className)}
+      className={cn(
+        "flex h-8 w-8 items-center justify-center text-muted-foreground",
+        className
+      )}
       {...props}
     >
       <IconDots className="size-3.5" />

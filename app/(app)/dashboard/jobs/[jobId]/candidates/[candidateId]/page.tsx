@@ -150,8 +150,6 @@ export default async function CandidateDetailsPage({
   }
   const rec = report?.recommendation ? recColors[report.recommendation] : null
 
-  // ── Panels ────────────────────────────────────────────────────────────────
-
   const evidencePanel = (
     <div className="space-y-5">
       {/* Proposal */}
@@ -318,7 +316,6 @@ export default async function CandidateDetailsPage({
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-0">
-      {/* ── Top navigation ─────────────────────────────────────────────────── */}
       <div className="mb-5 flex items-center justify-between">
         <Breadcrumb>
           <BreadcrumbList>
@@ -361,12 +358,10 @@ export default async function CandidateDetailsPage({
         </div>
       </div>
 
-      {/* ── Candidate identity card ─────────────────────────────────────────── */}
       <div
         className={`mb-6 overflow-hidden rounded-2xl border-2 ${rec?.ring ?? "border-border/40"} ${rec?.bg ?? "bg-card/50"}`}
       >
         <div className="flex flex-col gap-5 p-6 md:flex-row md:items-start md:justify-between">
-          {/* Left — identity */}
           <div className="flex items-start gap-4">
             <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-background/60 ring-1 ring-border/40 backdrop-blur-sm">
               <span className="text-xl font-bold text-foreground">
@@ -402,7 +397,6 @@ export default async function CandidateDetailsPage({
             </div>
           </div>
 
-          {/* Right — score */}
           {rec && report && (
             <div className="flex shrink-0 items-center gap-4 self-start rounded-xl bg-background/50 px-5 py-3.5 ring-1 ring-border/30 backdrop-blur-sm">
               <div className="text-center">
@@ -419,7 +413,7 @@ export default async function CandidateDetailsPage({
               <div className="h-10 w-px bg-border/40" />
               <div>
                 <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
-                  Verdict
+                  Recommendation
                 </p>
                 <p className={`mt-0.5 text-sm font-bold ${rec.text}`}>
                   {rec.label}
@@ -433,7 +427,6 @@ export default async function CandidateDetailsPage({
           )}
         </div>
 
-        {/* Action bar at the bottom of the identity card */}
         {candidate.resume_text && !hasReport && (
           <div className="border-t border-border/30 bg-background/30 px-6 py-3">
             <div className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
@@ -450,7 +443,6 @@ export default async function CandidateDetailsPage({
         )}
       </div>
 
-      {/* ── Tabbed content area ──────────────────────────────────────────────── */}
       <CandidatePageTabs
         hasReport={hasReport}
         evidencePanel={evidencePanel}

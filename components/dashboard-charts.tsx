@@ -17,7 +17,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 
-// ─── Analysis Progress Area Chart ────────────────────────────────────────────
 interface AnalysisProgressDataPoint {
   label: string
   completed: number
@@ -40,23 +39,57 @@ export function AnalysisProgressChart({
 }) {
   if (!data.length) return null
   return (
-    <ChartContainer config={analysisProgressChartConfig} className="h-48 w-full">
-      <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+    <ChartContainer
+      config={analysisProgressChartConfig}
+      className="h-48 w-full"
+    >
+      <AreaChart
+        data={data}
+        margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
+      >
         <defs>
           <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="oklch(0.72 0.18 192)" stopOpacity={0.35} />
-            <stop offset="95%" stopColor="oklch(0.72 0.18 192)" stopOpacity={0.02} />
+            <stop
+              offset="5%"
+              stopColor="oklch(0.72 0.18 192)"
+              stopOpacity={0.35}
+            />
+            <stop
+              offset="95%"
+              stopColor="oklch(0.72 0.18 192)"
+              stopOpacity={0.02}
+            />
           </linearGradient>
           <linearGradient id="gradReady" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="oklch(0.78 0.12 155)" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="oklch(0.78 0.12 155)" stopOpacity={0.02} />
+            <stop
+              offset="5%"
+              stopColor="oklch(0.78 0.12 155)"
+              stopOpacity={0.3}
+            />
+            <stop
+              offset="95%"
+              stopColor="oklch(0.78 0.12 155)"
+              stopOpacity={0.02}
+            />
           </linearGradient>
           <linearGradient id="gradPending" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="oklch(0.82 0.14 60)" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="oklch(0.82 0.14 60)" stopOpacity={0.02} />
+            <stop
+              offset="5%"
+              stopColor="oklch(0.82 0.14 60)"
+              stopOpacity={0.25}
+            />
+            <stop
+              offset="95%"
+              stopColor="oklch(0.82 0.14 60)"
+              stopOpacity={0.02}
+            />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 7%)" vertical={false} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="oklch(1 0 0 / 7%)"
+          vertical={false}
+        />
         <XAxis
           dataKey="label"
           tick={{ fontSize: 10, fill: "oklch(0.65 0.015 210)" }}
@@ -102,7 +135,6 @@ export function AnalysisProgressChart({
   )
 }
 
-// ─── Score Distribution Bar Chart ────────────────────────────────────────────
 interface ScoreBucket {
   range: string
   count: number
@@ -125,7 +157,11 @@ export function ScoreDistributionChart({ data }: { data: ScoreBucket[] }) {
   return (
     <ChartContainer config={scoreChartConfig} className="h-48 w-full">
       <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 7%)" vertical={false} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="oklch(1 0 0 / 7%)"
+          vertical={false}
+        />
         <XAxis
           dataKey="range"
           tick={{ fontSize: 10, fill: "oklch(0.65 0.015 210)" }}
@@ -141,7 +177,11 @@ export function ScoreDistributionChart({ data }: { data: ScoreBucket[] }) {
         <ChartTooltip content={<ChartTooltipContent />} />
         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
           {data.map((entry) => (
-            <Cell key={entry.range} fill={getBarColor(entry.range)} fillOpacity={0.85} />
+            <Cell
+              key={entry.range}
+              fill={getBarColor(entry.range)}
+              fillOpacity={0.85}
+            />
           ))}
         </Bar>
       </BarChart>
