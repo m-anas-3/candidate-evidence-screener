@@ -1,26 +1,16 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { motion, useReducedMotion, type Variants } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
 const ease = [0.22, 1, 0.36, 1] as const
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.52, ease },
-  },
-}
-
 export function MotionReveal({
   children,
   className,
   delay = 0,
-  onLoad = false,
 }: {
   children: ReactNode
   className?: string
@@ -32,14 +22,12 @@ export function MotionReveal({
   return (
     <motion.div
       className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-      {...(onLoad
-        ? { animate: { opacity: 1, y: 0 } }
-        : {
-            whileInView: { opacity: 1, y: 0 },
-            viewport: { once: true, amount: 0.22 },
-          })}
-      transition={{ duration: 0.56, delay, ease }}
+      initial={false}
+      whileInView={
+        reduceMotion ? undefined : { opacity: [1, 0.98, 1], y: [0, -2, 0] }
+      }
+      viewport={{ once: true, amount: 0.22 }}
+      transition={{ duration: 0.48, delay, ease }}
     >
       {children}
     </motion.div>
@@ -53,25 +41,8 @@ export function MotionStagger({
   children: ReactNode
   className?: string
 }) {
-  const reduceMotion = useReducedMotion()
-
   return (
-    <motion.div
-      className={className}
-      variants={
-        reduceMotion
-          ? undefined
-          : {
-              hidden: {},
-              visible: {
-                transition: { staggerChildren: 0.07, delayChildren: 0.04 },
-              },
-            }
-      }
-      initial={reduceMotion ? false : "hidden"}
-      whileInView={reduceMotion ? undefined : "visible"}
-      viewport={{ once: true, amount: 0.16 }}
-    >
+    <motion.div className={className} initial={false}>
       {children}
     </motion.div>
   )
@@ -84,13 +55,8 @@ export function MotionItem({
   children: ReactNode
   className?: string
 }) {
-  const reduceMotion = useReducedMotion()
-
   return (
-    <motion.div
-      className={className}
-      variants={reduceMotion ? undefined : itemVariants}
-    >
+    <motion.div className={className} initial={false}>
       {children}
     </motion.div>
   )
@@ -111,11 +77,11 @@ export function MotionProgressBar({
   return (
     <motion.div
       className={cn("h-full origin-left rounded-full bg-primary", className)}
-      initial={reduceMotion ? false : { scaleX: 0 }}
+      initial={false}
       whileInView={reduceMotion ? undefined : { scaleX }}
-      style={reduceMotion ? { scaleX } : undefined}
+      style={{ scaleX }}
       viewport={{ once: true, amount: 0.8 }}
-      transition={{ duration: 0.7, delay: 0.12, ease }}
+      transition={{ duration: 0.5, delay: 0.1, ease }}
     />
   )
 }
@@ -130,7 +96,7 @@ export function MotionTracePath({ className }: { className?: string }) {
     >
       <motion.span
         className="absolute inset-y-0 left-0 w-1/3 rounded-full bg-primary"
-        initial={reduceMotion ? false : { x: "-110%" }}
+        initial={false}
         animate={reduceMotion ? undefined : { x: ["-110%", "320%"] }}
         transition={{
           duration: 2.9,

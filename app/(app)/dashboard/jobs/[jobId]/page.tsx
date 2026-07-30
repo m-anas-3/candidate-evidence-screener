@@ -377,12 +377,12 @@ export default async function JobDetailsPage({
                                   width: `${report.score}%`,
                                   backgroundColor:
                                     report.score >= 80
-                                      ? "oklch(0.72 0.18 192)"
+                                      ? "var(--chart-1)"
                                       : report.score >= 60
-                                        ? "oklch(0.78 0.12 155)"
+                                        ? "var(--chart-2)"
                                         : report.score >= 40
-                                          ? "oklch(0.82 0.14 60)"
-                                          : "oklch(0.70 0.20 22)",
+                                          ? "var(--chart-3)"
+                                          : "var(--chart-5)",
                                 }}
                               />
                             </div>

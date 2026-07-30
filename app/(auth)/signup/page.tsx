@@ -12,7 +12,7 @@ export default function SignUpPage() {
         <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
           Recruiter workspace
         </p>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h2 className="editorial-display text-4xl leading-none font-normal tracking-[-0.04em] text-foreground">
           Create your account
         </h2>
         <p className="text-[13px] leading-6 text-muted-foreground">

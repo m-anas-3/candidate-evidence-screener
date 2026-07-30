@@ -12,7 +12,7 @@ export default function SamplePortfolioPage() {
         <p className="text-sm font-medium text-muted-foreground">
           Synthetic evaluation fixture
         </p>
-        <h1 className="mt-2 text-3xl font-semibold">
+        <h1 className="editorial-display mt-3 text-5xl leading-none font-normal tracking-[-0.04em]">
           Jordan Lee — Selected work
         </h1>
         <p className="mt-3 text-muted-foreground">

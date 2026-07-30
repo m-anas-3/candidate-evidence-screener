@@ -108,7 +108,7 @@ export default function CaseStudyPage() {
             >
               Portfolio case study
             </Badge>
-            <h1 className="mt-6 max-w-xl text-4xl leading-tight font-semibold text-balance sm:text-6xl">
+            <h1 className="editorial-display mt-6 max-w-xl text-5xl leading-[0.95] font-normal tracking-[-0.05em] text-balance sm:text-7xl">
               Verify freelancer claims without outsourcing judgment.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
@@ -128,12 +128,12 @@ export default function CaseStudyPage() {
         </div>
       </section>
 
-      <section className="border-b bg-muted/25 py-16 sm:py-20">
+      <section className="border-b bg-[var(--palette-paper)] py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="font-mono text-[10px] font-semibold tracking-[0.14em] text-primary uppercase">
+          <p className="text-[10px] font-semibold tracking-[0.14em] text-[var(--palette-vermilion)] uppercase">
             Product workflow
           </p>
-          <h2 className="mt-3 max-w-2xl text-3xl font-semibold sm:text-4xl">
+          <h2 className="editorial-display mt-3 max-w-2xl text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
             A complete review path from role criteria to follow-up.
           </h2>
           <div className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-5">
@@ -158,10 +158,10 @@ export default function CaseStudyPage() {
       <section className="border-b py-16 sm:py-20">
         <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="font-mono text-[10px] font-semibold tracking-[0.14em] text-primary uppercase">
+            <p className="text-[10px] font-semibold tracking-[0.14em] text-[var(--palette-vermilion)] uppercase">
               Responsible boundary
             </p>
-            <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
+            <h2 className="editorial-display mt-3 text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
               Assistance, not automated selection.
             </h2>
             <p className="mt-5 text-sm leading-7 text-muted-foreground">
@@ -187,12 +187,12 @@ export default function CaseStudyPage() {
         </div>
       </section>
 
-      <section className="border-b bg-card py-16 sm:py-20">
+      <section className="border-b bg-[var(--palette-lavender)]/45 py-16 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="font-mono text-[10px] font-semibold tracking-[0.14em] text-primary uppercase">
+          <p className="text-[10px] font-semibold tracking-[0.14em] text-[var(--palette-vermilion)] uppercase">
             Engineering proof points
           </p>
-          <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
+          <h2 className="editorial-display mt-3 text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
             Built around explicit trust boundaries.
           </h2>
           <div className="mt-10 grid gap-4 md:grid-cols-3">

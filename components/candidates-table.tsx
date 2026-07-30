@@ -47,10 +47,10 @@ interface CandidateItem {
 }
 
 function getScoreColor(score: number) {
-  if (score >= 80) return "oklch(0.72 0.18 192)"
-  if (score >= 60) return "oklch(0.78 0.12 155)"
-  if (score >= 40) return "oklch(0.82 0.14 60)"
-  return "oklch(0.70 0.20 22)"
+  if (score >= 80) return "var(--chart-1)"
+  if (score >= 60) return "var(--chart-2)"
+  if (score >= 40) return "var(--chart-3)"
+  return "var(--chart-5)"
 }
 
 export function CandidatesTable({

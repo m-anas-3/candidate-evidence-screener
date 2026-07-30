@@ -22,7 +22,7 @@ export default async function LoginPage({
         <p className="text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
           Welcome back
         </p>
-        <h2 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h2 className="editorial-display text-4xl leading-none font-normal tracking-[-0.04em] text-foreground">
           Sign in
         </h2>
         <p className="text-[13px] leading-6 text-muted-foreground">

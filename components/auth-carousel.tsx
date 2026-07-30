@@ -69,14 +69,14 @@ export function AuthCarousel() {
           key={current}
           className="animate-in duration-500 fade-in slide-in-from-bottom-3"
         >
-          <span className="mb-6 flex size-11 items-center justify-center rounded-lg border border-white/15 bg-white/8 text-primary">
+          <span className="mb-7 flex size-11 items-center justify-center border border-foreground/15 bg-card/70 text-primary">
             <Icon className="size-5" aria-hidden />
           </span>
-          <h2 className="text-[2rem] leading-[1.18] font-semibold tracking-[-0.03em] text-white xl:text-[2.4rem]">
+          <h2 className="editorial-display max-w-xl text-[2.7rem] leading-[0.98] font-normal tracking-[-0.05em] text-foreground xl:text-[3.6rem]">
             {slide.headline}
           </h2>
 
-          <p className="mt-4 max-w-md text-[15px] leading-7 text-white/75">
+          <p className="mt-6 max-w-md text-[15px] leading-7 text-foreground/62">
             {slide.body}
           </p>
         </div>
@@ -94,7 +94,7 @@ export function AuthCarousel() {
                 "rounded-full transition-all duration-300",
                 i === current
                   ? "h-1.5 w-6 bg-primary"
-                  : "h-1.5 w-1.5 bg-white/20 hover:bg-white/40"
+                  : "h-1.5 w-1.5 bg-foreground/20 hover:bg-foreground/40"
               )}
             />
           ))}
@@ -104,7 +104,7 @@ export function AuthCarousel() {
             type="button"
             onClick={() => go((current - 1 + slides.length) % slides.length)}
             aria-label="Previous slide"
-            className="flex size-9 items-center justify-center rounded-md border border-white/15 text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            className="flex size-9 items-center justify-center border border-foreground/20 text-foreground/60 transition-colors hover:bg-card/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
           >
             <IconChevronLeft className="size-4" aria-hidden />
           </button>
@@ -112,7 +112,7 @@ export function AuthCarousel() {
             type="button"
             onClick={() => go((current + 1) % slides.length)}
             aria-label="Next slide"
-            className="flex size-9 items-center justify-center rounded-md border border-white/15 text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            className="flex size-9 items-center justify-center border border-foreground/20 text-foreground/60 transition-colors hover:bg-card/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
           >
             <IconChevronRight className="size-4" aria-hidden />
           </button>

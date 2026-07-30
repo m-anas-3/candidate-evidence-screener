@@ -64,8 +64,8 @@ export function AppSidebar({ email }: { email?: string }) {
           href="/dashboard"
           className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center"
         >
-          <span className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/20 transition-all hover:bg-primary/20">
-            <IconShieldCheck className="size-4 text-primary" />
+          <span className="relative flex size-8 shrink-0 items-center justify-center border border-foreground bg-foreground text-background transition-transform hover:-translate-y-0.5">
+            <IconShieldCheck className="size-4" />
           </span>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
             <span className="block truncate text-[13px] font-semibold tracking-tight text-sidebar-foreground">
@@ -93,7 +93,7 @@ export function AppSidebar({ email }: { email?: string }) {
                       className={cn(
                         "relative h-9 rounded-lg px-3 text-[13px] font-medium transition-all duration-150",
                         active
-                          ? "bg-primary/12 text-primary"
+                          ? "bg-card text-primary shadow-sm ring-1 ring-sidebar-border"
                           : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                       )}
                     >

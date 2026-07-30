@@ -29,7 +29,7 @@ export function PageHeader({
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="editorial-display text-4xl leading-none font-normal tracking-[-0.04em] text-foreground">
           {title}
         </h1>
         {description ? (

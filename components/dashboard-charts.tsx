@@ -26,10 +26,10 @@ interface AnalysisProgressDataPoint {
 }
 
 const analysisProgressChartConfig = {
-  completed: { label: "Analyzed", color: "oklch(0.72 0.18 192)" },
-  ready: { label: "Ready", color: "oklch(0.78 0.12 155)" },
-  pending: { label: "Pending", color: "oklch(0.82 0.14 60)" },
-  failed: { label: "Failed", color: "oklch(0.70 0.20 22)" },
+  completed: { label: "Analyzed", color: "var(--chart-1)" },
+  ready: { label: "Ready", color: "var(--chart-2)" },
+  pending: { label: "Pending", color: "var(--chart-3)" },
+  failed: { label: "Failed", color: "var(--chart-5)" },
 } satisfies ChartConfig
 
 export function AnalysisProgressChart({
@@ -49,55 +49,31 @@ export function AnalysisProgressChart({
       >
         <defs>
           <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor="oklch(0.72 0.18 192)"
-              stopOpacity={0.35}
-            />
-            <stop
-              offset="95%"
-              stopColor="oklch(0.72 0.18 192)"
-              stopOpacity={0.02}
-            />
+            <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.35} />
+            <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.02} />
           </linearGradient>
           <linearGradient id="gradReady" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor="oklch(0.78 0.12 155)"
-              stopOpacity={0.3}
-            />
-            <stop
-              offset="95%"
-              stopColor="oklch(0.78 0.12 155)"
-              stopOpacity={0.02}
-            />
+            <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.02} />
           </linearGradient>
           <linearGradient id="gradPending" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor="oklch(0.82 0.14 60)"
-              stopOpacity={0.25}
-            />
-            <stop
-              offset="95%"
-              stopColor="oklch(0.82 0.14 60)"
-              stopOpacity={0.02}
-            />
+            <stop offset="5%" stopColor="var(--chart-3)" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="var(--chart-3)" stopOpacity={0.02} />
           </linearGradient>
         </defs>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="oklch(1 0 0 / 7%)"
+          stroke="rgb(23 23 23 / 10%)"
           vertical={false}
         />
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 10, fill: "oklch(0.65 0.015 210)" }}
+          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fontSize: 10, fill: "oklch(0.65 0.015 210)" }}
+          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
           axisLine={false}
           tickLine={false}
           allowDecimals={false}
@@ -106,7 +82,7 @@ export function AnalysisProgressChart({
         <Area
           type="monotone"
           dataKey="completed"
-          stroke="oklch(0.72 0.18 192)"
+          stroke="var(--chart-1)"
           strokeWidth={2}
           fill="url(#gradCompleted)"
           dot={false}
@@ -115,7 +91,7 @@ export function AnalysisProgressChart({
         <Area
           type="monotone"
           dataKey="ready"
-          stroke="oklch(0.78 0.12 155)"
+          stroke="var(--chart-2)"
           strokeWidth={1.5}
           fill="url(#gradReady)"
           dot={false}
@@ -124,7 +100,7 @@ export function AnalysisProgressChart({
         <Area
           type="monotone"
           dataKey="pending"
-          stroke="oklch(0.82 0.14 60)"
+          stroke="var(--chart-3)"
           strokeWidth={1.5}
           fill="url(#gradPending)"
           dot={false}
@@ -141,15 +117,15 @@ interface ScoreBucket {
 }
 
 const scoreChartConfig = {
-  count: { label: "Candidates", color: "oklch(0.72 0.18 192)" },
+  count: { label: "Candidates", color: "var(--chart-1)" },
 } satisfies ChartConfig
 
 function getBarColor(range: string): string {
   const start = parseInt(range.split("–")[0] ?? "0", 10)
-  if (start >= 80) return "oklch(0.72 0.18 192)"
-  if (start >= 60) return "oklch(0.78 0.12 155)"
-  if (start >= 40) return "oklch(0.82 0.14 60)"
-  return "oklch(0.70 0.20 22)"
+  if (start >= 80) return "var(--chart-1)"
+  if (start >= 60) return "var(--chart-2)"
+  if (start >= 40) return "var(--chart-3)"
+  return "var(--chart-5)"
 }
 
 export function ScoreDistributionChart({ data }: { data: ScoreBucket[] }) {
@@ -159,17 +135,17 @@ export function ScoreDistributionChart({ data }: { data: ScoreBucket[] }) {
       <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="oklch(1 0 0 / 7%)"
+          stroke="rgb(23 23 23 / 10%)"
           vertical={false}
         />
         <XAxis
           dataKey="range"
-          tick={{ fontSize: 10, fill: "oklch(0.65 0.015 210)" }}
+          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fontSize: 10, fill: "oklch(0.65 0.015 210)" }}
+          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
           axisLine={false}
           tickLine={false}
           allowDecimals={false}

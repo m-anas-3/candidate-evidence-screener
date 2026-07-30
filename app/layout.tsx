@@ -21,7 +21,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="font-sans antialiased">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className="font-sans antialiased"
+      data-scroll-behavior="smooth"
+    >
       <body>
         <ThemeProvider>
           <QueryProvider>{children}</QueryProvider>

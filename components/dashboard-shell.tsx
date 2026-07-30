@@ -24,7 +24,7 @@ export function DashboardShell({
         <AppSidebar email={email} />
         <SidebarInset className="bg-background">
           {/* Top bar */}
-          <header className="sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b border-border/50 bg-background/85 px-4 backdrop-blur-md sm:px-5">
+          <header className="sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b border-border/70 bg-background/92 px-4 backdrop-blur-md sm:px-5">
             <SidebarTrigger className="-ml-0.5 size-7 rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" />
             <Separator
               orientation="vertical"
@@ -38,7 +38,7 @@ export function DashboardShell({
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col gap-6 p-5 sm:p-7">
+          <main className="flex flex-1 flex-col gap-6 bg-[radial-gradient(circle_at_top_right,rgba(176,116,206,0.08),transparent_28rem)] p-5 sm:p-7">
             {children}
           </main>
         </SidebarInset>
