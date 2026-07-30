@@ -77,16 +77,16 @@ export function ResumeExtractionControl({
   if (isReady) {
     return (
       <div className="space-y-2">
-        <div className="flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5">
+        <div className="flex items-center gap-2.5 rounded-md border border-primary/30 bg-primary/10 px-3 py-2.5">
           <IconCircleCheck
             aria-hidden
-            className="size-4 shrink-0 text-emerald-700 dark:text-emerald-400"
+            className="size-4 shrink-0 text-primary"
           />
           <div>
-            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+            <p className="text-sm font-medium text-primary">
               Resume text ready
             </p>
-            <p className="text-xs text-emerald-700 dark:text-emerald-400">
+            <p className="text-xs text-foreground/70">
               Evidence is prepared for analysis.
             </p>
           </div>

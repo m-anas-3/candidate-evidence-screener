@@ -46,13 +46,6 @@ interface CandidateItem {
   } | null
 }
 
-function getScoreColor(score: number) {
-  if (score >= 80) return "var(--chart-1)"
-  if (score >= 60) return "var(--chart-2)"
-  if (score >= 40) return "var(--chart-3)"
-  return "var(--chart-5)"
-}
-
 export function CandidatesTable({
   candidates,
   jobs,
@@ -304,7 +297,7 @@ export function CandidatesTable({
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{
                                   width: `${report.score}%`,
-                                  backgroundColor: getScoreColor(report.score),
+                                  backgroundColor: "var(--chart-primary)",
                                 }}
                               />
                             </div>
@@ -435,15 +428,15 @@ function RecBadge({ rec }: { rec: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     strong_fit: {
       label: "Strong documented match",
-      cls: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+      cls: "border-primary/30 bg-primary/10 text-primary",
     },
     possible_fit: {
       label: "Potential documented match",
-      cls: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+      cls: "border-foreground/25 bg-surface-subtle text-foreground",
     },
     weak_fit: {
       label: "Limited documented match",
-      cls: "border-destructive/20 bg-destructive/10 text-destructive",
+      cls: "border-dashed border-foreground/40 bg-transparent text-foreground",
     },
   }
   const item = map[rec] ?? {

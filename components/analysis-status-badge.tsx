@@ -3,7 +3,6 @@ import {
   IconClock,
   IconExclamationCircle,
   IconLoader2,
-  IconSparkles,
 } from "@tabler/icons-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -31,8 +30,7 @@ const statusConfig: Record<
     label: "Extracting",
     icon: IconLoader2,
     variant: "outline",
-    className:
-      "border-amber-500/25 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-400",
+    className: "border-dashed border-primary/45 bg-primary/5 text-primary",
   },
   ready: {
     label: "Ready",
@@ -43,24 +41,22 @@ const statusConfig: Record<
   },
   processing: {
     label: "Processing",
-    icon: IconSparkles,
+    icon: IconLoader2,
     variant: "outline",
-    className:
-      "border-sky-500/25 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-400",
+    className: "border-dashed border-primary/45 bg-primary/10 text-primary",
   },
   completed: {
     label: "Analyzed",
     icon: IconCircleCheck,
     variant: "outline",
-    className:
-      "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-400",
+    className: "border-primary/30 bg-primary/10 text-primary",
   },
   failed: {
     label: "Failed",
     icon: IconExclamationCircle,
     variant: "outline",
     className:
-      "border-destructive/25 bg-destructive/10 text-destructive hover:bg-destructive/15",
+      "border-dashed border-foreground/45 bg-foreground/5 text-foreground",
   },
 }
 

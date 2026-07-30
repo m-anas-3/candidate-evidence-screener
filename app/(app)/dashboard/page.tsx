@@ -171,33 +171,27 @@ export default async function DashboardPage() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={<IconBriefcase className="size-4" />}
-          accent="text-[var(--palette-orchid-ink)] bg-[var(--palette-lavender)]"
           label="Open Roles"
           value={totalJobs}
           sub="Active job criteria"
         />
         <StatCard
           icon={<IconUsers className="size-4" />}
-          accent="text-[var(--palette-sky-ink)] bg-[var(--palette-sky)]"
           label="Candidates"
           value={totalCandidates}
           sub="Across all roles"
         />
         <StatCard
           icon={<IconClock className="size-4" />}
-          accent="text-[var(--palette-amber-ink)] bg-[var(--palette-peach)]/55"
           label="In Progress"
           value={awaitingAnalysis}
           sub="Awaiting extraction or analysis"
-          valueClass="text-[var(--palette-amber-ink)]"
         />
         <StatCard
           icon={<IconCircleCheck className="size-4" />}
-          accent="text-[var(--palette-green)] bg-[var(--palette-aquamarine)]/55"
           label="Reports Ready"
           value={reportsReady}
           sub={`${completionRate}% completion rate`}
-          valueClass="text-[var(--palette-green)]"
         />
       </div>
 
@@ -376,36 +370,27 @@ export default async function DashboardPage() {
 
 function StatCard({
   icon,
-  accent,
   label,
   value,
   sub,
-  valueClass,
 }: {
   icon: React.ReactNode
-  accent: string
   label: string
   value: number
   sub: string
-  valueClass?: string
 }) {
   return (
-    <Card className="group relative overflow-hidden border-border/60 transition-all duration-300 hover:border-primary/25 hover:shadow-md">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(176,116,206,0.12),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      <CardContent className="relative p-5">
+    <Card className="group border-border/60 transition-colors duration-200 hover:border-primary/35">
+      <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             {label}
           </p>
-          <span
-            className={`flex size-8 items-center justify-center rounded-lg ${accent}`}
-          >
+          <span className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
             {icon}
           </span>
         </div>
-        <p
-          className={`mt-3 font-mono text-3xl font-bold tracking-tight ${valueClass ?? "text-foreground"}`}
-        >
+        <p className="mt-3 font-mono text-3xl font-bold tracking-tight text-foreground">
           {value}
         </p>
         <p className="mt-1 text-xs text-muted-foreground">{sub}</p>

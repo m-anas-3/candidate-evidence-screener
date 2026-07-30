@@ -21,6 +21,12 @@ export function DashboardShell({
   return (
     <TooltipProvider delayDuration={0}>
       <SidebarProvider>
+        <a
+          href="#dashboard-content"
+          className="fixed top-3 left-3 z-[70] -translate-y-20 rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background transition-transform focus:translate-y-0 focus:outline-none"
+        >
+          Skip to dashboard content
+        </a>
         <AppSidebar email={email} />
         <SidebarInset className="bg-background">
           {/* Top bar */}
@@ -38,7 +44,10 @@ export function DashboardShell({
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col gap-6 bg-[radial-gradient(circle_at_top_right,rgba(176,116,206,0.08),transparent_28rem)] p-5 sm:p-7">
+          <main
+            id="dashboard-content"
+            className="flex flex-1 flex-col gap-6 bg-background p-5 sm:p-7"
+          >
             {children}
           </main>
         </SidebarInset>

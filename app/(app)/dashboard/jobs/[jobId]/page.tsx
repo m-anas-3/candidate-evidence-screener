@@ -145,8 +145,7 @@ export default async function JobDetailsPage({
       </div>
 
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-primary/8 via-card to-card p-6 md:p-8">
-        <div className="absolute -top-12 -right-12 size-40 rounded-full bg-primary/5 blur-3xl" />
+      <div className="relative overflow-hidden rounded-lg border border-border bg-surface-accent p-6 md:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
@@ -184,14 +183,12 @@ export default async function JobDetailsPage({
                 </span>
                 <span className="text-muted-foreground">candidates</span>
               </span>
-              <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/15 bg-emerald-500/10 px-3 py-1.5">
-                <IconCircleCheck className="size-3.5 text-emerald-700 dark:text-emerald-400" />
-                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+              <span className="flex items-center gap-1.5 rounded-md border border-primary/25 bg-primary/10 px-3 py-1.5">
+                <IconCircleCheck className="size-3.5 text-primary" />
+                <span className="font-semibold text-primary">
                   {reportsReadyCount}
                 </span>
-                <span className="text-emerald-700 dark:text-emerald-400">
-                  ready
-                </span>
+                <span className="text-foreground/70">ready</span>
               </span>
             </div>
           </div>
@@ -257,10 +254,10 @@ export default async function JobDetailsPage({
               </div>
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 text-muted-foreground">
-                  <IconCircleCheck className="size-4 text-emerald-700 dark:text-emerald-400" />{" "}
-                  Reports Ready
+                  <IconCircleCheck className="size-4 text-primary" /> Reports
+                  Ready
                 </span>
-                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                <span className="font-semibold text-primary">
                   {reportsReadyCount}
                 </span>
               </div>
@@ -375,14 +372,7 @@ export default async function JobDetailsPage({
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{
                                   width: `${report.score}%`,
-                                  backgroundColor:
-                                    report.score >= 80
-                                      ? "var(--chart-1)"
-                                      : report.score >= 60
-                                        ? "var(--chart-2)"
-                                        : report.score >= 40
-                                          ? "var(--chart-3)"
-                                          : "var(--chart-5)",
+                                  backgroundColor: "var(--chart-primary)",
                                 }}
                               />
                             </div>
@@ -480,18 +470,16 @@ function RecommendationBadge({
   const config = {
     strong_fit: {
       label: "Strong documented match",
-      className:
-        "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-400",
+      className: "border-primary/30 bg-primary/10 text-primary",
     },
     possible_fit: {
       label: "Potential documented match",
-      className:
-        "border-amber-500/20 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-400",
+      className: "border-foreground/25 bg-surface-subtle text-foreground",
     },
     weak_fit: {
       label: "Limited documented match",
       className:
-        "border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/15",
+        "border-dashed border-foreground/40 bg-transparent text-foreground",
     },
   }
   const item = config[rec]

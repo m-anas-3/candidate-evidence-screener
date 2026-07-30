@@ -174,8 +174,8 @@ export default async function JobsPage({
                     {/* Reports ready */}
                     <TableCell className="py-4">
                       <div className="flex items-center gap-1.5 text-xs">
-                        <IconCircleCheck className="size-3.5 text-emerald-700 dark:text-emerald-400" />
-                        <span className="font-medium text-emerald-700 dark:text-emerald-400">
+                        <IconCircleCheck className="size-3.5 text-primary" />
+                        <span className="font-medium text-primary">
                           {reportCount}
                         </span>
                         {candidateCount > 0 && (

@@ -19,24 +19,7 @@ export default async function AuthLayout({
 
   return (
     <main className="min-h-svh bg-background lg:grid lg:grid-cols-[1fr_minmax(28rem,0.72fr)]">
-      <section className="relative hidden overflow-hidden border-r bg-[var(--palette-lavender)] p-12 lg:flex lg:flex-col xl:p-16">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-[8%] -left-10 h-20 w-52 bg-[var(--palette-sky)]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-[17%] left-0 h-28 w-24 bg-[var(--palette-aquamarine)]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-[12%] -right-10 h-28 w-44 bg-[var(--palette-peach)]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-8 bottom-[12%] h-14 w-52 bg-white/35"
-        />
-
+      <section className="relative hidden overflow-hidden border-r bg-surface-accent p-12 lg:flex lg:flex-col xl:p-16">
         <div className="relative flex shrink-0 items-center gap-3">
           <span className="flex size-9 items-center justify-center border border-foreground bg-foreground text-background">
             <IconShieldCheck className="size-4.5" />
@@ -60,15 +43,7 @@ export default async function AuthLayout({
         </p>
       </section>
 
-      <section className="relative flex min-h-svh flex-col items-center justify-center bg-[var(--palette-paper)] p-6 sm:p-10 lg:min-h-0">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-0 right-0 h-24 w-24 bg-[var(--palette-peach)]/45 lg:hidden"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-0 left-0 h-20 w-32 bg-[var(--palette-sky)]/55 lg:hidden"
-        />
+      <section className="relative flex min-h-svh flex-col items-center justify-center bg-background p-6 sm:p-10 lg:min-h-0">
         <div className="mb-8 flex items-center gap-2.5 lg:hidden">
           <span className="flex size-8 items-center justify-center border border-foreground bg-foreground text-background">
             <IconShieldCheck className="size-4" />
@@ -77,7 +52,7 @@ export default async function AuthLayout({
             Evidence Screener
           </span>
         </div>
-        <div className="relative w-full max-w-md border bg-card p-6 shadow-[12px_14px_0_rgba(176,116,206,0.14)] sm:p-8">
+        <div className="relative w-full max-w-md border bg-card p-6 shadow-[10px_12px_0_color-mix(in_srgb,var(--primary)_11%,transparent)] sm:p-8">
           {children}
         </div>
       </section>

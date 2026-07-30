@@ -47,33 +47,19 @@ export function AnalysisProgressChart({
         data={data}
         margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
       >
-        <defs>
-          <linearGradient id="gradCompleted" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.35} />
-            <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.02} />
-          </linearGradient>
-          <linearGradient id="gradReady" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.02} />
-          </linearGradient>
-          <linearGradient id="gradPending" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--chart-3)" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="var(--chart-3)" stopOpacity={0.02} />
-          </linearGradient>
-        </defs>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="rgb(23 23 23 / 10%)"
+          stroke="var(--border)"
           vertical={false}
         />
         <XAxis
           dataKey="label"
-          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
+          tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
+          tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
           axisLine={false}
           tickLine={false}
           allowDecimals={false}
@@ -84,7 +70,8 @@ export function AnalysisProgressChart({
           dataKey="completed"
           stroke="var(--chart-1)"
           strokeWidth={2}
-          fill="url(#gradCompleted)"
+          fill="var(--chart-1)"
+          fillOpacity={0.16}
           dot={false}
           activeDot={{ r: 4, strokeWidth: 0 }}
         />
@@ -93,7 +80,9 @@ export function AnalysisProgressChart({
           dataKey="ready"
           stroke="var(--chart-2)"
           strokeWidth={1.5}
-          fill="url(#gradReady)"
+          strokeDasharray="5 3"
+          fill="var(--chart-2)"
+          fillOpacity={0.1}
           dot={false}
           activeDot={{ r: 3, strokeWidth: 0 }}
         />
@@ -102,7 +91,9 @@ export function AnalysisProgressChart({
           dataKey="pending"
           stroke="var(--chart-3)"
           strokeWidth={1.5}
-          fill="url(#gradPending)"
+          strokeDasharray="2 4"
+          fill="var(--chart-3)"
+          fillOpacity={0.06}
           dot={false}
           activeDot={{ r: 3, strokeWidth: 0 }}
         />
@@ -120,12 +111,12 @@ const scoreChartConfig = {
   count: { label: "Candidates", color: "var(--chart-1)" },
 } satisfies ChartConfig
 
-function getBarColor(range: string): string {
+function getBarOpacity(range: string): number {
   const start = parseInt(range.split("–")[0] ?? "0", 10)
-  if (start >= 80) return "var(--chart-1)"
-  if (start >= 60) return "var(--chart-2)"
-  if (start >= 40) return "var(--chart-3)"
-  return "var(--chart-5)"
+  if (start >= 80) return 1
+  if (start >= 60) return 0.82
+  if (start >= 40) return 0.64
+  return 0.46
 }
 
 export function ScoreDistributionChart({ data }: { data: ScoreBucket[] }) {
@@ -135,17 +126,17 @@ export function ScoreDistributionChart({ data }: { data: ScoreBucket[] }) {
       <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="rgb(23 23 23 / 10%)"
+          stroke="var(--border)"
           vertical={false}
         />
         <XAxis
           dataKey="range"
-          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
+          tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fontSize: 10, fill: "rgb(23 23 23 / 55%)" }}
+          tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
           axisLine={false}
           tickLine={false}
           allowDecimals={false}
@@ -155,8 +146,8 @@ export function ScoreDistributionChart({ data }: { data: ScoreBucket[] }) {
           {data.map((entry) => (
             <Cell
               key={entry.range}
-              fill={getBarColor(entry.range)}
-              fillOpacity={0.85}
+              fill="var(--chart-primary)"
+              fillOpacity={getBarOpacity(entry.range)}
             />
           ))}
         </Bar>

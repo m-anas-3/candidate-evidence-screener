@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import {
-  IconArrowLeft,
   IconArrowRight,
   IconCheck,
   IconFileDescription,
@@ -14,8 +13,11 @@ import {
   IconUpload,
 } from "@tabler/icons-react"
 
+import { LandingHeader } from "@/components/landing-header"
+import { LandingFooter } from "@/components/landing-page"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: "Portfolio Case Study",
@@ -78,160 +80,164 @@ const engineering = [
   },
 ] as const
 
-export default function CaseStudyPage() {
-  return (
-    <main className="min-h-svh bg-background text-foreground">
-      <header className="border-b">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-          >
-            <IconArrowLeft className="size-4" aria-hidden />
-            Evidence Screener
-          </Link>
-          <Button asChild size="sm">
-            <Link href="/signup">
-              Try the workspace
-              <IconArrowRight data-icon="inline-end" className="size-4" />
-            </Link>
-          </Button>
-        </div>
-      </header>
+export default async function CaseStudyPage() {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  const isAuthenticated = Boolean(data?.claims)
+  const primaryHref = isAuthenticated ? "/dashboard" : "/signup"
+  const primaryLabel = isAuthenticated ? "Open dashboard" : "Start screening"
 
-      <section className="border-b py-16 sm:py-24">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
-          <div>
-            <Badge
-              variant="outline"
-              className="font-mono text-[10px] uppercase"
-            >
-              Portfolio case study
-            </Badge>
-            <h1 className="editorial-display mt-6 max-w-xl text-5xl leading-[0.95] font-normal tracking-[-0.05em] text-balance sm:text-7xl">
-              Verify freelancer claims without outsourcing judgment.
-            </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-              Recruiters need to reconcile role requirements, proposals, and
-              resumes quickly. Evidence Screener turns those documents into a
-              reviewable evidence brief while keeping the final decision with a
-              human recruiter.
+  return (
+    <div className="landing-page min-h-svh overflow-x-clip bg-background text-foreground">
+      <a
+        href="#main-content"
+        className="fixed top-3 left-3 z-[70] -translate-y-20 rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background transition-transform focus:translate-y-0 focus:outline-none"
+      >
+        Skip to content
+      </a>
+      <LandingHeader
+        isAuthenticated={isAuthenticated}
+        primaryHref={primaryHref}
+        primaryLabel={primaryLabel}
+        linkPrefix="/"
+      />
+
+      <main id="main-content">
+        <section className="border-b py-16 sm:py-24">
+          <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+            <div>
+              <Badge
+                variant="outline"
+                className="font-mono text-[10px] uppercase"
+              >
+                Portfolio case study
+              </Badge>
+              <h1 className="editorial-display mt-6 max-w-xl text-5xl leading-[0.95] font-normal tracking-[-0.05em] text-balance sm:text-7xl">
+                Verify freelancer claims without outsourcing judgment.
+              </h1>
+              <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+                Recruiters need to reconcile role requirements, proposals, and
+                resumes quickly. Evidence Screener turns those documents into a
+                reviewable evidence brief while keeping the final decision with
+                a human recruiter.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-2">
+                <Badge>Evidence-backed</Badge>
+                <Badge variant="secondary">Synthetic demo</Badge>
+                <Badge variant="outline">Human review required</Badge>
+              </div>
+            </div>
+
+            <SyntheticReport />
+          </div>
+        </section>
+
+        <section className="border-b bg-surface-subtle py-16 sm:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <p className="text-[10px] font-semibold tracking-[0.14em] text-primary uppercase">
+              Product workflow
             </p>
-            <div className="mt-8 flex flex-wrap gap-2">
-              <Badge>Evidence-backed</Badge>
-              <Badge variant="secondary">Synthetic demo</Badge>
-              <Badge variant="outline">Human review required</Badge>
+            <h2 className="editorial-display mt-3 max-w-2xl text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
+              A complete review path from role criteria to follow-up.
+            </h2>
+            <div className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-5">
+              {workflow.map((step, index) => (
+                <article key={step.title} className="bg-background p-5">
+                  <div className="flex items-center justify-between">
+                    <step.icon className="size-5 text-primary" aria-hidden />
+                    <span className="font-mono text-[10px] text-muted-foreground">
+                      0{index + 1}
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-sm font-semibold">{step.title}</h3>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                    {step.copy}
+                  </p>
+                </article>
+              ))}
             </div>
           </div>
+        </section>
 
-          <SyntheticReport />
-        </div>
-      </section>
-
-      <section className="border-b bg-[var(--palette-paper)] py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-[10px] font-semibold tracking-[0.14em] text-[var(--palette-vermilion)] uppercase">
-            Product workflow
-          </p>
-          <h2 className="editorial-display mt-3 max-w-2xl text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
-            A complete review path from role criteria to follow-up.
-          </h2>
-          <div className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-5">
-            {workflow.map((step, index) => (
-              <article key={step.title} className="bg-background p-5">
-                <div className="flex items-center justify-between">
-                  <step.icon className="size-5 text-primary" aria-hidden />
-                  <span className="font-mono text-[10px] text-muted-foreground">
-                    0{index + 1}
-                  </span>
+        <section className="border-b py-16 sm:py-20">
+          <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-[10px] font-semibold tracking-[0.14em] text-primary uppercase">
+                Responsible boundary
+              </p>
+              <h2 className="editorial-display mt-3 text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
+                Assistance, not automated selection.
+              </h2>
+              <p className="mt-5 text-sm leading-7 text-muted-foreground">
+                The product reports documented fit and uncertainty. It does not
+                decide who should be hired, profile personal traits, or turn a
+                portfolio into an opaque score.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {safeguards.map((safeguard) => (
+                <div
+                  key={safeguard}
+                  className="flex items-start gap-3 rounded-lg border p-4 text-sm"
+                >
+                  <IconCheck
+                    className="mt-0.5 size-4 shrink-0 text-primary"
+                    aria-hidden
+                  />
+                  <span>{safeguard}</span>
                 </div>
-                <h3 className="mt-6 text-sm font-semibold">{step.title}</h3>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {step.copy}
-                </p>
-              </article>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="border-b py-16 sm:py-20">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="text-[10px] font-semibold tracking-[0.14em] text-[var(--palette-vermilion)] uppercase">
-              Responsible boundary
+        <section className="border-b bg-surface-accent py-16 sm:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <p className="text-[10px] font-semibold tracking-[0.14em] text-primary uppercase">
+              Engineering proof points
             </p>
             <h2 className="editorial-display mt-3 text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
-              Assistance, not automated selection.
+              Built around explicit trust boundaries.
             </h2>
-            <p className="mt-5 text-sm leading-7 text-muted-foreground">
-              The product reports documented fit and uncertainty. It does not
-              decide who should be hired, profile personal traits, or turn a
-              portfolio into an opaque score.
-            </p>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {engineering.map((item) => (
+                <article
+                  key={item.title}
+                  className="rounded-lg border bg-background p-6"
+                >
+                  <item.icon className="size-5 text-primary" aria-hidden />
+                  <h3 className="mt-6 text-base font-semibold">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    {item.copy}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {safeguards.map((safeguard) => (
-              <div
-                key={safeguard}
-                className="flex items-start gap-3 rounded-lg border p-4 text-sm"
-              >
-                <IconCheck
-                  className="mt-0.5 size-4 shrink-0 text-primary"
-                  aria-hidden
-                />
-                <span>{safeguard}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="border-b bg-[var(--palette-lavender)]/45 py-16 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-[10px] font-semibold tracking-[0.14em] text-[var(--palette-vermilion)] uppercase">
-            Engineering proof points
-          </p>
-          <h2 className="editorial-display mt-3 text-4xl leading-none font-normal tracking-[-0.04em] sm:text-5xl">
-            Built around explicit trust boundaries.
-          </h2>
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {engineering.map((item) => (
-              <article
-                key={item.title}
-                className="rounded-lg border bg-background p-6"
-              >
-                <item.icon className="size-5 text-primary" aria-hidden />
-                <h3 className="mt-6 text-base font-semibold">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  {item.copy}
-                </p>
-              </article>
-            ))}
+        <section className="py-16 sm:py-20">
+          <div className="mx-auto flex max-w-4xl flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-center">
+            <div>
+              <p className="text-2xl font-semibold">
+                Explore the synthetic workflow.
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                The authenticated sample uses fictional data and requires no
+                real candidate documents.
+              </p>
+            </div>
+            <Button asChild size="lg">
+              <Link href={primaryHref}>
+                {isAuthenticated ? "Open dashboard" : "Create a demo workspace"}
+                <IconArrowRight data-icon="inline-end" className="size-4" />
+              </Link>
+            </Button>
           </div>
-        </div>
-      </section>
-
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto flex max-w-4xl flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-center">
-          <div>
-            <p className="text-2xl font-semibold">
-              Explore the synthetic workflow.
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              The authenticated sample uses fictional data and requires no real
-              candidate documents.
-            </p>
-          </div>
-          <Button asChild size="lg">
-            <Link href="/signup">
-              Create a demo workspace
-              <IconArrowRight data-icon="inline-end" className="size-4" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+      <LandingFooter isAuthenticated={isAuthenticated} linkPrefix="/" />
+    </div>
   )
 }
 
@@ -269,7 +275,7 @@ function SyntheticReport() {
         </div>
         <div>
           <p className="text-xs font-semibold">Recruiter review points</p>
-          <div className="mt-3 rounded-md border border-amber-500/25 bg-amber-500/5 p-3 text-xs leading-5">
+          <div className="mt-3 rounded-md border border-dashed border-foreground/35 bg-surface-subtle p-3 text-xs leading-5">
             Kubernetes experience was not found. Verify this declared must-have
             before proceeding.
           </div>

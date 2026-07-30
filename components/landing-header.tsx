@@ -25,10 +25,12 @@ export function LandingHeader({
   isAuthenticated,
   primaryHref,
   primaryLabel,
+  linkPrefix = "",
 }: {
   isAuthenticated: boolean
   primaryHref: string
   primaryLabel: string
+  linkPrefix?: "" | "/"
 }) {
   const { scrollY } = useScroll()
   const reduceMotion = useReducedMotion()
@@ -55,8 +57,8 @@ export function LandingHeader({
         className={cn(
           "pointer-events-auto mx-auto w-full border transition-[max-width,border-color,border-radius,background-color,box-shadow] ease-out motion-safe:duration-500 motion-reduce:duration-0",
           scrolled
-            ? "max-w-[calc(100%-1rem)] rounded-[1.4rem] border-foreground/12 bg-background/75 shadow-[0_18px_50px_rgba(40,28,42,0.14)] backdrop-blur-2xl supports-[backdrop-filter]:bg-background/68 sm:max-w-[calc(100%-2rem)] xl:max-w-[74rem]"
-            : "max-w-full rounded-none border-x-0 border-t-0 border-border/80 bg-background/95 backdrop-blur-md"
+            ? "max-w-[calc(100%-1rem)] rounded-xl border-foreground/15 bg-background/82 shadow-[0_14px_36px_color-mix(in_srgb,var(--ink)_12%,transparent)] backdrop-blur-sm supports-[backdrop-filter]:bg-background/76 sm:max-w-[calc(100%-2rem)] xl:max-w-[74rem]"
+            : "max-w-full rounded-none border-x-0 border-t-0 border-border/80 bg-background/96"
         )}
       >
         <div
@@ -74,7 +76,11 @@ export function LandingHeader({
             {navItems.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                href={
+                  item.href.startsWith("#")
+                    ? `${linkPrefix}${item.href}`
+                    : item.href
+                }
                 className="text-[0.8125rem] font-medium text-foreground/68 transition-colors hover:text-foreground focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background focus-visible:outline-none"
               >
                 {item.label}
@@ -94,7 +100,7 @@ export function LandingHeader({
             <Button
               asChild
               className={cn(
-                "rounded-full border-foreground/10 text-[0.8125rem] shadow-none transition-[height,padding] hover:bg-[color-mix(in_oklch,var(--primary),black_8%)]",
+                "border-foreground/10 text-[0.8125rem] shadow-none transition-[height,padding]",
                 scrolled ? "h-9 px-4" : "h-10 px-5"
               )}
             >
@@ -117,12 +123,16 @@ export function LandingHeader({
             </summary>
             <nav
               aria-label="Mobile navigation"
-              className="absolute top-12 right-0 w-[17rem] rounded-xl border bg-popover/95 p-2 text-popover-foreground shadow-[0_20px_50px_rgba(28,22,19,0.16)] backdrop-blur-xl"
+              className="absolute top-12 right-0 w-[17rem] rounded-lg border bg-popover/96 p-2 text-popover-foreground shadow-[0_18px_42px_color-mix(in_srgb,var(--ink)_14%,transparent)] backdrop-blur-sm"
             >
               {navItems.map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={
+                    item.href.startsWith("#")
+                      ? `${linkPrefix}${item.href}`
+                      : item.href
+                  }
                   className="block rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 >
                   {item.label}

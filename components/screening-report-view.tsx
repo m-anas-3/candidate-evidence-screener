@@ -21,7 +21,7 @@ import type { EvidenceItem, ScreeningReport } from "@/lib/agent/report-schema"
 import { getRecruiterBrief } from "@/lib/agent/report-presentation"
 
 // ---------------------------------------------------------------------------
-// Colour maps
+// Source and recommendation treatments use only the shared product tokens.
 // ---------------------------------------------------------------------------
 
 const sourceLabels: Record<EvidenceItem["source"], string> = {
@@ -32,12 +32,11 @@ const sourceLabels: Record<EvidenceItem["source"], string> = {
 }
 
 const sourceStyles: Record<EvidenceItem["source"], string> = {
-  resume: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-400",
-  proposal:
-    "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-400",
-  portfolio:
-    "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  not_found: "border-destructive/30 bg-destructive/10 text-destructive",
+  resume: "border-primary/30 bg-primary/10 text-primary",
+  proposal: "border-foreground/25 bg-surface-subtle text-foreground",
+  portfolio: "border-foreground/25 bg-transparent text-foreground",
+  not_found:
+    "border-dashed border-foreground/40 bg-foreground/5 text-foreground",
 }
 
 type Rec = ScreeningReport["recommendation"]
@@ -48,21 +47,21 @@ const recConfig: Record<
 > = {
   strong_fit: {
     label: "Strong documented match",
-    color: "text-emerald-700 dark:text-emerald-400",
-    ring: "border-emerald-500/40",
-    bar: "bg-emerald-500",
+    color: "text-primary",
+    ring: "border-primary/45",
+    bar: "bg-primary",
   },
   possible_fit: {
     label: "Potential documented match",
-    color: "text-amber-700 dark:text-amber-400",
-    ring: "border-amber-500/40",
-    bar: "bg-amber-500",
+    color: "text-foreground",
+    ring: "border-foreground/30",
+    bar: "bg-primary/70",
   },
   weak_fit: {
     label: "Limited documented match",
-    color: "text-destructive",
-    ring: "border-destructive/40",
-    bar: "bg-destructive",
+    color: "text-foreground",
+    ring: "border-dashed border-foreground/50",
+    bar: "bg-foreground/70",
   },
 }
 
@@ -78,8 +77,8 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
   return (
     <div className="space-y-4">
       {/* Keep the human-review requirement visible without leading with legal copy. */}
-      <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-        <IconAlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-700 dark:text-amber-400" />
+      <div className="flex items-start gap-3 rounded-md border border-foreground/25 bg-surface-subtle px-4 py-3">
+        <IconAlertTriangle className="mt-0.5 size-4 shrink-0 text-foreground" />
         <p className="text-xs leading-5 text-muted-foreground">
           <span className="font-semibold text-foreground">
             Recruiter review required.
@@ -200,9 +199,7 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
       <div className="grid gap-4 md:grid-cols-2">
         <SkillPills
           title="Supported requirements"
-          icon={
-            <IconCircleCheck className="size-4 text-emerald-700 dark:text-emerald-400" />
-          }
+          icon={<IconCircleCheck className="size-4 text-primary" />}
           items={report.matchedSkills.filter((i) => i.source !== "not_found")}
           emptyText="No supported requirements were identified."
         />
@@ -219,7 +216,7 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
         <Card className="border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-sm">
-              <IconNotes className="size-4 text-violet-700 dark:text-violet-400" />
+              <IconNotes className="size-4 text-primary" />
               Proposal
             </CardTitle>
           </CardHeader>
@@ -310,9 +307,7 @@ export function ScreeningReportView({ report }: { report: ScreeningReport }) {
       {/* Outreach draft — collapsible */}
       <CollapsibleSection
         title="Candidate message draft"
-        icon={
-          <IconMessageCircle className="size-4 text-sky-700 dark:text-sky-400" />
-        }
+        icon={<IconMessageCircle className="size-4 text-primary" />}
         defaultOpen={false}
       >
         <p className="mb-3 text-xs text-muted-foreground">
@@ -399,9 +394,7 @@ function SkillPills({
           <p
             className={cn(
               "text-xs italic",
-              emptyGood
-                ? "text-emerald-700 dark:text-emerald-400"
-                : "text-muted-foreground"
+              emptyGood ? "text-primary" : "text-muted-foreground"
             )}
           >
             {emptyText}

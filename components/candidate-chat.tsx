@@ -8,7 +8,7 @@ import {
   IconLoader2,
   IconMessageCircle,
   IconSend,
-  IconSparkles,
+  IconShieldCheck,
   IconUser,
 } from "@tabler/icons-react"
 
@@ -48,7 +48,7 @@ export function CandidateChat({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    bottomRef.current?.scrollIntoView({ behavior: "auto" })
   }, [messages])
 
   async function send() {
@@ -141,7 +141,7 @@ export function CandidateChat({
   if (!hasReport) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/50 bg-muted/10 py-16 text-center">
-        <IconSparkles className="mb-3 size-8 text-muted-foreground/40" />
+        <IconShieldCheck className="mb-3 size-8 text-muted-foreground/40" />
         <p className="text-sm font-semibold">No screening report yet</p>
         <p className="mt-1 max-w-xs text-xs leading-5 text-muted-foreground">
           Run the fit analysis first. The chat uses the report as evidence to
@@ -185,7 +185,7 @@ export function CandidateChat({
                     key={q}
                     type="button"
                     onClick={() => setInput(q)}
-                    className="rounded-full border border-border/50 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+                    className="rounded-md border border-border/50 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
                   >
                     {q}
                   </button>
@@ -289,14 +289,14 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         {isUser ? (
           <IconUser className="size-3.5" />
         ) : (
-          <IconSparkles className="size-3.5" />
+          <IconShieldCheck className="size-3.5" />
         )}
       </span>
 
       {/* Bubble */}
       <div
         className={cn(
-          "max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
+          "max-w-[82%] rounded-lg px-4 py-3 text-sm leading-relaxed",
           isUser
             ? "rounded-tr-sm bg-primary text-primary-foreground"
             : "rounded-tl-sm border border-border/40 bg-card text-foreground shadow-sm"

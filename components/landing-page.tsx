@@ -130,8 +130,6 @@ function Hero({
 }) {
   return (
     <section className="relative border-b" aria-labelledby="hero-title">
-      <PastelBlocks position="hero" />
-
       <div className="relative mx-auto max-w-[90rem] px-5 pt-20 pb-14 sm:px-8 sm:pt-28 sm:pb-20 lg:px-12 lg:pt-32">
         <div className="mx-auto max-w-[68rem] text-center">
           <p className="landing-eyebrow">Evidence-first candidate review</p>
@@ -153,7 +151,7 @@ function Hero({
             <Button
               asChild
               size="lg"
-              className="h-12 rounded-full px-6 text-sm shadow-[0_5px_0_rgba(66,28,79,0.12)] hover:bg-[color-mix(in_oklch,var(--primary),black_8%)]"
+              className="h-12 px-6 text-sm shadow-[0_4px_0_color-mix(in_srgb,var(--primary)_18%,transparent)]"
             >
               <Link href={primaryHref}>
                 {primaryLabel}
@@ -164,7 +162,7 @@ function Hero({
               asChild
               size="lg"
               variant="outline"
-              className="h-12 rounded-full bg-background px-6 text-sm shadow-none hover:bg-muted"
+              className="h-12 bg-background px-6 text-sm shadow-none hover:bg-muted"
             >
               <Link href="/case-study">
                 View case study
@@ -223,7 +221,7 @@ function CandidateReportPreview() {
       </div>
 
       <div className="grid lg:grid-cols-[0.72fr_1.28fr]">
-        <div className="border-b bg-[var(--landing-lavender)] p-5 sm:p-7 lg:border-r lg:border-b-0">
+        <div className="border-b bg-surface-accent p-5 sm:p-7 lg:border-r lg:border-b-0">
           <p className="landing-ui-label">Recruiter brief</p>
           <p className="mt-5 text-5xl leading-none font-semibold tracking-[-0.06em]">
             79
@@ -247,7 +245,7 @@ function CandidateReportPreview() {
           <div className="mt-7 border-t border-foreground/12 pt-5">
             <p className="landing-ui-label">Review next</p>
             <div className="mt-3 flex items-start gap-2.5">
-              <IconAlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--landing-vermilion)]" />
+              <IconAlertTriangle className="mt-0.5 size-4 shrink-0 text-foreground" />
               <p className="text-xs leading-5 text-foreground/68">
                 Ask for evidence of production Kubernetes ownership.
               </p>
@@ -311,7 +309,7 @@ function CandidateReportPreview() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 border-t bg-[var(--landing-paper)] px-5 py-3.5 text-[0.6875rem] text-foreground/56 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+      <div className="flex flex-col gap-2 border-t bg-surface-subtle px-5 py-3.5 text-[0.6875rem] text-foreground/56 sm:flex-row sm:items-center sm:justify-between sm:px-7">
         <span className="inline-flex items-center gap-2">
           <IconShieldCheck className="size-4 text-primary" />
           Advisory result · Final decision remains with the recruiter
@@ -375,16 +373,16 @@ function TraceSection() {
             </div>
 
             <div
-              className="relative hidden border-x bg-[var(--landing-paper)] lg:block"
+              className="relative hidden border-x bg-surface-subtle lg:block"
               aria-hidden
             >
               <span className="absolute top-[8.4rem] left-1/2 h-[10.8rem] -translate-x-1/2 border-l border-foreground/20" />
               <span className="absolute top-[8.4rem] right-1/2 left-0 border-t border-foreground/20" />
               <span className="absolute top-[19.2rem] right-0 left-1/2 border-t border-foreground/20" />
-              <span className="absolute top-[13.4rem] left-1/2 size-3 -translate-x-1/2 rounded-full bg-primary ring-4 ring-[var(--landing-orchid-soft)]" />
+              <span className="absolute top-[13.4rem] left-1/2 size-3 -translate-x-1/2 rounded-full bg-primary ring-4 ring-primary/15" />
             </div>
 
-            <div className="border-t bg-[var(--landing-sky)] p-5 sm:p-8 lg:border-t-0 lg:p-10">
+            <div className="border-t bg-surface-accent p-5 sm:p-8 lg:border-t-0 lg:p-10">
               <div className="flex items-center justify-between border-b border-foreground/12 pb-5">
                 <p className="landing-ui-label">Role criteria</p>
                 <span className="text-[0.6875rem] text-foreground/45">
@@ -416,7 +414,7 @@ function TraceSection() {
                     Must-have gap keeps the result below Strong Fit
                   </p>
                 </div>
-                <span className="landing-display text-5xl leading-none text-[var(--landing-vermilion)]">
+                <span className="landing-display text-5xl leading-none text-primary">
                   79
                 </span>
               </div>
@@ -462,7 +460,7 @@ function WorkflowSection() {
   return (
     <section
       id="how-it-works"
-      className="scroll-mt-24 border-b bg-[var(--landing-paper)] py-20 sm:py-28 lg:py-36"
+      className="scroll-mt-24 border-b bg-surface-subtle py-20 sm:py-28 lg:py-36"
       aria-labelledby="workflow-title"
     >
       <div className="mx-auto grid max-w-[90rem] gap-14 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24 lg:px-12">
@@ -486,7 +484,7 @@ function WorkflowSection() {
               key={step.number}
               className="grid gap-5 border-b border-foreground/20 py-7 sm:grid-cols-[3rem_1fr_auto] sm:items-start sm:gap-7 sm:py-9"
             >
-              <span className="text-xs font-semibold tracking-[0.12em] text-[var(--landing-vermilion)]">
+              <span className="text-xs font-semibold tracking-[0.12em] text-primary">
                 {step.number}
               </span>
               <div>
@@ -528,7 +526,6 @@ function WorkflowWorkspace() {
           number="01"
           label="Role"
           title="Full-stack TypeScript Engineer"
-          color="peach"
         >
           <SmallField label="Must-have" value="TypeScript" />
           <SmallField label="Must-have" value="Next.js" />
@@ -538,7 +535,6 @@ function WorkflowWorkspace() {
           number="02"
           label="Candidate evidence"
           title="Maya Chen"
-          color="sky"
         >
           <FileRow icon={IconFileDescription} label="maya-chen-resume.pdf" />
           <FileRow icon={IconNotes} label="Proposal text added" />
@@ -548,7 +544,6 @@ function WorkflowWorkspace() {
           number="03"
           label="Evidence brief"
           title="Ready for recruiter review"
-          color="orchid"
           last
         >
           <div className="grid grid-cols-3 gap-2">
@@ -557,7 +552,7 @@ function WorkflowWorkspace() {
             <CompactMetric label="Review" value="1" />
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-medium">
-            <span className="size-2 rounded-full bg-[var(--landing-orchid)]" />
+            <span className="size-2 rounded-full bg-primary" />
             Possible Fit · Advisory
           </div>
         </WorkspaceColumn>
@@ -607,7 +602,7 @@ function RecruiterBriefPreview() {
         <ReviewList
           title="Supported strengths"
           icon={IconCircleCheck}
-          background="aquamarine"
+          accented
           items={[
             "Production TypeScript service experience",
             "Job-specific Next.js delivery examples",
@@ -617,7 +612,6 @@ function RecruiterBriefPreview() {
         <ReviewList
           title="Evidence gaps"
           icon={IconAlertTriangle}
-          background="peach"
           items={[
             "Kubernetes ownership not found",
             "Scale of the referenced systems is unclear",
@@ -659,7 +653,7 @@ function RecruiterBriefPreview() {
 
 function GroundedChatPreview() {
   return (
-    <div className="flex min-h-[35rem] flex-col overflow-hidden border bg-[var(--landing-lavender)]">
+    <div className="flex min-h-[35rem] flex-col overflow-hidden border bg-surface-accent">
       <ProductWindowHeader
         icon={IconMessageCircle}
         label="Grounded follow-up"
@@ -720,7 +714,7 @@ function DecisionBoundary() {
   return (
     <div className="mt-5 grid border bg-foreground text-background lg:grid-cols-[0.72fr_1fr_1fr]">
       <div className="border-b border-background/15 p-6 lg:border-r lg:border-b-0 lg:p-8">
-        <p className="text-[0.6875rem] font-semibold tracking-[0.12em] text-[var(--landing-peach)] uppercase">
+        <p className="text-[0.6875rem] font-semibold tracking-[0.12em] text-primary-foreground/70 uppercase">
           Decision boundary
         </p>
         <p className="landing-display mt-4 text-3xl leading-[1.02] tracking-[-0.04em]">
@@ -778,7 +772,7 @@ function SafeguardsSection() {
   return (
     <section
       id="safeguards"
-      className="scroll-mt-24 border-b bg-[var(--landing-sky)] py-20 sm:py-28 lg:py-36"
+      className="scroll-mt-24 border-b bg-surface-accent py-20 sm:py-28 lg:py-36"
       aria-labelledby="safeguards-title"
     >
       <div className="mx-auto grid max-w-[90rem] gap-16 px-5 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:gap-24 lg:px-12">
@@ -825,40 +819,36 @@ function PrivacyLayers() {
     <div className="relative min-h-[35rem] lg:min-h-[45rem]">
       <div
         aria-hidden
-        className="absolute top-[3%] right-[4%] h-[30%] w-[82%] rotate-[3deg] border border-foreground/25 bg-[var(--landing-peach)]"
+        className="absolute top-[3%] right-[4%] h-[30%] w-[82%] rotate-[3deg] border border-foreground/25 bg-surface-subtle"
       />
       <div
         aria-hidden
-        className="absolute top-[22%] left-[2%] h-[31%] w-[84%] -rotate-[2deg] border border-foreground/25 bg-[var(--landing-aquamarine)]"
+        className="absolute top-[22%] left-[2%] h-[31%] w-[84%] -rotate-[2deg] border border-foreground/25 bg-primary/10"
       />
       <div
         aria-hidden
-        className="absolute right-[1%] bottom-[19%] h-[31%] w-[86%] rotate-[1.5deg] border border-foreground/25 bg-[var(--landing-lavender)]"
+        className="absolute right-[1%] bottom-[19%] h-[31%] w-[86%] rotate-[1.5deg] border border-foreground/25 bg-surface-accent"
       />
 
-      <div className="absolute inset-x-[8%] top-[9%] border bg-card p-5 shadow-[12px_14px_0_rgba(24,22,20,0.08)] sm:p-7">
+      <div className="absolute inset-x-[8%] top-[9%] border bg-card p-5 shadow-[12px_14px_0_color-mix(in_srgb,var(--ink)_8%,transparent)] sm:p-7">
         <LayerHeader number="01" label="Recruiter account" icon={IconLock} />
         <p className="mt-5 text-sm leading-6 text-foreground/62">
           Authentication establishes the workspace boundary before jobs,
           candidates, or reports can be accessed.
         </p>
       </div>
-      <div className="absolute inset-x-[3%] top-[36%] border bg-card p-5 shadow-[12px_14px_0_rgba(24,22,20,0.08)] sm:p-7">
+      <div className="absolute inset-x-[3%] top-[36%] border bg-card p-5 shadow-[12px_14px_0_color-mix(in_srgb,var(--ink)_8%,transparent)] sm:p-7">
         <LayerHeader
           number="02"
           label="Private candidate evidence"
           icon={IconFileDescription}
         />
         <div className="mt-5 grid grid-cols-2 gap-3 text-xs">
-          <span className="border bg-[var(--landing-paper)] p-3">
-            Resume PDF
-          </span>
-          <span className="border bg-[var(--landing-paper)] p-3">
-            Proposal text
-          </span>
+          <span className="border bg-surface-subtle p-3">Resume PDF</span>
+          <span className="border bg-surface-subtle p-3">Proposal text</span>
         </div>
       </div>
-      <div className="absolute inset-x-[10%] top-[64%] border bg-foreground p-5 text-background shadow-[12px_14px_0_rgba(24,22,20,0.12)] sm:p-7">
+      <div className="absolute inset-x-[10%] top-[64%] border bg-foreground p-5 text-background shadow-[12px_14px_0_color-mix(in_srgb,var(--ink)_12%,transparent)] sm:p-7">
         <LayerHeader
           number="03"
           label="Validated advisory report"
@@ -904,7 +894,7 @@ function FaqSection() {
             >
               <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:py-7">
                 <span className="flex gap-4 sm:gap-7">
-                  <span className="pt-1 text-[0.625rem] font-semibold tracking-[0.1em] text-[var(--landing-vermilion)]">
+                  <span className="pt-1 text-[0.625rem] font-semibold tracking-[0.1em] text-primary">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="text-base font-semibold tracking-[-0.02em] sm:text-lg">
@@ -937,10 +927,9 @@ function FinalCta({
 
   return (
     <section
-      className="relative overflow-hidden bg-[var(--landing-lavender)] py-24 sm:py-32 lg:py-40"
+      className="relative overflow-hidden bg-surface-accent py-24 sm:py-32 lg:py-40"
       aria-labelledby="cta-title"
     >
-      <PastelBlocks position="cta" />
       <div className="relative mx-auto max-w-[64rem] px-5 text-center sm:px-8">
         <SectionKicker>Start with the evidence</SectionKicker>
         <h2
@@ -957,7 +946,7 @@ function FinalCta({
           <Button
             asChild
             size="lg"
-            className="h-12 rounded-full px-6 text-sm shadow-[0_5px_0_rgba(66,28,79,0.12)] hover:bg-[color-mix(in_oklch,var(--primary),black_8%)]"
+            className="h-12 px-6 text-sm shadow-[0_4px_0_color-mix(in_srgb,var(--primary)_18%,transparent)]"
           >
             <Link href={primaryHref}>
               {primaryLabel}
@@ -969,7 +958,7 @@ function FinalCta({
               asChild
               size="lg"
               variant="outline"
-              className="h-12 rounded-full bg-transparent px-6 text-sm shadow-none hover:bg-background/55"
+              className="h-12 bg-transparent px-6 text-sm shadow-none hover:bg-background/55"
             >
               <Link href="/login">Sign in</Link>
             </Button>
@@ -984,9 +973,15 @@ function FinalCta({
   )
 }
 
-function LandingFooter({ isAuthenticated }: { isAuthenticated: boolean }) {
+export function LandingFooter({
+  isAuthenticated,
+  linkPrefix = "",
+}: {
+  isAuthenticated: boolean
+  linkPrefix?: "" | "/"
+}) {
   return (
-    <footer className="border-t border-foreground/15 bg-[var(--landing-lavender)]">
+    <footer className="border-t border-foreground/15 bg-surface-accent">
       <div className="mx-auto max-w-[90rem] px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
         <div className="grid gap-12 border-b border-foreground/15 pb-12 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
@@ -1003,7 +998,11 @@ function LandingFooter({ isAuthenticated }: { isAuthenticated: boolean }) {
             {navItems.map((item) => (
               <Link
                 key={item.href}
-                href={item.href}
+                href={
+                  item.href.startsWith("#")
+                    ? `${linkPrefix}${item.href}`
+                    : item.href
+                }
                 className="text-foreground/60 transition-colors hover:text-foreground focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 {item.label}
@@ -1056,7 +1055,7 @@ function ProductWindowHeader({
   return (
     <div className="flex flex-col gap-3 border-b bg-card px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
       <div className="flex items-center gap-3">
-        <span className="flex size-8 items-center justify-center border bg-[var(--landing-paper)] text-primary">
+        <span className="flex size-8 items-center justify-center border bg-surface-subtle text-primary">
           <Icon className="size-4" />
         </span>
         <p className="text-sm font-semibold">{label}</p>
@@ -1083,7 +1082,7 @@ function ReportMetric({
       <p
         className={cn(
           "mt-2 truncate text-sm font-semibold",
-          tone === "orchid" && "text-[var(--landing-orchid-ink)]"
+          tone === "orchid" && "text-primary"
         )}
       >
         {value}
@@ -1108,7 +1107,7 @@ function SourceCard({
       className={cn(
         "min-h-[6rem] border p-3.5",
         subdued
-          ? "border-dashed bg-[var(--landing-paper)] text-foreground/55"
+          ? "border-dashed bg-surface-subtle text-foreground/55"
           : "bg-card"
       )}
     >
@@ -1139,7 +1138,7 @@ function CriterionCard({
       className={cn(
         "min-h-[6rem] border p-3.5",
         missing
-          ? "border-[var(--landing-vermilion)]/35 bg-[var(--landing-peach)]/35"
+          ? "border-dashed border-foreground/35 bg-surface-subtle"
           : "bg-card"
       )}
     >
@@ -1148,9 +1147,7 @@ function CriterionCard({
         <span
           className={cn(
             "inline-flex items-center gap-1 text-[0.625rem] font-semibold",
-            missing
-              ? "text-[var(--landing-vermilion)]"
-              : "text-[var(--landing-green)]"
+            missing ? "text-foreground" : "text-primary"
           )}
         >
           {missing ? (
@@ -1182,12 +1179,12 @@ function TraceQuote({
   return (
     <blockquote className="mt-6 border-b border-foreground/12 pb-6">
       <div className="flex items-center justify-between text-[0.625rem] font-semibold tracking-[0.1em] uppercase">
-        <span className="text-[var(--landing-vermilion)]">{number}</span>
+        <span className="text-primary">{number}</span>
         <span className="text-foreground/40">{source}</span>
       </div>
       <p className="mt-4 text-sm leading-7 text-foreground/68">
         {before}
-        <mark className="bg-[var(--landing-aquamarine)] px-1 py-0.5 text-foreground">
+        <mark className="bg-primary/12 px-1 py-0.5 text-foreground">
           {highlight}
         </mark>
         {after}
@@ -1213,8 +1210,8 @@ function TraceResult({
         className={cn(
           "flex size-8 shrink-0 items-center justify-center border",
           tone === "positive"
-            ? "border-[var(--landing-green)]/25 bg-[var(--landing-aquamarine)] text-[var(--landing-green)]"
-            : "border-[var(--landing-vermilion)]/25 bg-[var(--landing-peach)] text-[var(--landing-vermilion)]"
+            ? "border-primary/30 bg-primary/10 text-primary"
+            : "border-dashed border-foreground/35 bg-surface-subtle text-foreground"
         )}
       >
         <Icon className="size-4" />
@@ -1231,33 +1228,24 @@ function WorkspaceColumn({
   number,
   label,
   title,
-  color,
   last = false,
   children,
 }: {
   number: string
   label: string
   title: string
-  color: "peach" | "sky" | "orchid"
   last?: boolean
   children: ReactNode
 }) {
-  const backgrounds = {
-    peach: "bg-[var(--landing-peach)]/45",
-    sky: "bg-[var(--landing-sky)]",
-    orchid: "bg-[var(--landing-lavender)]",
-  }
-
   return (
     <div
       className={cn(
-        "border-b p-5 sm:p-7 lg:border-r lg:border-b-0 lg:p-8",
-        backgrounds[color],
+        "border-b bg-surface-subtle p-5 even:bg-surface-accent sm:p-7 lg:border-r lg:border-b-0 lg:p-8",
         last && "border-b-0 lg:border-r-0"
       )}
     >
       <div className="flex items-center justify-between text-[0.625rem] font-semibold tracking-[0.1em] uppercase">
-        <span className="text-[var(--landing-vermilion)]">{number}</span>
+        <span className="text-primary">{number}</span>
         <span className="text-foreground/42">{label}</span>
       </div>
       <h3 className="mt-6 min-h-12 text-lg leading-6 font-semibold tracking-[-0.02em]">
@@ -1300,21 +1288,19 @@ function CompactMetric({ label, value }: { label: string; value: string }) {
 function ReviewList({
   title,
   icon: Icon,
-  background,
+  accented = false,
   items,
 }: {
   title: string
   icon: LandingIcon
-  background: "aquamarine" | "peach"
+  accented?: boolean
   items: string[]
 }) {
   return (
     <div
       className={cn(
         "border-b p-5 sm:p-7",
-        background === "aquamarine"
-          ? "bg-[var(--landing-aquamarine)]/42 sm:border-r"
-          : "bg-[var(--landing-peach)]/42"
+        accented ? "bg-primary/8 sm:border-r" : "bg-surface-subtle"
       )}
     >
       <div className="flex items-center gap-2">
@@ -1335,7 +1321,7 @@ function ReviewList({
 
 function SourceTag({ children }: { children: ReactNode }) {
   return (
-    <span className="border border-foreground/12 bg-[var(--landing-paper)] px-2 py-1 text-[0.625rem] font-medium text-foreground/55">
+    <span className="border border-foreground/12 bg-surface-subtle px-2 py-1 text-[0.625rem] font-medium text-foreground/55">
       {children}
     </span>
   )
@@ -1360,7 +1346,7 @@ function BoundaryList({
       <p
         className={cn(
           "text-xs font-semibold",
-          emphasized && "text-[var(--landing-aquamarine)]"
+          emphasized && "text-primary-foreground"
         )}
       >
         {label}
@@ -1403,7 +1389,7 @@ function LayerHeader({
         <Icon
           className={cn(
             "size-4",
-            inverse ? "text-[var(--landing-aquamarine)]" : "text-primary"
+            inverse ? "text-primary-foreground" : "text-primary"
           )}
         />
         <p className="text-sm font-semibold">{label}</p>
@@ -1411,7 +1397,7 @@ function LayerHeader({
       <span
         className={cn(
           "text-[0.625rem] font-semibold tracking-[0.1em]",
-          inverse ? "text-background/50" : "text-[var(--landing-vermilion)]"
+          inverse ? "text-background/50" : "text-primary"
         )}
       >
         {number}
@@ -1459,39 +1445,9 @@ function SectionKicker({
   children: ReactNode
 }) {
   return (
-    <p className="text-[0.6875rem] font-semibold tracking-[0.14em] text-[var(--landing-vermilion)] uppercase">
+    <p className="text-[0.6875rem] font-semibold tracking-[0.14em] text-primary uppercase">
       {number ? `${number}. ` : ""}
       {children}
     </p>
-  )
-}
-
-function PastelBlocks({ position }: { position: "hero" | "cta" }) {
-  return (
-    <div
-      aria-hidden
-      className={cn(
-        "pointer-events-none absolute inset-0 overflow-hidden",
-        position === "hero" ? "opacity-75" : "opacity-55"
-      )}
-    >
-      {position === "hero" ? (
-        <>
-          <span className="landing-pastel-block absolute top-[8%] -left-12 h-16 w-24 bg-[var(--landing-lavender)] sm:left-0 sm:w-32" />
-          <span className="landing-pastel-block landing-delay-1 absolute top-[14%] -left-4 h-10 w-48 bg-[var(--landing-sky)] sm:left-10" />
-          <span className="landing-pastel-block landing-delay-2 absolute top-[23%] left-0 h-20 w-16 bg-[var(--landing-aquamarine)] sm:w-24" />
-          <span className="landing-pastel-block landing-delay-3 absolute top-[10%] -right-8 h-24 w-24 bg-[var(--landing-peach)] sm:right-2 sm:w-36" />
-          <span className="landing-pastel-block landing-delay-1 absolute top-[20%] -right-6 h-12 w-40 bg-[var(--landing-lavender)] sm:right-10" />
-          <span className="landing-pastel-block landing-delay-2 absolute top-[27%] right-0 h-16 w-16 bg-[var(--landing-sky)] sm:w-24" />
-        </>
-      ) : (
-        <>
-          <span className="landing-pastel-block absolute top-[22%] -left-12 h-14 w-40 bg-[var(--landing-sky)] sm:left-4" />
-          <span className="landing-pastel-block landing-delay-1 absolute top-[38%] left-0 h-20 w-24 bg-[var(--landing-aquamarine)] sm:w-36" />
-          <span className="landing-pastel-block landing-delay-2 absolute top-[27%] -right-16 h-20 w-52 bg-[var(--landing-peach)] sm:right-2" />
-          <span className="landing-pastel-block landing-delay-3 absolute top-[48%] right-0 h-12 w-32 bg-[var(--landing-sky)] sm:right-10" />
-        </>
-      )}
-    </div>
   )
 }

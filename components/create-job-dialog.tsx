@@ -3,7 +3,7 @@
 import { useActionState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { IconBriefcase, IconPlus, IconSparkles } from "@tabler/icons-react"
+import { IconBriefcase, IconLoader2, IconPlus } from "@tabler/icons-react"
 
 import { createJobForDialog } from "@/app/(app)/dashboard/jobs/actions"
 import { Button } from "@/components/ui/button"
@@ -177,7 +177,7 @@ function JobDialogForm({ onSuccess }: { onSuccess: (jobId: string) => void }) {
         >
           {pending ? (
             <>
-              <IconSparkles className="mr-1.5 size-3.5 animate-pulse" />
+              <IconLoader2 className="mr-1.5 size-3.5 animate-spin" />
               Creating role…
             </>
           ) : (

@@ -8,7 +8,7 @@ import {
   IconFileText,
   IconLink,
   IconNotes,
-  IconSparkles,
+  IconReportAnalytics,
 } from "@tabler/icons-react"
 
 import { AnalysisStatusBadge } from "@/components/analysis-status-badge"
@@ -128,24 +128,24 @@ export default async function CandidateDetailsPage({
   const recColors = {
     strong_fit: {
       label: "Strong documented match",
-      ring: "border-emerald-500/50",
-      bg: "bg-emerald-500/8",
-      text: "text-emerald-700 dark:text-emerald-400",
-      score: "text-emerald-700 dark:text-emerald-400",
+      ring: "border-primary/45",
+      bg: "bg-primary/8",
+      text: "text-primary",
+      score: "text-primary",
     },
     possible_fit: {
       label: "Potential documented match",
-      ring: "border-amber-500/50",
-      bg: "bg-amber-500/8",
-      text: "text-amber-700 dark:text-amber-400",
-      score: "text-amber-700 dark:text-amber-400",
+      ring: "border-foreground/30",
+      bg: "bg-surface-subtle",
+      text: "text-foreground",
+      score: "text-foreground",
     },
     weak_fit: {
       label: "Limited documented match",
-      ring: "border-destructive/50",
-      bg: "bg-destructive/8",
-      text: "text-destructive",
-      score: "text-destructive",
+      ring: "border-dashed border-foreground/50",
+      bg: "bg-transparent",
+      text: "text-foreground",
+      score: "text-foreground",
     },
   }
   const rec = report?.recommendation ? recColors[report.recommendation] : null
@@ -156,7 +156,7 @@ export default async function CandidateDetailsPage({
       <Card className="border-border/40">
         <CardHeader className="border-b pb-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-700 dark:text-violet-400">
+            <span className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
               <IconNotes className="size-4" />
             </span>
             <div>
@@ -183,7 +183,7 @@ export default async function CandidateDetailsPage({
         <Card className="border-border/40">
           <CardHeader className="border-b pb-4">
             <div className="flex items-center gap-3">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-sky-500/10 text-sky-700 dark:text-sky-400">
+              <span className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
                 <IconFileText className="size-4" />
               </span>
               <div>
@@ -226,7 +226,7 @@ export default async function CandidateDetailsPage({
       <Card className="border-border/40">
         <CardHeader className="border-b pb-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400">
+            <span className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
               <IconLink className="size-4" />
             </span>
             <div>
@@ -278,7 +278,7 @@ export default async function CandidateDetailsPage({
     <Card className="border-border/40 bg-muted/5">
       <CardContent className="flex flex-col items-center justify-center py-16 text-center">
         <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <IconSparkles className="size-6" />
+          <IconReportAnalytics className="size-6" />
         </div>
         <p className="text-base font-semibold">No report yet</p>
         <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">

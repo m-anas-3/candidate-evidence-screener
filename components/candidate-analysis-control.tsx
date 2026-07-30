@@ -6,8 +6,8 @@ import { toast } from "sonner"
 import {
   IconFileText,
   IconLoader2,
+  IconReportAnalytics,
   IconRefresh,
-  IconSparkles,
 } from "@tabler/icons-react"
 
 import { Button } from "@/components/ui/button"
@@ -130,7 +130,7 @@ export function CandidateAnalysisControl({
       onClick={analyze}
       type="button"
     >
-      {status === "failed" ? <IconRefresh /> : <IconSparkles />}
+      {status === "failed" ? <IconRefresh /> : <IconReportAnalytics />}
       {status === "failed" ? "Retry fit analysis" : "Run fit analysis"}
     </Button>
   )
